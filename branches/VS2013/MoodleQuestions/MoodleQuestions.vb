@@ -224,6 +224,35 @@ Public Class MoodleQuestions
                "Blue Text = Answers are fixed, Black Text = Answers are randomly shuffled.", vbExclamation)
         End If
     End Sub
+
+    Public Sub Check(ByVal control As Office.IRibbonControl)
+        ' Macro recorded on 21.12.2008 by Daniel to Update Header
+        Globals.ThisDocument.Application.ActiveWindow.ActivePane.View.SeekView = WdSeekView.wdSeekCurrentPageHeader
+        Globals.ThisDocument.Application.ActiveDocument.Selection.Fields.Update()
+        Globals.ThisDocument.Application.ActiveDocument.Selection.EndKey(Unit:=WdUnits.wdLine)
+        Globals.ThisDocument.Application.ActiveDocument.Selection.MoveLeft(Unit:=WdUnits.wdCharacter, Count:=1)
+        Globals.ThisDocument.Application.ActiveDocument.Selection.Fields.Update()
+        Globals.ThisDocument.Application.ActiveWindow.ActivePane.View.SeekView = WdSeekView.wdSeekMainDocument
+
+        If CheckQuestionnaire() Then MsgBox("Now everything is OK", vbInformation)
+    End Sub
+
+    Public Sub Export(ByVal control As Office.IRibbonControl)
+        Dim StatusBar As String
+        StatusBar = "Checking the quiz questions formatting, please wait..."
+        ' Before conversion, document is validated
+        If CheckQuestionnaire() = True Then
+
+            StatusBar = "Converting to Moodle XML format, please wait..."
+            Convert2XML()
+
+        Else
+            MsgBox("The export operation can not be started until everything is OK" & vbCr & "and there is at least one question.", vbCritical, "Error")
+        End If
+
+
+    End Sub
+
 #End Region
 
 #Region "Helpers"
@@ -911,21 +940,6 @@ Public Class MoodleQuestions
     End Sub
 
 
-    Public Sub Export(control As Microsoft.Office.Core.IRibbonExtensibility)
-        Dim StatusBar As String
-        StatusBar = "Checking the quiz questions formatting, please wait..."
-        ' Before conversion, document is validated
-        If CheckQuestionnaire() = True Then
-
-            StatusBar = "Converting to Moodle XML format, please wait..."
-            Convert2XML()
-
-        Else
-            MsgBox("The export operation can not be started until everything is OK" & vbCr & "and there is at least one question.", vbCritical, "Error")
-        End If
-
-
-    End Sub
 
     Private Sub Convert2XML()
 
@@ -1312,17 +1326,5 @@ Public Class MoodleQuestions
         Err.Clear()
     End Function
 
-
-    Public Sub Check(control As Microsoft.Office.Core.IRibbonExtensibility)
-        ' Macro recorded on 21.12.2008 by Daniel to Update Header
-        Globals.ThisDocument.Application.ActiveWindow.ActivePane.View.SeekView = WdSeekView.wdSeekCurrentPageHeader
-        Globals.ThisDocument.Application.ActiveDocument.Selection.Fields.Update()
-        Globals.ThisDocument.Application.ActiveDocument.Selection.EndKey(Unit:=WdUnits.wdLine)
-        Globals.ThisDocument.Application.ActiveDocument.Selection.MoveLeft(Unit:=WdUnits.wdCharacter, Count:=1)
-        Globals.ThisDocument.Application.ActiveDocument.Selection.Fields.Update()
-        Globals.ThisDocument.Application.ActiveWindow.ActivePane.View.SeekView = WdSeekView.wdSeekMainDocument
-
-        If CheckQuestionnaire() Then MsgBox("Now everything is OK", vbInformation)
-    End Sub
 
 End Class
