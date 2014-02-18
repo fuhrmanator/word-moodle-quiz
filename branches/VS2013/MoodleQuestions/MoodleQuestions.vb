@@ -1280,9 +1280,9 @@ Public Class MoodleQuestions
 
 
     Private Function XSLT_Range(textrange As Range, xsltfilename As String) As String
-        Dim xsldoc As New MSXML2.FreeThreadedDOMDocument
+        Dim xsldoc As New MSXML2.FreeThreadedDOMDocument60
         xsldoc.load(xmlpath & xsltfilename)
-        Dim xslt As New MSXML2.XSLTemplate
+        Dim xslt As New MSXML2.XSLTemplate60
         xslt.stylesheet = xsldoc
         Dim xsltProcessor As MSXML2.IXSLProcessor
         xsltProcessor = xslt.createProcessor
