@@ -2,13 +2,13 @@
 <customUI xmlns="http://schemas.microsoft.com/office/2009/07/customui" onLoad="Ribbon_Load" loadImage="OnLoadImage">
   <ribbon>
     <tabs>
-      <tab id="CustomTab1" label="Moodle Quiz">
+      <tab id="MoodleQuestions" label="Moodle Questions">
         <group id="MoodleQuiz" label="MoodleQuiz">
           <button id="MCQ" label="Multiple Choice" size="large" onAction="AddMultipleChoiceQ" screentip="Multiple Choice" image="multiplechoice"
                  showImage="true" visible="true" supertip="Inserts a multiple choice question at the cursor location."/>
           <button id="matching" label="Matching" size="large" onAction="AddMatchingQ" image="matching_a" />
           <button id="shuffleanswers" label="Shuffle Answers" size="large" onAction="ChangeShuffleanswerTrueFalse" image="shuffleanswers" />
-          <button id="MarkTrueFalse" label="Mark as True/False" size="large" onAction="MarkTrueAnswer" image="MarkasTrueFalse" />
+          <button id="MarkTrueFalse" label="Toggle answer" size="large" onAction="ToggleAnswer" image="ToggleAnswer" />
           <button id="TrueStatement" label="True Statement" size="large" onAction="AddTrueStatement" image="_true" />
           <button id="FalseStatement" label="False Statement" size="large" onAction="AddFalseStatement" image="_false" />
           <separator id="MdlQzSep1" />
