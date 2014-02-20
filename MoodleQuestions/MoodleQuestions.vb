@@ -81,18 +81,33 @@ Public Class MoodleQuestions
     Public Sub AddEssay(ByVal control As Office.IRibbonControl)
         AddParagraphOfStyle(STYLE_ESSAY, "Insert An Essay question here (an Open Question). [This can not be the last question in the document.]")
     End Sub
-    ' Marks the blank word
-    Public Sub MarkBlankWord(ByVal control As Office.IRibbonControl)
-        Dim aRange As Microsoft.Office.Interop.Word.Range
+    Public Sub ToggleMissingWord(ByVal control As Office.IRibbonControl)
+        ' Only applies to questions of STYLE_MISSINGWORDQ
+        If (getSelectionStyle() = STYLE_MISSINGWORDQ) Then
+            Dim aRange As Microsoft.Office.Interop.Word.Range = getSelectionRange()
+            If CType(aRange.Words(1).Style, Word.Style).NameLocal = STYLE_BLANK_WORD Then
+                'aRange.Select()
+                'Globals.ThisDocument.Application.Selection.Find.ClearFormatting()
+                'TODO fix toggle of missing word
+                aRange.Find.ClearFormatting()
+            Else
+                aRange.Style = STYLE_BLANK_WORD
+            End If
+            'get the current selection
+            'aRange = Globals.ThisDocument.Application.Selection.Range(Start:=Globals.ThisDocument.Application.Selection.Words(1).Start, End:=Globals.ThisDocument.Application.Selection.Words(1).End)
+            'If Globals.ThisDocument.Application.Selection.Words(1).Style = STYLE_BLANK_WORD Then
+            '    aRange.Select()
+            '    Globals.ThisDocument.Application.Selection.Find.ClearFormatting()
+            'Else
+            '    'RTrim(ActiveDocument.Words(1)).Style = STYLE_BLANK_WORD
+            '    aRange.Style = STYLE_BLANK_WORD
+            'End If
 
-        aRange = Globals.ThisDocument.Application.Range(Start:=Globals.ThisDocument.Application.Selection.Words(1).Start, End:=Globals.ThisDocument.Application.Selection.Words(1).End)
-        If Globals.ThisDocument.Application.Selection.Words(1).Style = STYLE_BLANK_WORD Then
-            aRange.Select()
-            Globals.ThisDocument.Application.Selection.Find.ClearFormatting()
         Else
-            'RTrim(ActiveDocument.Words(1)).Style = STYLE_BLANK_WORD
-            aRange.Style = STYLE_BLANK_WORD
+            MsgBox("Select a word in a Missing-word question first.", vbExclamation)
         End If
+
+
     End Sub
 
     ' Add feedback - this doesn't seem to work in options or between options. Only creates <generalfeedback> rather than <feedback> and cuts off the rest of the text.
@@ -295,7 +310,7 @@ Public Class MoodleQuestions
     Public Const STYLE_SHORT_ANSWER = "A Short Answer"
     Public Const STYLE_LEFT_PAIR = "A Matching Left"
     Public Const STYLE_RIGHT_PAIR = "A Matching Right"
-    Public Const STYLE_BLANK_WORD = "A Blank Word"
+    Public Const STYLE_BLANK_WORD = "MissingWord"
     Public Const STYLE_COMMENT = "Comment"
     ' Supplement(ed by) Daniel
     Public Const STYLE_MULTICHOICEQ_FIXANSWER = "Q Multi Choice FixAnswer"
@@ -1335,5 +1350,7 @@ Public Class MoodleQuestions
     Private Sub setSelectionStyle(theStyle As String)
         Globals.ThisDocument.Application.Selection.Paragraphs.Style = theStyle
     End Sub
-
+    Private Function getSelectionRange() As Range
+        Return Globals.ThisDocument.Application.Selection.Range
+    End Function
 End Class
