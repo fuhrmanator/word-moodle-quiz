@@ -13,7 +13,7 @@
           <button id="FalseStatement" label="False Statement" size="large" onAction="AddFalseStatement" image="_false" />
           <separator id="MdlQzSep1" />
           <button id="MissingWord" label="Missing Word" size="large" onAction="AddMissingWordQ" image="missingword" />
-          <button id="MarkMissingWord" label="Mark Missing Word" size="large" onAction="MarkBlankWord" image="markmissing" />
+          <button id="MarkMissingWord" label="Mark Missing Word" size="large" onAction="ToggleMissingWord" image="markmissing" />
           <separator id="MdlQzSep2" />
           <button id="numerical" label="Numerical" size="large" onAction="AddNumericalQ" image="numerical" />
           <button id="numericaltolerance" label="Numerical Tolerance" size="large" onAction="AddNumericalTolerance" image="tolerance" />
