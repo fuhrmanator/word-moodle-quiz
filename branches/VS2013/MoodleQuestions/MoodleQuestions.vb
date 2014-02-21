@@ -89,7 +89,7 @@ Public Class MoodleQuestions
         ' Only applies to questions of STYLE_MISSINGWORDQ
         If (getSelectionStyle() = STYLE_MISSINGWORDQ) Then
             ' get only the first word of the selection
-            Dim aRange As Microsoft.Office.Interop.Word.Range = getSelectionRange()
+            Dim aRange As Microsoft.Office.Interop.Word.Range = getDocumentSelectionRange()
             aRange.Start = Globals.ThisDocument.Application.Selection.Words(1).Start
             aRange.End = Globals.ThisDocument.Application.Selection.Words(1).End
             ' toggle the style of the word
@@ -204,13 +204,13 @@ Public Class MoodleQuestions
         Dim theStyle As String = getSelectionStyle()
 
         If theStyle = STYLE_CORRECTANSWER Then
-            setSelectionStyle(STYLE_INCORRECTANSWER)
+            setSelectionParagraphStyle(STYLE_INCORRECTANSWER)
         ElseIf theStyle = STYLE_INCORRECTANSWER Then
-            setSelectionStyle(STYLE_CORRECTANSWER)
+            setSelectionParagraphStyle(STYLE_CORRECTANSWER)
         ElseIf theStyle = STYLE_TRUESTATEMENT Then
-            setSelectionStyle(STYLE_FALSESTATEMENT)
+            setSelectionParagraphStyle(STYLE_FALSESTATEMENT)
         ElseIf theStyle = STYLE_FALSESTATEMENT Then
-            setSelectionStyle(STYLE_TRUESTATEMENT)
+            setSelectionParagraphStyle(STYLE_TRUESTATEMENT)
         Else 'Error: give instructions:
             MsgBox("This command toggles a statement from True to False." & vbCr & _
                    "Cursor must be on an answer for Multiple Choice" & vbCr & _
@@ -221,13 +221,13 @@ Public Class MoodleQuestions
     Public Sub ChangeShuffleanswerTrueFalse(ByVal control As Office.IRibbonControl)
 
         If getSelectionStyle() = STYLE_MATCHINGQ Then
-            setSelectionStyle(STYLE_MATCHINGQ_FIXANSWER)
+            setSelectionParagraphStyle(STYLE_MATCHINGQ_FIXANSWER)
         ElseIf getSelectionStyle() = STYLE_MATCHINGQ_FIXANSWER Then
-            setSelectionStyle(STYLE_MATCHINGQ)
+            setSelectionParagraphStyle(STYLE_MATCHINGQ)
         ElseIf getSelectionStyle() = STYLE_MULTICHOICEQ Then
-            setSelectionStyle(STYLE_MULTICHOICEQ_FIXANSWER)
+            setSelectionParagraphStyle(STYLE_MULTICHOICEQ_FIXANSWER)
         ElseIf getSelectionStyle() = STYLE_MULTICHOICEQ_FIXANSWER Then
-            setSelectionStyle(STYLE_MULTICHOICEQ)
+            setSelectionParagraphStyle(STYLE_MULTICHOICEQ)
 
         Else 'Error: give instructions:
             MsgBox("This command is only for MCQs and Matching Questions. " & vbCr & _
@@ -410,7 +410,7 @@ Public Class MoodleQuestions
     ' Returns true if everything is fine, otherwise false
     Function CheckQuestionnaire() As Boolean
         'return false if empty document
-        If getCharacterCount() = 1 Then Return False
+        If getDocumentCharacterCount() = 1 Then Return False
 
         Dim startOfQuestion, endOfQuestion, setEndPoint
         Dim isOK As Boolean
@@ -421,7 +421,7 @@ Public Class MoodleQuestions
         questionType = ""
 
         ' Check each paragraph at a time and specify needed tags
-        For Each para As Paragraph In getParagraphs()
+        For Each para As Paragraph In getDocumentParagraphs()
 
             ' Check if empty paragraph
             If para.Range.Text = vbCr Then
@@ -471,9 +471,9 @@ Public Class MoodleQuestions
             End If
 
             ' Check if the end of document
-            If para.Range.End = getRangeEnd() And _
+            If para.Range.End = getDocumentRangeEnd() And _
             startOfQuestion <> para.Range.End Then
-                isOK = CheckQuestion(startOfQuestion, getRangeEnd())
+                isOK = CheckQuestion(startOfQuestion, getDocumentRangeEnd())
             End If
 
             If isOK = False Then Exit For ' Exit if error is found
@@ -481,7 +481,7 @@ Public Class MoodleQuestions
         Next para
 
         'TODO not sure this makes sense, it will just skip the refresh
-        If getCharacterCount() = 1 Then Return isOK
+        If getDocumentCharacterCount() = 1 Then Return isOK
 
 
         moveCursorToEndOfDocument()
@@ -788,30 +788,32 @@ Public Class MoodleQuestions
         Globals.ThisDocument.Application.ActiveWindow.ActivePane.View.SeekView = WdSeekView.wdSeekMainDocument
 
 
-        'look for the folder containing .xml question patterns
-        xmlpath = Globals.ThisDocument.Application.Path & "\xml-question\"
-        If Not DirExists(xmlpath) Then
-            If Globals.ThisDocument.Application.AttachedTemplate.Path <> "" Then
-                xmlpath = Globals.ThisDocument.Application.AttachedTemplate.Path & "\xml-question\"
-            Else
-                xmlpath = Globals.ThisDocument.Application.Path & "\xml-question\"
-            End If
-            If Not DirExists(xmlpath) Then
-                MsgBox("The xml-question\ folder is not found. Please keep this quiz question document in the original folder.", vbCritical, "Error")
-                Exit Sub
-            End If
-        End If
+        '.xml question patterns are now in project resources (visual studio)
+
+        'xmlpath = Globals.ThisDocument.Application.Path & "\xml-question\"
+        'If Not DirExists(xmlpath) Then
+        '    If Globals.ThisDocument.Application.AttachedTemplate.Path <> "" Then
+        '        xmlpath = Globals.ThisDocument.Application.AttachedTemplate.Path & "\xml-question\"
+        '    Else
+        '        xmlpath = Globals.ThisDocument.Application.Path & "\xml-question\"
+        '    End If
+        '    If Not DirExists(xmlpath) Then
+        '        MsgBox("The xml-question\ folder is not found. Please keep this quiz question document in the original folder.", vbCritical, "Error")
+        '        Exit Sub
+        '    End If
+        'End If
 
         'choose the file name to save with
-        Dim fd As Microsoft.Office.Core.FileDialog
-        fd = Globals.ThisDocument.Application.FileDialog(Microsoft.Office.Core.MsoFileDialogType.msoFileDialogSaveAs)
+        'Dim fd As SaveFileDialog = New SaveFileDialog
+
+        Dim fd As Microsoft.Office.Core.FileDialog = Globals.ThisDocument.Application.FileDialog(Microsoft.Office.Core.MsoFileDialogType.msoFileDialogSaveAs)
         '.FilterIndex = 2 fuer Word 2003, 14 fuer Word 2010
         fd.FilterIndex = 14
         fd.InitialFileName = FILE_PREFIX & Format(Now, "yyyymmdd") & ".xml"
         If fd.Show <> -1 Then Exit Sub
 
         Dim header As String
-        header = Globals.ThisDocument.Application.Sections(1).Headers(WdHeaderFooterIndex.wdHeaderFooterPrimary).Range.Text
+        header = getDocumentHeaderText()
 
 
         '//*** save the file in utf-8 using stream ***//
@@ -840,11 +842,12 @@ Public Class MoodleQuestions
         paralookahead = Nothing
 
         Dim rac, wac As Integer
+        Dim xmlResource As String
 
-        For Each para In Globals.ThisDocument.Application.Paragraphs '?handle each paragraph separately.
+        For Each para In getDocumentParagraphs() '?handle each paragraph separately.
             dd = New MSXML2.DOMDocument60
 
-            Select Case para.Style
+            Select Case para.Range.Style.NameLocal
 
                 Case STYLE_SHORTANSWERQ
                     dd.load(xmlpath & "shortanswer.xml")
@@ -853,7 +856,7 @@ Public Class MoodleQuestions
                     paralookahead = para.Next
                     xmlnod = dd.documentElement.selectSingleNode("answer")
                     dd.documentElement.removeChild(xmlnod)
-                    Do While (paralookahead.Style = STYLE_SHORT_ANSWER)
+                    Do While (paralookahead.Style.NameLocal = STYLE_SHORT_ANSWER)
                         xmlnod.attributes.getNamedItem("fraction").text = "100"
                         xmlnod.selectSingleNode("text").text = RemoveCR(paralookahead.Range.Text)
                         dd.documentElement.appendChild(xmlnod)
@@ -876,12 +879,12 @@ Public Class MoodleQuestions
                     xmlnod = dd.documentElement.selectSingleNode("answer")
                     dd.documentElement.removeChild(xmlnod)
 
-                    Do While (paralookahead.Style = STYLE_SHORT_ANSWER)
+                    Do While (paralookahead.Style.NameLocal = STYLE_SHORT_ANSWER)
                         xmlnod.attributes.getNamedItem("fraction").text = "100"
                         xmlnod.selectSingleNode("text").text = RemoveCR(paralookahead.Range.Text)
                         paralookahead = paralookahead.Next
                         If Not paralookahead Is Nothing Then
-                            If (paralookahead.Style = STYLE_NUM_TOLERANCE) Then
+                            If (paralookahead.Style.NameLocal = STYLE_NUM_TOLERANCE) Then
                                 xmlnod.selectSingleNode("tolerance").text = RemoveCR(paralookahead.Range.Text)
                                 paralookahead = paralookahead.Next
                             Else
@@ -914,8 +917,8 @@ Public Class MoodleQuestions
 
                     rac = 0
                     wac = 0
-                    Do While (paralookahead.Style = STYLE_CORRECTANSWER) Or (paralookahead.Style = STYLE_INCORRECTANSWER)
-                        If paralookahead.Style = STYLE_CORRECTANSWER Then
+                    Do While (paralookahead.Style.NameLocal = STYLE_CORRECTANSWER) Or (paralookahead.Style.NameLocal = STYLE_INCORRECTANSWER)
+                        If paralookahead.Style.NameLocal = STYLE_CORRECTANSWER Then
                             xmlnod.attributes.getNamedItem("fraction").text = "100"
                             rac = rac + 1
                         Else
@@ -943,7 +946,12 @@ Public Class MoodleQuestions
                     End If
 
                 Case STYLE_MULTICHOICEQ
-                    dd.load(xmlpath & "multichoicevar.xml")
+                    xmlResource = My.Resources.MultiChoiceVar_xml
+                    If Not dd.loadXML(xmlResource) Then
+                        MsgBox("Failed to load XML " & xmlResource & " in program.")
+                        'TODO fail gracefully?
+                        Throw New Exception
+                    End If
                     ProcessCommonTags(dd, para)
 
                     ' processing each <answer>'
@@ -953,8 +961,8 @@ Public Class MoodleQuestions
                     rac = 0 'right answer choices
                     wac = 0 'wrong answer choices
                     ' loop breaks wrongly because of Feedback Style
-                    Do While (paralookahead.Style = STYLE_CORRECTANSWER) Or (paralookahead.Style = STYLE_INCORRECTANSWER)
-                        If paralookahead.Style = STYLE_CORRECTANSWER Then
+                    Do While (paralookahead.Style.NameLocal = STYLE_CORRECTANSWER) Or (paralookahead.Style.NameLocal = STYLE_INCORRECTANSWER)
+                        If paralookahead.Style.NameLocal = STYLE_CORRECTANSWER Then
                             xmlnod.attributes.getNamedItem("fraction").text = "100"
                             rac = rac + 1
                         Else
@@ -965,7 +973,7 @@ Public Class MoodleQuestions
 
                         paralookahead = paralookahead.Next
                         ' Feedback Style processing here
-                        If paralookahead.Style = STYLE_FEEDBACK Then
+                        If paralookahead.Style.NameLocal = STYLE_FEEDBACK Then
                             ' Set XML <feedback> text
                             xmlnod.selectSingleNode("feedback/text").text = RemoveCR(paralookahead.Range.Text)
                             paralookahead = paralookahead.Next
@@ -999,8 +1007,8 @@ Public Class MoodleQuestions
                     paralookahead = para.Next
                     xmlnod = dd.documentElement.selectSingleNode("subquestion")
                     dd.documentElement.removeChild(xmlnod)
-                    Do While (paralookahead.Style = STYLE_LEFT_PAIR) Or (paralookahead.Style = STYLE_RIGHT_PAIR)
-                        If paralookahead.Style = STYLE_LEFT_PAIR Then
+                    Do While (paralookahead.Style.NameLocal = STYLE_LEFT_PAIR) Or (paralookahead.Style.NameLocal = STYLE_RIGHT_PAIR)
+                        If paralookahead.Style.NameLocal = STYLE_LEFT_PAIR Then
                             xmlnod.selectSingleNode("text").text = RemoveCR(paralookahead.Range.Text)
                         Else
                             xmlnod.selectSingleNode("answer").selectSingleNode("text").text = RemoveCR(paralookahead.Range.Text)
@@ -1020,8 +1028,8 @@ Public Class MoodleQuestions
                     paralookahead = para.Next
                     xmlnod = dd.documentElement.selectSingleNode("subquestion")
                     dd.documentElement.removeChild(xmlnod)
-                    Do While (paralookahead.Style = STYLE_LEFT_PAIR) Or (paralookahead.Style = STYLE_RIGHT_PAIR)
-                        If paralookahead.Style = STYLE_LEFT_PAIR Then
+                    Do While (paralookahead.Style.NameLocal = STYLE_LEFT_PAIR) Or (paralookahead.Style.NameLocal = STYLE_RIGHT_PAIR)
+                        If paralookahead.Style.NameLocal = STYLE_LEFT_PAIR Then
                             xmlnod.selectSingleNode("text").text = RemoveCR(paralookahead.Range.Text)
                         Else
                             xmlnod.selectSingleNode("answer").selectSingleNode("text").text = RemoveCR(paralookahead.Range.Text)
@@ -1063,7 +1071,7 @@ Public Class MoodleQuestions
 
 
             If Not paralookahead Is Nothing Then
-                If (paralookahead.Style = STYLE_QUESTIONNAME) Then
+                If (paralookahead.Style.NameLocal = STYLE_QUESTIONNAME) Then
                     xmlnod = dd.documentElement.selectSingleNode("name")
                     dd.documentElement.removeChild(xmlnod)
                     xmlnod.selectSingleNode("text").text = RemoveCR(paralookahead.Range.Text)
@@ -1075,7 +1083,7 @@ Public Class MoodleQuestions
             End If
             If Not paralookahead Is Nothing Then '**seems to be setting generalfeedback for any feedback tag...
                 ' CPF commented out
-                '          If (paralookahead.Style = STYLE_FEEDBACK) Then
+                '          If (paralookahead.Style.NameLocal = STYLE_FEEDBACK) Then
                 '             Set xmlnod = dd.documentElement.SelectSingleNode("generalfeedback")
                 '             dd.documentElement.RemoveChild xmlnod
                 '             xmlnod.SelectSingleNode("text").text = RemoveCR(paralookahead.Range.text)
@@ -1092,7 +1100,8 @@ Public Class MoodleQuestions
 
         objStream.WriteText("</quiz>")
         'Save the stream to a file
-        objStream.SaveToFile(FileName:=fd.SelectedItems(1), Options:=ADODB.SaveOptionsEnum.adSaveCreateOverWrite)
+        objStream.SaveToFile(getFileNameFromFileDialog(fd), ADODB.SaveOptionsEnum.adSaveCreateOverWrite)
+        'objStream.SaveToFile(FileName:=fd.SelectedItems(1), Options:=ADODB.SaveOptionsEnum.adSaveCreateOverWrite)
 
     End Sub
 
@@ -1104,10 +1113,10 @@ Public Class MoodleQuestions
 
         ' processing <questiontext> '
         dd.documentElement.selectSingleNode("questiontext") _
-        .selectSingleNode("text").text = XSLT_Range(para.Range, "FormattedText.xslt")
+        .selectSingleNode("text").text = XSLT_Range(para.Range, My.Resources.FormattedText_xslt)
 
         '
-        If Not XSLT_Range(para.Range, "PictureName.xslt") = "" Then 'if it is NOT null/empty
+        If Not XSLT_Range(para.Range, My.Resources.PictureName_xslt) = "" Then 'if it is NOT null/empty
 
             Dim header As String
             Dim stringlength As Long
@@ -1116,10 +1125,10 @@ Public Class MoodleQuestions
             header = Left(header, stringlength - 1)
 
             'processing <image>'
-            dd.documentElement.selectSingleNode("image").text = "Images_forQuizQuestions/" & header & Right(XSLT_Range(para.Range, "PictureName.xslt"), 4)
-            'dd.documentElement.SelectSingleNode("image").text = Mid(XSLT_Range(para.Range, "PictureName.xslt"), 10) (commented out: Rohrer)'
+            dd.documentElement.selectSingleNode("image").text = "Images_forQuizQuestions/" & header & Right(XSLT_Range(para.Range, My.Resources.PictureName_xslt), 4)
+            'dd.documentElement.SelectSingleNode("image").text = Mid(XSLT_Range(para.Range, My.Resources.PictureName_xslt), 10) (commented out: Rohrer)'
             'processing <image_base64>'
-            dd.documentElement.selectSingleNode("image_base64").text = XSLT_Range(para.Range, "Picture.xslt")
+            dd.documentElement.selectSingleNode("image_base64").text = XSLT_Range(para.Range, My.Resources.Picture_xslt)
         End If
 
 
@@ -1128,9 +1137,9 @@ Public Class MoodleQuestions
     End Sub
 
 
-    Private Function XSLT_Range(textrange As Range, xsltfilename As String) As String
+    Private Function XSLT_Range(textrange As Range, xsltFileContents As String) As String
         Dim xsldoc As New MSXML2.FreeThreadedDOMDocument60
-        xsldoc.load(xmlpath & xsltfilename)
+        xsldoc.loadXML(xsltFileContents)
         Dim xslt As New MSXML2.XSLTemplate60
         xslt.stylesheet = xsldoc
         Dim xsltProcessor As MSXML2.IXSLProcessor
@@ -1165,22 +1174,22 @@ Public Class MoodleQuestions
         Return CType(Globals.ThisDocument.Application.Selection.Paragraphs.Style, Word.Style).NameLocal
     End Function
 
-    Private Sub setSelectionStyle(theStyle As String)
+    Private Sub setSelectionParagraphStyle(theStyle As String)
         Globals.ThisDocument.Application.Selection.Paragraphs.Style = theStyle
     End Sub
-    Private Function getSelectionRange() As Range
+    Private Function getDocumentSelectionRange() As Range
         Return Globals.ThisDocument.Application.Selection.Range
     End Function
 
-    Private Function getCharacterCount() As Integer
+    Private Function getDocumentCharacterCount() As Integer
         Return Globals.ThisDocument.Application.ActiveDocument.Characters.Count
     End Function
 
-    Private Function getParagraphs() As Paragraphs
+    Private Function getDocumentParagraphs() As Paragraphs
         Return Globals.ThisDocument.Application.ActiveDocument.Paragraphs
     End Function
 
-    Private Function getRangeEnd() As Integer
+    Private Function getDocumentRangeEnd() As Integer
         Return Globals.ThisDocument.Application.ActiveDocument.Range.End
     End Function
 
@@ -1195,5 +1204,13 @@ Public Class MoodleQuestions
     Private Sub moveCursorToStartOfDocument()
         Globals.ThisDocument.Application.Selection.HomeKey(WdUnits.wdStory, Nothing)
     End Sub
+
+    Private Function getDocumentHeaderText() As String
+        Return Globals.ThisDocument.Application.ActiveDocument.Sections(1).Headers(WdHeaderFooterIndex.wdHeaderFooterPrimary).Range.Text()
+    End Function
+
+    Private Function getFileNameFromFileDialog(fd As Microsoft.Office.Core.FileDialog) As String
+        Return fd.SelectedItems.Item(1)
+    End Function
 
 End Class
