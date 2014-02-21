@@ -14,11 +14,15 @@
 '3. Assign attributes to the control tags in the Ribbon XML file to identify the appropriate callback methods in your code.
 
 'For more information, see the Ribbon XML documentation in the Visual Studio Tools for Office Help.
-'TODO integrate template file so Paragraph Styles will be valid
-'TODO add all Callbacks from ribbon buttons 
+'FIXED (didn't do, different design, simplify) integrate template file so Paragraph Styles will be valid
+'FIXED add all Callbacks from ribbon buttons 
 'FIXED add icons to Ribbon item
-'TODO fix paragraph styles so language comes from Keyboard or Normal (http://answers.microsoft.com/en-us/office/forum/office_2010-word/how-to-specify-dont-change-the-language-setting-in/966aec6e-4d4d-4fef-af42-5c4ad260f751)
+'FIXED fix paragraph styles so language comes from Keyboard or Normal (http://answers.microsoft.com/en-us/office/forum/office_2010-word/how-to-specify-dont-change-the-language-setting-in/966aec6e-4d4d-4fef-af42-5c4ad260f751)
 'TODO find a deployment site for Project Publishing. Google Drive won't work because it doesn't have clean URLs for directories.
+'TODO Try using style feedback to indicate [shuffled] questions (rather than arbitrary colors). Numbering allows inserting text after the 1. (e.g., 1. [shuffled])
+'TODO Fix feedback button (for which questions is answer feedback valid? Do we need different feedback word styles?)
+
+
 
 Imports Microsoft.Office.Interop.Word
 Imports stdole
@@ -40,7 +44,7 @@ Public Class MoodleQuestions
     'Create callback methods here. For more information about adding callback methods, visit http://go.microsoft.com/fwlink/?LinkID=271226
     Public Sub Ribbon_Load(ByVal ribbonUI As Office.IRibbonUI)
         Me.ribbon = ribbonUI
-        Me.ribbon.ActivateTab("MoodleQuestions")
+        Me.ribbon.ActivateTab("MoodleQuestions") 'Make Moodle Questions toolbar active on startup
     End Sub
 
     Public Function OnLoadImage(imageId As String) As IPictureDisp
@@ -214,9 +218,8 @@ Public Class MoodleQuestions
         End If
     End Sub
 
-    ' From Daniel: Changes Shuffleanswerfalse
     Public Sub ChangeShuffleanswerTrueFalse(ByVal control As Office.IRibbonControl)
-        'TODO verify the logic of Shuffle
+
         If getSelectionStyle() = STYLE_MATCHINGQ Then
             setSelectionStyle(STYLE_MATCHINGQ_FIXANSWER)
         ElseIf getSelectionStyle() = STYLE_MATCHINGQ_FIXANSWER Then
@@ -347,11 +350,11 @@ Public Class MoodleQuestions
 
     ' Count the number of paragraphs having the specified
     ' style in the defined range
-    Function CountStylesInRange(aStyle, startPoint, endPoint) As Integer
+    Function CountStylesInRange(aStyle As String, startPoint As Integer, endPoint As Integer) As Integer
         Dim aRange As Microsoft.Office.Interop.Word.Range
         Dim endP
         Dim counter
-        aRange = Globals.ThisDocument.Application.Range(Start:=startPoint, End:=endPoint)
+        aRange = getDocumentRange(startPoint, endPoint)
         endP = aRange.End  'store end point
         counter = 0
 
@@ -406,7 +409,8 @@ Public Class MoodleQuestions
     ' Checks the questionnaire.
     ' Returns true if everything is fine, otherwise false
     Function CheckQuestionnaire() As Boolean
-        If Globals.ThisDocument.Application.Content.Characters.Count = 1 Then Return False 'Exit Function
+        'return false if empty document
+        If getCharacterCount() = 1 Then Return False
 
         Dim startOfQuestion, endOfQuestion, setEndPoint
         Dim isOK As Boolean
@@ -417,10 +421,10 @@ Public Class MoodleQuestions
         questionType = ""
 
         ' Check each paragraph at a time and specify needed tags
-        For Each para In Globals.ThisDocument.Application.Paragraphs
+        For Each para As Paragraph In getParagraphs()
 
             ' Check if empty paragraph
-            If para.Range = vbCr Then
+            If para.Range.Text = vbCr Then
                 para.Range.Delete() ' delete all empty paragraphs
                 If questionType = "" Then questionType = para.Range.Style.NameLocal
             ElseIf para.Range.Style.NameLocal = STYLE_MULTICHOICEQ Or _
@@ -467,31 +471,33 @@ Public Class MoodleQuestions
             End If
 
             ' Check if the end of document
-            If para.Range.End = Globals.ThisDocument.Application.Range.End And _
+            If para.Range.End = getRangeEnd() And _
             startOfQuestion <> para.Range.End Then
-                isOK = CheckQuestion(startOfQuestion, Globals.ThisDocument.Application.Range.End)
+                isOK = CheckQuestion(startOfQuestion, getRangeEnd())
             End If
 
             If isOK = False Then Exit For ' Exit if error is found
 
         Next para
 
-        ' why? CPF
-        If Globals.ThisDocument.Application.Content.Characters.Count = 1 Then Return isOK 'Exit Function
+        'TODO not sure this makes sense, it will just skip the refresh
+        If getCharacterCount() = 1 Then Return isOK
 
+
+        moveCursorToEndOfDocument()
         Globals.ThisDocument.Application.ScreenRefresh()
         Return isOK
     End Function
 
     ' Checks whether the chosen question is valid
     ' Returns true if the question is OK, otherwise
-    Function CheckQuestion(startPoint, endPoint) As Boolean
+    Function CheckQuestion(startPoint As Integer, endPoint As Integer) As Boolean
         Dim isOk As Boolean
         Dim rightCount, rightPairCount, leftPairCount, wordCount As Integer
 
         Dim aRange As Range
 
-        aRange = Globals.ThisDocument.Application.Range(startPoint, endPoint)
+        aRange = getDocumentRange(startPoint, endPoint)
         aRange.Select()
         'MsgBox "See Range for specifying question type." & questionType & vbCr & _
         '      "Start: " & startPoint & " End: " & endPoint
@@ -1165,4 +1171,29 @@ Public Class MoodleQuestions
     Private Function getSelectionRange() As Range
         Return Globals.ThisDocument.Application.Selection.Range
     End Function
+
+    Private Function getCharacterCount() As Integer
+        Return Globals.ThisDocument.Application.ActiveDocument.Characters.Count
+    End Function
+
+    Private Function getParagraphs() As Paragraphs
+        Return Globals.ThisDocument.Application.ActiveDocument.Paragraphs
+    End Function
+
+    Private Function getRangeEnd() As Integer
+        Return Globals.ThisDocument.Application.ActiveDocument.Range.End
+    End Function
+
+    Private Function getDocumentRange(startPoint As Integer, endPoint As Integer) As Microsoft.Office.Interop.Word.Range
+        Return Globals.ThisDocument.Application.ActiveDocument.Range(startPoint, endPoint)
+    End Function
+
+    Private Sub moveCursorToEndOfDocument()
+        Globals.ThisDocument.Application.Selection.EndKey(WdUnits.wdStory, Nothing)
+    End Sub
+
+    Private Sub moveCursorToStartOfDocument()
+        Globals.ThisDocument.Application.Selection.HomeKey(WdUnits.wdStory, Nothing)
+    End Sub
+
 End Class
