@@ -1,0 +1,20 @@
+  <question type="essay">
+    <name><text></text>
+</name>
+    <questiontext format="html">
+<text></text>
+    </questiontext>
+    <image></image>
+	<image_base64></image_base64>
+    <generalfeedback>
+<text></text>
+    </generalfeedback>
+    <defaultgrade></defaultgrade>
+    <penalty>1</penalty>
+    <hidden></hidden>
+    <shuffleanswers></shuffleanswers>
+<answer fraction="0">
+    <feedback><text></text>
+</feedback>
+</answer>
+</question>
