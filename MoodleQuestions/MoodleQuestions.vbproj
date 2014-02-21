@@ -280,6 +280,42 @@
   <ItemGroup>
     <None Include="Resources\missingword.png" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\MultiChoiceVar.xml.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Essay_xml.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\False_xml.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\FormattedText.xslt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\matchingfix.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\matchingvar.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\multichoicefix.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\numerical.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Picture.xslt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\PictureName.xslt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\shortanswer.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\true.xml" />
+  </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
