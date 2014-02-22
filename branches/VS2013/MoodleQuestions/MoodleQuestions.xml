@@ -23,7 +23,7 @@
           <separator id="MdlQzSep4" />
           <button id="pasteImage" label="Paste Image" size="large" onAction="PasteImage" image="pasteimage" />
           <button id="questionTitle" label="Question Name" size="large" onAction="AddQuestionTitle" image="questiontitle" />
-          <button id="feedback" label="Feedback" size="large" onAction="AddQuestionFeedback" image="feedback" />
+          <button id="feedback" label="Answer Feedback" size="large" onAction="AddAnswerFeedback" image="feedback" />
           <button id="comment" label="Comment (not imported)" size="large" onAction="AddComment" image="comment" />
           <separator id="MdlQzSep5" />
           <button id="cleanup" label="Check Layout" size="large" onAction="check" image="cleanup" />
