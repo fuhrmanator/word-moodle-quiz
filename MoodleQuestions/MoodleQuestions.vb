@@ -18,9 +18,14 @@
 'FIXED add all Callbacks from ribbon buttons 
 'FIXED add icons to Ribbon item
 'FIXED fix paragraph styles so language comes from Keyboard or Normal (http://answers.microsoft.com/en-us/office/forum/office_2010-word/how-to-specify-dont-change-the-language-setting-in/966aec6e-4d4d-4fef-af42-5c4ad260f751)
+'FIXED Style "A Short Answer" is missing from .DOCM
 'TODO find a deployment site for Project Publishing. Google Drive won't work because it doesn't have clean URLs for directories.
-'TODO Try using style feedback to indicate [shuffled] questions (rather than arbitrary colors). Numbering allows inserting text after the 1. (e.g., 1. [shuffled])
-'TODO Fix feedback button (for which questions is answer feedback valid? Do we need different feedback word styles?)
+'TODO Try using style content to indicate [shuffled] questions (rather than arbitrary colors). Numbering allows inserting text after the 1. (e.g., 1. [S] for shuffled)
+'TODO For which questions is answer feedback valid? Do we need different feedback word styles?
+'TODO Figure out what "Question Name" button is supposed to do
+'TODO Add "Question Feedback" button (different from Answer feedback)
+'TODO Understand Numerical Questions: "Q Numerical" is followed by "Short Answer" in the v21 template. Should we make a "A Numerical" for consistency? Might impact "Check Layout" function.
+'TODO Fix Export for all question types
 
 
 
@@ -105,7 +110,7 @@ Public Class MoodleQuestions
 
     End Sub
 
-    Public Sub AddQuestionFeedback(ByVal control As Office.IRibbonControl)
+    Public Sub AddAnswerFeedback(ByVal control As Office.IRibbonControl)
         If getSelectionStyle() = STYLE_ANSWERWEIGHT Or _
            getSelectionStyle() = STYLE_SHORTANSWERQ Or _
            getSelectionStyle() = STYLE_MISSINGWORDQ Or _
@@ -118,8 +123,8 @@ Public Class MoodleQuestions
            getSelectionStyle() = STYLE_FALSESTATEMENT Or _
            getSelectionStyle() = STYLE_QUESTIONNAME Or _
            getSelectionStyle() = STYLE_BLANK_WORD Then
-            InsertAfterRange("Insert feedback of the previous choice or answer here.", _
-                             STYLE_FEEDBACK, Globals.ThisDocument.Application.Selection.Paragraphs(1).Range)
+            InsertParagraphAfterCurrentParagraph("Insert feedback of the previous choice or answer here.", _
+                             STYLE_FEEDBACK)
 
 
         Else 'Error: Give Instructions:
@@ -132,8 +137,8 @@ Public Class MoodleQuestions
     ' Add tolerance
     Public Sub AddNumericalTolerance(ByVal control As Office.IRibbonControl)
         If getSelectionStyle() = STYLE_SHORT_ANSWER Then
-            InsertAfterRange("Replace me with Tolerance for the answer as a Decimal. Eg: 0.01", _
-                             STYLE_NUM_TOLERANCE, Globals.ThisDocument.Application.Selection.Paragraphs(1).Range)
+            InsertParagraphAfterCurrentParagraph("Replace me with Tolerance for the answer as a Decimal. Eg: 0.01", _
+                             STYLE_NUM_TOLERANCE)
         Else 'Error: Give Instructions:
             MsgBox(" " & vbCr & _
                    "Place the cursor at the end of the numerical answer.", vbExclamation)
@@ -153,8 +158,7 @@ Public Class MoodleQuestions
            getSelectionStyle() = STYLE_FALSESTATEMENT Or _
            getSelectionStyle() = STYLE_RIGHT_PAIR Or _
            getSelectionStyle() = STYLE_BLANK_WORD Then
-            InsertAfterRange("Add a question title.", _
-                 STYLE_QUESTIONNAME, Globals.ThisDocument.Application.Selection.Paragraphs(1).Range)
+            InsertParagraphAfterCurrentParagraph("Add a question title.", STYLE_QUESTIONNAME)
         Else 'Error: Give Instructions:
             MsgBox("Feedback to insert at the end of the last response selected. " & vbCr & _
                    "The title must appear before the feedback" & vbCr & _
@@ -632,7 +636,9 @@ Public Class MoodleQuestions
     End Sub
 
     ' Inserts text at the end of the paragraph
-    Sub InsertAfterRange(ByVal text As String, aStyle As Style, ByVal aRange As Range)
+    Sub InsertParagraphAfterCurrentParagraph(ByVal text As String, aStyle As String)
+        Dim aRange As Range = Globals.ThisDocument.Application.Selection.Paragraphs(1).Range
+
         With aRange
             .EndOf(Unit:=WdUnits.wdParagraph, Extend:=WdMovementType.wdMove)
             .InsertParagraphBefore()
@@ -788,21 +794,6 @@ Public Class MoodleQuestions
         Globals.ThisDocument.Application.ActiveWindow.ActivePane.View.SeekView = WdSeekView.wdSeekMainDocument
 
 
-        '.xml question patterns are now in project resources (visual studio)
-
-        'xmlpath = Globals.ThisDocument.Application.Path & "\xml-question\"
-        'If Not DirExists(xmlpath) Then
-        '    If Globals.ThisDocument.Application.AttachedTemplate.Path <> "" Then
-        '        xmlpath = Globals.ThisDocument.Application.AttachedTemplate.Path & "\xml-question\"
-        '    Else
-        '        xmlpath = Globals.ThisDocument.Application.Path & "\xml-question\"
-        '    End If
-        '    If Not DirExists(xmlpath) Then
-        '        MsgBox("The xml-question\ folder is not found. Please keep this quiz question document in the original folder.", vbCritical, "Error")
-        '        Exit Sub
-        '    End If
-        'End If
-
         'choose the file name to save with
         'Dim fd As SaveFileDialog = New SaveFileDialog
 
@@ -850,7 +841,8 @@ Public Class MoodleQuestions
             Select Case para.Range.Style.NameLocal
 
                 Case STYLE_SHORTANSWERQ
-                    dd.load(xmlpath & "shortanswer.xml")
+                    xmlResource = My.Resources.Shortanswer_xml
+                    loadXML(xmlResource, dd)
                     ProcessCommonTags(dd, para)
                     ' processing each <answer>'
                     paralookahead = para.Next
@@ -867,12 +859,14 @@ Public Class MoodleQuestions
                     Loop
 
                 Case STYLE_ESSAY
-                    dd.load(xmlpath & "essay.xml")
+                    xmlResource = My.Resources.Essay_xml
+                    loadXML(xmlResource, dd)
                     ProcessCommonTags(dd, para)
                     'LTG: do I need to have Set paralookahead = para.Next here? why / why not?
 
                 Case STYLE_NUMERICALQ
-                    dd.load(xmlpath & "numerical.xml")
+                    xmlResource = My.Resources.Numerical_xml
+                    loadXML(xmlResource, dd)
                     ProcessCommonTags(dd, para)
                     ' processing each <answer>'
                     paralookahead = para.Next
@@ -897,17 +891,20 @@ Public Class MoodleQuestions
                     Loop
 
                 Case STYLE_FALSESTATEMENT
-                    dd.load(xmlpath & "false.xml")
+                    xmlResource = My.Resources.False_xml
+                    loadXML(xmlResource, dd)
                     ProcessCommonTags(dd, para)
                     paralookahead = para.Next
 
                 Case STYLE_TRUESTATEMENT
-                    dd.load(xmlpath & "true.xml")
+                    xmlResource = My.Resources.True_xml
+                    loadXML(xmlResource, dd)
                     ProcessCommonTags(dd, para)
                     paralookahead = para.Next
 
                 Case STYLE_MULTICHOICEQ_FIXANSWER
-                    dd.load(xmlpath & "multichoicefix.xml")
+                    xmlResource = My.Resources.MultiChoiceFix_xml
+                    loadXML(xmlResource, dd)
                     ProcessCommonTags(dd, para)
 
                     ' processing each <answer>'
@@ -947,11 +944,7 @@ Public Class MoodleQuestions
 
                 Case STYLE_MULTICHOICEQ
                     xmlResource = My.Resources.MultiChoiceVar_xml
-                    If Not dd.loadXML(xmlResource) Then
-                        MsgBox("Failed to load XML " & xmlResource & " in program.")
-                        'TODO fail gracefully?
-                        Throw New Exception
-                    End If
+                    loadXML(xmlResource, dd)
                     ProcessCommonTags(dd, para)
 
                     ' processing each <answer>'
@@ -1000,7 +993,8 @@ Public Class MoodleQuestions
                     End If
 
                 Case STYLE_MATCHINGQ
-                    dd.load(xmlpath & "matchingvar.xml")
+                    xmlResource = My.Resources.MatchingVar_xml
+                    loadXML(xmlResource, dd)
                     ProcessCommonTags(dd, para)
 
                     ' processing each <subquestion>'
@@ -1021,7 +1015,8 @@ Public Class MoodleQuestions
                     Loop
 
                 Case STYLE_MATCHINGQ_FIXANSWER
-                    dd.load(xmlpath & "matchingfix.xml")
+                    xmlResource = My.Resources.MatchingFix_xml
+                    loadXML(xmlResource, dd)
                     ProcessCommonTags(dd, para)
 
                     ' processing each <subquestion>'
@@ -1042,12 +1037,14 @@ Public Class MoodleQuestions
                     Loop
 
                 Case STYLE_MISSINGWORDQ
-                    dd.load(xmlpath & "shortanswer.xml")
+                    'TODO: Verify that MissingWord uses same XML as short answer?
+                    xmlResource = My.Resources.Shortanswer_xml
+                    loadXML(xmlResource, dd)
                     Dim theChar As Range
                     Dim misword As String
                     misword = ""
                     For Each theChar In para.Range.Characters
-                        If theChar.Style = STYLE_BLANK_WORD Then misword = misword & theChar.Text
+                        If theChar.Style.NameLocal = STYLE_BLANK_WORD Then misword = misword & theChar.Text
                     Next theChar
                     ProcessCommonTags(dd, para)
                     dd.documentElement.selectSingleNode("name").selectSingleNode("text").text = Replace( _
@@ -1212,5 +1209,14 @@ Public Class MoodleQuestions
     Private Function getFileNameFromFileDialog(fd As Microsoft.Office.Core.FileDialog) As String
         Return fd.SelectedItems.Item(1)
     End Function
+
+    Private Sub loadXML(xmlResource As String, dd As MSXML2.DOMDocument60)
+        If Not dd.loadXML(xmlResource) Then
+            MsgBox("Failed to load XML " & xmlResource & " in program.")
+            'TODO fail gracefully?
+            Throw New Exception
+        End If
+
+    End Sub
 
 End Class
