@@ -15,8 +15,8 @@
           <button id="MissingWord" label="Missing Word" size="large" onAction="AddMissingWordQ" image="missingword" />
           <button id="MarkMissingWord" label="Mark Missing Word" size="large" onAction="ToggleMissingWord" image="markmissing" />
           <separator id="MdlQzSep2" />
-          <button id="numerical" label="Numerical" size="large" onAction="AddNumericalQ" image="numerical" />
-          <button id="numericaltolerance" label="Numerical Tolerance" size="large" onAction="AddNumericalTolerance" image="tolerance" />
+          <button id="numerical" label="Numerical" size="large" onAction="AddNumericalQ" image="numerical" enabled="false" />
+          <button id="numericaltolerance" label="Numerical Tolerance" size="large" onAction="AddNumericalTolerance" image="tolerance" enabled="false" />
           <separator id="MdlQzSep3" />
           <button id="shortanswer" label="Short Answer" size="large" onAction="AddShortAnswerQ" image="shortanswer" />
           <button id="essay" label="Essay" size="large" onAction="AddEssay" image="essay" />
