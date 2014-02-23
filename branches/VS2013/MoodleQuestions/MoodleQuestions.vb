@@ -26,7 +26,8 @@
 'TODO Add "Question Feedback" button (different from Answer feedback)
 'TODO Understand Numerical Questions: "Q Numerical" is followed by "Short Answer" in the v21 template. Should we make a "A Numerical" for consistency? Might impact "Check Layout" function.
 'TODO Fix Export for all question types
-
+'TODO Selecting a missing word and using the button also selects the space after the word, which cause a problem in <questiontext/text>
+'TODO Answer feedback does not apply to matching answers, but button allows it to be inserted after STYLE_RIGHT_PAIR
 
 
 Imports Microsoft.Office.Interop.Word
@@ -110,19 +111,13 @@ Public Class MoodleQuestions
 
     End Sub
 
+    'TODO make sure only answers that can get feedback are allowed
     Public Sub AddAnswerFeedback(ByVal control As Office.IRibbonControl)
-        If getSelectionStyle() = STYLE_ANSWERWEIGHT Or _
-           getSelectionStyle() = STYLE_SHORTANSWERQ Or _
-           getSelectionStyle() = STYLE_MISSINGWORDQ Or _
-           getSelectionStyle() = STYLE_CORRECTANSWER Or _
-           getSelectionStyle() = STYLE_INCORRECTANSWER Or _
-           getSelectionStyle() = STYLE_SHORT_ANSWER Or _
-           getSelectionStyle() = STYLE_RIGHT_PAIR Or _
-           getSelectionStyle() = STYLE_NUM_TOLERANCE Or _
+        If getSelectionStyle() = STYLE_CORRECT_MC_ANSWER Or _
+           getSelectionStyle() = STYLE_INCORRECT_MC_ANSWER Or _
            getSelectionStyle() = STYLE_TRUESTATEMENT Or _
            getSelectionStyle() = STYLE_FALSESTATEMENT Or _
-           getSelectionStyle() = STYLE_QUESTIONNAME Or _
-           getSelectionStyle() = STYLE_BLANK_WORD Then
+           getSelectionStyle() = STYLE_SHORT_ANSWER Then
             InsertParagraphAfterCurrentParagraph("Insert feedback of the previous choice or answer here.", _
                              STYLE_FEEDBACK)
 
@@ -150,13 +145,13 @@ Public Class MoodleQuestions
         If getSelectionStyle() = STYLE_ANSWERWEIGHT Or _
            getSelectionStyle() = STYLE_SHORTANSWERQ Or _
            getSelectionStyle() = STYLE_MISSINGWORDQ Or _
-           getSelectionStyle() = STYLE_CORRECTANSWER Or _
+           getSelectionStyle() = STYLE_CORRECT_MC_ANSWER Or _
            getSelectionStyle() = STYLE_NUM_TOLERANCE Or _
-           getSelectionStyle() = STYLE_INCORRECTANSWER Or _
+           getSelectionStyle() = STYLE_INCORRECT_MC_ANSWER Or _
            getSelectionStyle() = STYLE_TRUESTATEMENT Or _
            getSelectionStyle() = STYLE_SHORT_ANSWER Or _
            getSelectionStyle() = STYLE_FALSESTATEMENT Or _
-           getSelectionStyle() = STYLE_RIGHT_PAIR Or _
+           getSelectionStyle() = STYLE_RIGHT_MATCH Or _
            getSelectionStyle() = STYLE_BLANK_WORD Then
             InsertParagraphAfterCurrentParagraph("Add a question title.", STYLE_QUESTIONNAME)
         Else 'Error: Give Instructions:
@@ -207,10 +202,10 @@ Public Class MoodleQuestions
         'Toggles MCQ answer (right-wrong) or switches true and false statements.
         Dim theStyle As String = getSelectionStyle()
 
-        If theStyle = STYLE_CORRECTANSWER Then
-            setSelectionParagraphStyle(STYLE_INCORRECTANSWER)
-        ElseIf theStyle = STYLE_INCORRECTANSWER Then
-            setSelectionParagraphStyle(STYLE_CORRECTANSWER)
+        If theStyle = STYLE_CORRECT_MC_ANSWER Then
+            setSelectionParagraphStyle(STYLE_INCORRECT_MC_ANSWER)
+        ElseIf theStyle = STYLE_INCORRECT_MC_ANSWER Then
+            setSelectionParagraphStyle(STYLE_CORRECT_MC_ANSWER)
         ElseIf theStyle = STYLE_TRUESTATEMENT Then
             setSelectionParagraphStyle(STYLE_FALSESTATEMENT)
         ElseIf theStyle = STYLE_FALSESTATEMENT Then
@@ -303,12 +298,12 @@ Public Class MoodleQuestions
     Public Const STYLE_MISSINGWORDQ = "Q Missing Word"
     Public Const STYLE_TRUESTATEMENT = "Q True Statement"
     Public Const STYLE_FALSESTATEMENT = "Q False Statement"
-    Public Const STYLE_CORRECTANSWER = "A Correct Choice"
-    Public Const STYLE_INCORRECTANSWER = "A Incorrect Choice"
+    Public Const STYLE_CORRECT_MC_ANSWER = "A Correct Choice"
+    Public Const STYLE_INCORRECT_MC_ANSWER = "A Incorrect Choice"
     Public Const STYLE_SHORT_ANSWER = "A Short Answer"
-    Public Const STYLE_LEFT_PAIR = "A Matching Left"
-    Public Const STYLE_RIGHT_PAIR = "A Matching Right"
-    Public Const STYLE_BLANK_WORD = "MissingWord"
+    Public Const STYLE_LEFT_MATCH = "A Matching Left"
+    Public Const STYLE_RIGHT_MATCH = "A Matching Right"
+    Public Const STYLE_BLANK_WORD = "MissingWord"  'this string used in an XSLT template
     Public Const STYLE_COMMENT = "Comment"
     ' Supplement(ed by) Daniel
     Public Const STYLE_MULTICHOICEQ_FIXANSWER = "Q Multi Choice FixAnswer"
@@ -468,7 +463,7 @@ Public Class MoodleQuestions
                 startOfQuestion = para.Range.End
                 questionType = "NOT_KNOWN"
                 setEndPoint = False
-            ElseIf para.Range.Style.NameLocal = STYLE_CORRECTANSWER And _
+            ElseIf para.Range.Style.NameLocal = STYLE_CORRECT_MC_ANSWER And _
                    questionType = STYLE_NUMERICALQ Then
                 ' Exit if error is found
                 If CheckNumericAnswer(para.Range) = False Then Return False 'Exit Function
@@ -511,7 +506,7 @@ Public Class MoodleQuestions
           questionType = STYLE_MULTICHOICEQ_FIXANSWER Then
 
             ' Check that there are right anwers specified
-            rightCount = CountStylesInRange(STYLE_CORRECTANSWER, startPoint, endPoint)
+            rightCount = CountStylesInRange(STYLE_CORRECT_MC_ANSWER, startPoint, endPoint)
 
             If rightCount = 0 Then
                 aRange.Select()
@@ -541,8 +536,8 @@ Public Class MoodleQuestions
         ElseIf questionType = STYLE_MATCHINGQ Or questionType = STYLE_MATCHINGQ_FIXANSWER Then
 
             ' Count the number of pairs
-            rightPairCount = CountStylesInRange(STYLE_RIGHT_PAIR, startPoint, endPoint)
-            leftPairCount = CountStylesInRange(STYLE_LEFT_PAIR, startPoint, endPoint)
+            rightPairCount = CountStylesInRange(STYLE_RIGHT_MATCH, startPoint, endPoint)
+            leftPairCount = CountStylesInRange(STYLE_LEFT_MATCH, startPoint, endPoint)
 
             ' Too few pairs
             If leftPairCount < 3 Then
@@ -650,6 +645,7 @@ Public Class MoodleQuestions
     End Sub
 
     ' Set the answer weights of multiple choice questions.
+    'TODO dead code (never called)
     Public Sub SetAnswerWeights() ' aStyle, startPoint, endPoint)
         Dim startPoint, endPoint, rightScore, wrongScore, rightCount, wrongCount As Integer
 
@@ -659,8 +655,8 @@ Public Class MoodleQuestions
             wrongCount = 0
             Globals.ThisDocument.Application.Selection.MoveDown(Unit:=WdUnits.wdParagraph, Count:=1)
 
-            Do While getSelectionStyle() = STYLE_CORRECTANSWER Or _
-                  getSelectionStyle() = STYLE_INCORRECTANSWER Or _
+            Do While getSelectionStyle() = STYLE_CORRECT_MC_ANSWER Or _
+                  getSelectionStyle() = STYLE_INCORRECT_MC_ANSWER Or _
                   getSelectionStyle() = STYLE_FEEDBACK Or _
                   getSelectionStyle() = STYLE_ANSWERWEIGHT
 
@@ -681,9 +677,9 @@ Public Class MoodleQuestions
                 End If
 
                 ' Count the number of right and wrong answers
-                If getSelectionStyle() = STYLE_CORRECTANSWER Then
+                If getSelectionStyle() = STYLE_CORRECT_MC_ANSWER Then
                     rightCount = rightCount + 1
-                ElseIf getSelectionStyle() = STYLE_INCORRECTANSWER Then
+                ElseIf getSelectionStyle() = STYLE_INCORRECT_MC_ANSWER Then
                     wrongCount = wrongCount + 1
                 End If
 
@@ -733,9 +729,9 @@ Public Class MoodleQuestions
             ' Check if empty paragraph
             If para.Range = vbCr Then
                 para.Range.Delete() ' delete all empty paragraphs
-            ElseIf para.Range.Style = STYLE_CORRECTANSWER Then
+            ElseIf para.Range.Style = STYLE_CORRECT_MC_ANSWER Then
                 InsertAnswerWeight(rightScore, para.Range)
-            ElseIf para.Range.Style = STYLE_INCORRECTANSWER Then
+            ElseIf para.Range.Style = STYLE_INCORRECT_MC_ANSWER Then
                 InsertAnswerWeight(wrongScore, para.Range)
             End If
         Next para
@@ -800,7 +796,7 @@ Public Class MoodleQuestions
         Dim fd As Microsoft.Office.Core.FileDialog = Globals.ThisDocument.Application.FileDialog(Microsoft.Office.Core.MsoFileDialogType.msoFileDialogSaveAs)
         '.FilterIndex = 2 fuer Word 2003, 14 fuer Word 2010
         fd.FilterIndex = 14
-        fd.InitialFileName = FILE_PREFIX & Format(Now, "yyyymmdd") & ".xml"
+        fd.InitialFileName = FILE_PREFIX & Format(Now, "yyyyMMdd") & ".xml"
         If fd.Show <> -1 Then Exit Sub
 
         Dim header As String
@@ -902,48 +898,13 @@ Public Class MoodleQuestions
                     ProcessCommonTags(dd, para)
                     paralookahead = para.Next
 
-                Case STYLE_MULTICHOICEQ_FIXANSWER
-                    xmlResource = My.Resources.MultiChoiceFix_xml
-                    loadXML(xmlResource, dd)
-                    ProcessCommonTags(dd, para)
 
-                    ' processing each <answer>'
-                    paralookahead = para.Next
-                    xmlnod = dd.documentElement.selectSingleNode("answer")
-                    dd.documentElement.removeChild(xmlnod)
-
-                    rac = 0
-                    wac = 0
-                    Do While (paralookahead.Style.NameLocal = STYLE_CORRECTANSWER) Or (paralookahead.Style.NameLocal = STYLE_INCORRECTANSWER)
-                        If paralookahead.Style.NameLocal = STYLE_CORRECTANSWER Then
-                            xmlnod.attributes.getNamedItem("fraction").text = "100"
-                            rac = rac + 1
-                        Else
-                            xmlnod.attributes.getNamedItem("fraction").text = "0"
-                            wac = wac + 1
-                        End If
-                        xmlnod.selectSingleNode("text").text = RemoveCR(paralookahead.Range.Text)
-                        dd.documentElement.appendChild(xmlnod)
-
-                        xmlnod = xmlnod.cloneNode(True)
-                        paralookahead = paralookahead.Next
-                        If paralookahead Is Nothing Then Exit Do
-                    Loop
-
-                    If rac > 1 Then
-                        ' multiple correct/incorrect answers
-                        dd.documentElement.selectSingleNode("single").text = "false"
-                        ' re-looping for setting multi-true-answer fractions
-                        For Each mansw In dd.documentElement.selectNodes("answer")
-                            With mansw.Attributes.getNamedItem("fraction")
-                                If .text = 100 Then .text = Replace(100 / rac, ",", ".")
-                                If .text = 0 Then .text = Replace(-100 / wac, ",", ".")
-                            End With
-                        Next mansw
+                Case STYLE_MULTICHOICEQ_FIXANSWER, STYLE_MULTICHOICEQ
+                    If para.Range.Style.NameLocal = STYLE_MULTICHOICEQ_FIXANSWER Then
+                        xmlResource = My.Resources.MultiChoiceFix_xml
+                    Else
+                        xmlResource = My.Resources.MultiChoiceVar_xml
                     End If
-
-                Case STYLE_MULTICHOICEQ
-                    xmlResource = My.Resources.MultiChoiceVar_xml
                     loadXML(xmlResource, dd)
                     ProcessCommonTags(dd, para)
 
@@ -953,9 +914,8 @@ Public Class MoodleQuestions
                     dd.documentElement.removeChild(xmlnod)
                     rac = 0 'right answer choices
                     wac = 0 'wrong answer choices
-                    ' loop breaks wrongly because of Feedback Style
-                    Do While (paralookahead.Style.NameLocal = STYLE_CORRECTANSWER) Or (paralookahead.Style.NameLocal = STYLE_INCORRECTANSWER)
-                        If paralookahead.Style.NameLocal = STYLE_CORRECTANSWER Then
+                    Do While (paralookahead.Style.NameLocal = STYLE_CORRECT_MC_ANSWER) Or (paralookahead.Style.NameLocal = STYLE_INCORRECT_MC_ANSWER)
+                        If paralookahead.Style.NameLocal = STYLE_CORRECT_MC_ANSWER Then
                             xmlnod.attributes.getNamedItem("fraction").text = "100"
                             rac = rac + 1
                         Else
@@ -965,7 +925,7 @@ Public Class MoodleQuestions
                         xmlnod.selectSingleNode("text").text = RemoveCR(paralookahead.Range.Text)
 
                         paralookahead = paralookahead.Next
-                        ' Feedback Style processing here
+                        ' Answer Feedback Style processing here
                         If paralookahead.Style.NameLocal = STYLE_FEEDBACK Then
                             ' Set XML <feedback> text
                             xmlnod.selectSingleNode("feedback/text").text = RemoveCR(paralookahead.Range.Text)
@@ -992,8 +952,13 @@ Public Class MoodleQuestions
                         Next mansw
                     End If
 
-                Case STYLE_MATCHINGQ
-                    xmlResource = My.Resources.MatchingVar_xml
+                Case STYLE_MATCHINGQ, STYLE_MATCHINGQ_FIXANSWER
+
+                    If para.Range.Style.NameLocal = STYLE_MATCHINGQ Then
+                        xmlResource = My.Resources.MatchingVar_xml
+                    Else
+                        xmlResource = My.Resources.MatchingFix_xml
+                    End If
                     loadXML(xmlResource, dd)
                     ProcessCommonTags(dd, para)
 
@@ -1001,40 +966,45 @@ Public Class MoodleQuestions
                     paralookahead = para.Next
                     xmlnod = dd.documentElement.selectSingleNode("subquestion")
                     dd.documentElement.removeChild(xmlnod)
-                    Do While (paralookahead.Style.NameLocal = STYLE_LEFT_PAIR) Or (paralookahead.Style.NameLocal = STYLE_RIGHT_PAIR)
-                        If paralookahead.Style.NameLocal = STYLE_LEFT_PAIR Then
-                            xmlnod.selectSingleNode("text").text = RemoveCR(paralookahead.Range.Text)
-                        Else
-                            xmlnod.selectSingleNode("answer").selectSingleNode("text").text = RemoveCR(paralookahead.Range.Text)
-
-                            dd.documentElement.appendChild(xmlnod)
-                            xmlnod = xmlnod.cloneNode(True)
-                        End If
+                    Do While (paralookahead.Style.NameLocal = STYLE_LEFT_MATCH)
+                        'process left
+                        Dim leftQuestion As String = RemoveCR(paralookahead.Range.Text)
+                        xmlnod.selectSingleNode("text").text = leftQuestion
                         paralookahead = paralookahead.Next
-                        If paralookahead Is Nothing Then Exit Do
+                        'process right
+                        If paralookahead.Style.NameLocal = STYLE_RIGHT_MATCH Then
+                            xmlnod.selectSingleNode("answer").selectSingleNode("text").text = RemoveCR(paralookahead.Range.Text)
+                            paralookahead = paralookahead.Next
+                        Else
+                            'error, right is not matching left (should be found in check prior to calling here)
+                            Throw New Exception("No matching answer to left question '" & leftQuestion & "'")
+                        End If
+                        dd.documentElement.appendChild(xmlnod)
+                        xmlnod = xmlnod.cloneNode(True)
+                        If paralookahead Is Nothing Then Exit Do 'end of questions
                     Loop
 
-                Case STYLE_MATCHINGQ_FIXANSWER
-                    xmlResource = My.Resources.MatchingFix_xml
-                    loadXML(xmlResource, dd)
-                    ProcessCommonTags(dd, para)
+                    'Case STYLE_MATCHINGQ_FIXANSWER
+                    '    xmlResource = My.Resources.MatchingFix_xml
+                    '    loadXML(xmlResource, dd)
+                    '    ProcessCommonTags(dd, para)
 
-                    ' processing each <subquestion>'
-                    paralookahead = para.Next
-                    xmlnod = dd.documentElement.selectSingleNode("subquestion")
-                    dd.documentElement.removeChild(xmlnod)
-                    Do While (paralookahead.Style.NameLocal = STYLE_LEFT_PAIR) Or (paralookahead.Style.NameLocal = STYLE_RIGHT_PAIR)
-                        If paralookahead.Style.NameLocal = STYLE_LEFT_PAIR Then
-                            xmlnod.selectSingleNode("text").text = RemoveCR(paralookahead.Range.Text)
-                        Else
-                            xmlnod.selectSingleNode("answer").selectSingleNode("text").text = RemoveCR(paralookahead.Range.Text)
+                    '    ' processing each <subquestion>'
+                    '    paralookahead = para.Next
+                    '    xmlnod = dd.documentElement.selectSingleNode("subquestion")
+                    '    dd.documentElement.removeChild(xmlnod)
+                    '    Do While (paralookahead.Style.NameLocal = STYLE_LEFT_PAIR) Or (paralookahead.Style.NameLocal = STYLE_RIGHT_PAIR)
+                    '        If paralookahead.Style.NameLocal = STYLE_LEFT_PAIR Then
+                    '            xmlnod.selectSingleNode("text").text = RemoveCR(paralookahead.Range.Text)
+                    '        Else
+                    '            xmlnod.selectSingleNode("answer").selectSingleNode("text").text = RemoveCR(paralookahead.Range.Text)
 
-                            dd.documentElement.appendChild(xmlnod)
-                            xmlnod = xmlnod.cloneNode(True)
-                        End If
-                        paralookahead = paralookahead.Next
-                        If paralookahead Is Nothing Then Exit Do
-                    Loop
+                    '            dd.documentElement.appendChild(xmlnod)
+                    '            xmlnod = xmlnod.cloneNode(True)
+                    '        End If
+                    '        paralookahead = paralookahead.Next
+                    '        If paralookahead Is Nothing Then Exit Do
+                    '    Loop
 
                 Case STYLE_MISSINGWORDQ
                     'TODO: Verify that MissingWord uses same XML as short answer?
@@ -1046,9 +1016,9 @@ Public Class MoodleQuestions
                     For Each theChar In para.Range.Characters
                         If theChar.Style.NameLocal = STYLE_BLANK_WORD Then misword = misword & theChar.Text
                     Next theChar
-                    ProcessCommonTags(dd, para)
-                    dd.documentElement.selectSingleNode("name").selectSingleNode("text").text = Replace( _
-                      dd.documentElement.selectSingleNode("name").selectSingleNode("text").text, misword, "__________")
+                    ProcessCommonTags(dd, para)  ' XSLT template will swap out missing word (not sure why one uses XSLT, and the other replace below)
+                    dd.documentElement.selectSingleNode("name").selectSingleNode("text").text = _
+                        Replace(dd.documentElement.selectSingleNode("name").selectSingleNode("text").text, misword, "__________")
 
                     ' processing each <answer>'
                     paralookahead = para.Next
