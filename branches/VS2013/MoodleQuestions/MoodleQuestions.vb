@@ -19,15 +19,14 @@
 'FIXED add icons to Ribbon item
 'FIXED fix paragraph styles so language comes from Keyboard or Normal (http://answers.microsoft.com/en-us/office/forum/office_2010-word/how-to-specify-dont-change-the-language-setting-in/966aec6e-4d4d-4fef-af42-5c4ad260f751)
 'FIXED Style "A Short Answer" is missing from .DOCM
-'TODO find a deployment site for Project Publishing. Google Drive won't work because it doesn't have clean URLs for directories.
+'FIXED find a deployment site for Project Publishing. Google Drive won't work because it doesn't have clean URLs for directories.
 'TODO Try using style content to indicate [shuffled] questions (rather than arbitrary colors). Numbering allows inserting text after the 1. (e.g., 1. [S] for shuffled)
 'TODO For which questions is answer feedback valid? Do we need different feedback word styles?
 'TODO Figure out what "Question Name" button is supposed to do
 'TODO Add "Question Feedback" button (different from Answer feedback)
 'TODO Understand Numerical Questions: "Q Numerical" is followed by "Short Answer" in the v21 template. Should we make a "A Numerical" for consistency? Might impact "Check Layout" function.
-'TODO Fix Export for all question types
+'TODO Fix XML Export for all question types
 'TODO Selecting a missing word and using the button also selects the space after the word, which cause a problem in <questiontext/text>
-'TODO Answer feedback does not apply to matching answers, but button allows it to be inserted after STYLE_RIGHT_PAIR
 
 
 Imports Microsoft.Office.Interop.Word
@@ -1016,7 +1015,7 @@ Public Class MoodleQuestions
                     For Each theChar In para.Range.Characters
                         If theChar.Style.NameLocal = STYLE_BLANK_WORD Then misword = misword & theChar.Text
                     Next theChar
-                    ProcessCommonTags(dd, para)  ' XSLT template will swap out missing word (not sure why one uses XSLT, and the other replace below)
+                    ProcessCommonTags(dd, para)  ' XSLT template will swap out missing word
                     dd.documentElement.selectSingleNode("name").selectSingleNode("text").text = _
                         Replace(dd.documentElement.selectSingleNode("name").selectSingleNode("text").text, misword, "__________")
 
