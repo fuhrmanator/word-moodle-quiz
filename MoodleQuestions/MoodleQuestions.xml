@@ -26,8 +26,9 @@
           <button id="feedback" label="Answer Feedback" size="large" onAction="AddAnswerFeedback" image="feedback" />
           <button id="comment" label="Comment (not imported)" size="large" onAction="AddComment" image="comment" />
           <separator id="MdlQzSep5" />
-          <button id="cleanup" label="Check Layout" size="large" onAction="check" image="cleanup" />
-          <button id="export" label="Export to XML" size="large" onAction="export" image="export" />
+          <button id="cleanup" label="Check Layout" size="large" onAction="check" imageMso="FileCompatibilityCheckerWord" />
+          <button id="export" label="Export to XML" size="large" onAction="export" imageMso="ExportXmlFile" />
+          <button id="about" label="About..." size="large" onAction="displayVersionInfo" imageMso="AdvertisePublishAs" />
         </group>
       </tab>
     </tabs>
