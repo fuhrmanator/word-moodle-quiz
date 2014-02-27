@@ -50,6 +50,8 @@ Public Class MoodleQuestions
     Public Sub Ribbon_Load(ByVal ribbonUI As Office.IRibbonUI)
         Me.ribbon = ribbonUI
         Me.ribbon.ActivateTab("MoodleQuestions") 'Make Moodle Questions toolbar active on startup
+        updateVersionInfo()
+
     End Sub
 
     Public Function OnLoadImage(imageId As String) As IPictureDisp
@@ -59,6 +61,10 @@ Public Class MoodleQuestions
         Return tempImage
     End Function
     '''''BUTTON callbacks
+    ' Add Multiple Choice Question to the end of the active document
+    Public Sub displayVersionInfo(ByVal control As Office.IRibbonControl)
+        MsgBox("About MoodleQuestions..." & vbCrLf & "Published version: " & VERSION_INFO & vbCrLf & SOURCE_CODE_URL)
+    End Sub
 
     ' Add Multiple Choice Question to the end of the active document
     Public Sub AddMultipleChoiceQ(ByVal control As Office.IRibbonControl)
@@ -283,7 +289,8 @@ Public Class MoodleQuestions
 
 #End Region
 
-
+    Public VERSION_INFO As String = "unknown"
+    Public Const SOURCE_CODE_URL As String = "https://code.google.com/p/word-moodle-quiz/"
     ' General purpose styles.
     Public Const STYLE_NORMAL = Microsoft.Office.Interop.Word.WdBuiltinStyle.wdStyleNormal
 
@@ -1186,6 +1193,24 @@ Public Class MoodleQuestions
             Throw New Exception
         End If
 
+    End Sub
+
+    Private Sub updateVersionInfo()
+        ' Initialize the version number
+        If System.Deployment.Application.ApplicationDeployment.IsNetworkDeployed Then
+            VERSION_INFO = "unknown Network Deployed"
+
+            'This is a ClickOnce Application
+            If Not System.Diagnostics.Debugger.IsAttached Then
+                VERSION_INFO = System.Deployment.Application _
+                    .ApplicationDeployment.CurrentDeployment _
+                        .CurrentVersion.ToString()
+
+                'MsgBox("Started " & vbCrLf & " App Version:" _
+                '    & My.Application.Info.Version.ToString() & vbCrLf & _
+                '    " Published Version " & VERSION_INFO)
+            End If
+        End If
     End Sub
 
 End Class
