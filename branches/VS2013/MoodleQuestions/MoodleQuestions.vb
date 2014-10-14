@@ -183,16 +183,18 @@ Public Class MoodleQuestions
     End Sub
     Public Sub PasteImage(ByVal control As Office.IRibbonControl)
         '  Adds an image from the clipboard into a question.
+        'Globals.ThisDocument.Application.Selection.Paragraphs.Style = theStyle
+        '  TODO for test: tester tous les types d'extension d'images
         With Globals.ThisDocument.Application.Selection
-            If .Range.Style = STYLE_SHORTANSWERQ Or _
-               .Range.Style = STYLE_MISSINGWORDQ Or _
-               .Range.Style = STYLE_MULTICHOICEQ Or _
-               .Range.Style = STYLE_MATCHINGQ Or _
-               .Range.Style = STYLE_NUMERICALQ Or _
-               .Range.Style = STYLE_TRUESTATEMENT Or _
-               .Range.Style = STYLE_FALSESTATEMENT Or _
-               .Range.Style = STYLE_MULTICHOICEQ_FIXANSWER Or _
-               .Range.Style = STYLE_MATCHINGQ_FIXANSWER Then
+            If getSelectionStyle() = STYLE_SHORTANSWERQ Or _
+               getSelectionStyle() = STYLE_MISSINGWORDQ Or _
+               getSelectionStyle() = STYLE_MULTICHOICEQ Or _
+               getSelectionStyle() = STYLE_MATCHINGQ Or _
+               getSelectionStyle() = STYLE_NUMERICALQ Or _
+               getSelectionStyle() = STYLE_TRUESTATEMENT Or _
+               getSelectionStyle() = STYLE_FALSESTATEMENT Or _
+               getSelectionStyle() = STYLE_MULTICHOICEQ_FIXANSWER Or _
+               getSelectionStyle() = STYLE_MATCHINGQ_FIXANSWER Then
                 Globals.ThisDocument.Application.Options.ReplaceSelection = False
                 .TypeText(Text:=(" " & Chr(11)))
                 .Paste()
@@ -1093,7 +1095,8 @@ Public Class MoodleQuestions
 
             Dim header As String
             Dim stringlength As Long
-            header = Globals.ThisDocument.Application.Sections(1).Headers(WdHeaderFooterIndex.wdHeaderFooterPrimary).Range.Text
+
+            header = getDocumentHeaderText() ' Globals.ThisDocument.Application.ActiveDocument.Sections(1).Headers(WdHeaderFooterIndex.wdHeaderFooterPrimary).Range.Text
             stringlength = Len(header)
             header = Left(header, stringlength - 1)
 
