@@ -32,6 +32,8 @@
 Imports Microsoft.Office.Interop.Word
 Imports stdole
 
+Imports MSXML2
+
 <Runtime.InteropServices.ComVisible(True)> _
 Public Class MoodleQuestions
     Implements Office.IRibbonExtensibility
@@ -183,8 +185,9 @@ Public Class MoodleQuestions
     End Sub
     Public Sub PasteImage(ByVal control As Office.IRibbonControl)
         '  Adds an image from the clipboard into a question.
-        'Globals.ThisDocument.Application.Selection.Paragraphs.Style = theStyle
+        '  Globals.ThisDocument.Application.Selection.Paragraphs.Style = TYLE_SHORTANSWERQ
         '  TODO for test: tester tous les types d'extension d'images
+
         With Globals.ThisDocument.Application.Selection
             If getSelectionStyle() = STYLE_SHORTANSWERQ Or _
                getSelectionStyle() = STYLE_MISSINGWORDQ Or _
@@ -194,7 +197,9 @@ Public Class MoodleQuestions
                getSelectionStyle() = STYLE_TRUESTATEMENT Or _
                getSelectionStyle() = STYLE_FALSESTATEMENT Or _
                getSelectionStyle() = STYLE_MULTICHOICEQ_FIXANSWER Or _
-               getSelectionStyle() = STYLE_MATCHINGQ_FIXANSWER Then
+               getSelectionStyle() = STYLE_MATCHINGQ_FIXANSWER Or _
+               getSelectionStyle() = STYLE_CORRECT_MC_ANSWER Or _
+               getSelectionStyle() = STYLE_INCORRECT_MC_ANSWER Then
                 Globals.ThisDocument.Application.Options.ReplaceSelection = False
                 .TypeText(Text:=(" " & Chr(11)))
                 .Paste()
@@ -404,8 +409,8 @@ Public Class MoodleQuestions
         With Globals.ThisDocument.Application.Selection.Find
             .ClearFormatting()
             .Style = STYLE_ANSWERWEIGHT
-            .text = ""
-            .Replacement.text = ""
+            .Text = ""
+            .Replacement.Text = ""
             .Forward = True
             .Format = True
             .Execute(Replace:=Microsoft.Office.Interop.Word.WdReplace.wdReplaceAll)
@@ -786,7 +791,7 @@ Public Class MoodleQuestions
 
 
 
-    Private Sub Convert2XML()
+    Public Sub Convert2XML()
 
 
         ' Macro recorded on 21.12.2008 by Daniel Refresh Header (translation?)
@@ -832,6 +837,10 @@ Public Class MoodleQuestions
 
         Dim dd As MSXML2.DOMDocument60
         Dim xmlnod As MSXML2.IXMLDOMNode
+
+        'Dim dd As Xml.XmlDocument
+        'Dim xmlnod As XMLNode
+
         'Dim xmlnodelist As MSXML2.IXMLDOMNodeList
         Dim para As Paragraph, paralookahead As Paragraph
         paralookahead = Nothing
@@ -922,6 +931,7 @@ Public Class MoodleQuestions
                     dd.documentElement.removeChild(xmlnod)
                     rac = 0 'right answer choices
                     wac = 0 'wrong answer choices
+
                     Do While (paralookahead.Style.NameLocal = STYLE_CORRECT_MC_ANSWER) Or (paralookahead.Style.NameLocal = STYLE_INCORRECT_MC_ANSWER)
                         If paralookahead.Style.NameLocal = STYLE_CORRECT_MC_ANSWER Then
                             xmlnod.attributes.getNamedItem("fraction").text = "100"
@@ -930,7 +940,28 @@ Public Class MoodleQuestions
                             xmlnod.attributes.getNamedItem("fraction").text = "0"
                             wac = wac + 1
                         End If
-                        xmlnod.selectSingleNode("text").text = RemoveCR(paralookahead.Range.Text)
+                        ' xmlnod.selectSingleNode("text").text = RemoveCR(paralookahead.Range.Text)
+
+                        'insert image in answer
+                        'processing <image>'
+
+                        'Create a CData section. 
+                        Dim CDATASection As IXMLDOMCDATASection
+                        CDATASection = dd.createCDATASection("<p>" & XSLT_Range(paralookahead.Range, My.Resources.FormattedText_xslt) & "<img src=""@@PLUGINFILE@@/image.gif"" width=""88"" height=""74""/></p>")
+                        xmlnod.selectSingleNode("text").appendChild(CDATASection)
+                        If Not XSLT_Range(paralookahead.Range, My.Resources.PictureName_xslt) = "" Then 'if it is NOT null/empty
+                            '   Dim header As String
+                            Dim stringlength As Long
+                            header = getDocumentHeaderText() ' Globals.ThisDocument.Application.ActiveDocument.Sections(1).Headers(WdHeaderFooterIndex.wdHeaderFooterPrimary).Range.Text
+                            stringlength = Len(header)
+                            header = Left(header, stringlength - 1)
+                            'processing <image_base64>'
+                            xmlnod.selectSingleNode("file").text = XSLT_Range(paralookahead.Range, My.Resources.Picture_xslt)
+                        Else
+                            xmlnod.selectSingleNode("text").text = RemoveCR(paralookahead.Range.Text)
+                            xmlnod.selectSingleNode("file").text = ""
+                        End If
+                        ' fin bloc to insert image in answer
 
                         paralookahead = paralookahead.Next
                         ' Answer Feedback Style processing here
@@ -942,6 +973,8 @@ Public Class MoodleQuestions
 
                         dd.documentElement.appendChild(xmlnod)
                         xmlnod = xmlnod.cloneNode(True)
+
+                        xmlnod.selectSingleNode("text").text = Nothing
 
                         If paralookahead Is Nothing Then Exit Do
                     Loop
