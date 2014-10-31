@@ -71,6 +71,12 @@ Public Class MoodleQuestions
     ' Add Multiple Choice Question to the end of the active document
     Public Sub AddMultipleChoiceQ(ByVal control As Office.IRibbonControl)
         AddParagraphOfStyle(STYLE_MULTICHOICEQ, "Insert Multiple Choice Question")
+        AddParagraphOfStyle(STYLE_CORRECT_MC_ANSWER, "Insert Answer")
+        AddParagraphOfStyle(STYLE_FEEDBACK, "Insert feedback")
+        AddParagraphOfStyle(STYLE_INCORRECT_MC_ANSWER, "Insert Answer")
+        AddParagraphOfStyle(STYLE_FEEDBACK, "Insert feedback")
+        AddParagraphOfStyle(STYLE_INCORRECT_MC_ANSWER, "Insert Answer")
+        AddParagraphOfStyle(STYLE_FEEDBACK, "Insert feedback")
     End Sub
 
     ' Add Matching Question to the end of the active document
@@ -127,7 +133,7 @@ Public Class MoodleQuestions
            getSelectionStyle() = STYLE_SHORT_ANSWER Then
             InsertParagraphAfterCurrentParagraph("Insert feedback of the previous choice or answer here.", _
                              STYLE_FEEDBACK)
-
+            MsgBox("Feedback is")
 
         Else 'Error: Give Instructions:
             MsgBox("Feedback is placed at the end of the last possible response. " & vbCr & _
@@ -339,10 +345,10 @@ Public Class MoodleQuestions
     Public Sub AddParagraphOfStyle(aStyle, text)
         Dim myRange As Word.Range = Globals.ThisDocument.Application.Selection.Range
         With myRange
-            .InsertParagraphBefore()
-            '.Move Unit:=wdParagraph, Count:=1
-            .Text = text '.InsertBefore(text)
+            .InsertParagraphAfter() '.InsertBefore(text)
+            .Move(Unit:=WdUnits.wdParagraph, Count:=1)
             .Style = aStyle
+            .Text = text
             .Select()
         End With
     End Sub
