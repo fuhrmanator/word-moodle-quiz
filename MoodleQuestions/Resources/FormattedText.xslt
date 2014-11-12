@@ -12,7 +12,7 @@
 
   <xsl:template match="w:p/w:r//node() [@w:val='preformatted']">&lt;pre&gt;<xsl:value-of select="../../w:t"/>&lt;/pre&gt;</xsl:template>
 
-  <xsl:template match="w:p/w:r//node() [@w:val='BlankWord']">__________</xsl:template>
+  <xsl:template match="w:p/w:r//node() [@w:val='MissingWord']">__________</xsl:template>
 
   <xsl:template match="w:p/w:r [not(w:rPr/w:rStyle)]"><xsl:value-of select="w:t"/></xsl:template>
 

@@ -11,9 +11,9 @@ Imports System.Security
 
 <Assembly: AssemblyTitle("MoodleQuestions")> 
 <Assembly: AssemblyDescription("")> 
-<Assembly: AssemblyCompany("Hewlett-Packard Company")> 
+<Assembly: AssemblyCompany("")> 
 <Assembly: AssemblyProduct("MoodleQuestions")> 
-<Assembly: AssemblyCopyright("Copyright © Hewlett-Packard Company 2014")> 
+<Assembly: AssemblyCopyright("")> 
 <Assembly: AssemblyTrademark("")> 
 
 ' Setting ComVisible to false makes the types in this assembly not visible 
