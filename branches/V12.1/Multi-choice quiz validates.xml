@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz xmlns="http://moodle.org/Quiz.xsd">
+<!-- question: 0  -->
+  <bank_category>
+    <category>
+      <text>$course$/Default for S20132-LOG210-01/Outils UML</text>
+    </category>
+  </bank_category>
+
+<!-- question: 11005  -->
+  <multiple_choice_question>
+    <name>
+      <text>Comment actualiser les diagrammes après le codage</text>
+    </name>
+    <questiontext format="html">
+      <text><![CDATA[<p>Si vous travaillez dans une petite équipe en appliquant UML en mode esquisse, quelle est la suggestion de Craig Larman pour actualiser vos diagrammes UML après la fin d'une itération et pour recommencer la modélisation UML au début de la prochaine itération?</p>]]></text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <correctfeedback format="html">
+      <text></text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text></text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text></text>
+    </incorrectfeedback>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p>Utiliser un outil pour générer des diagrammes UML à partir du code existant - diagrammes de packages, de classes et d'interaction. Imprimer ces diagrammes sur de grandes feuilles de papier et les accrocher aux murs de la salle de modélisation. </p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>Ne pas actualiser les diagrammes, puisque vous serez assez familier avec le code après une itération. La modélisation "mentale" suffira.</p>]]></text>
+      <feedback format="html">
+        <text><![CDATA[<p>Incorrect. Il faut "itérer" sur la solution existante dans le processus unifié. Alors, Larman conseille d'utiliser un outil pour générer des diagrammes UML à partir du code existant - diagrammes de packages, de classes et d'interaction - et d'imprimer ces diagrammes sur de grandes feuilles de papier et les accrocher aux murs de la salle de modélisation. </p>]]></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p><span>Confier à un tiers ("outsource") la génération et l'impression des modèles UML, puisque le coût des outils UML sophistiqués et des tables traçantes est probablement trop élevé pour une petite équipe. </span></p>]]></text>
+      <feedback format="html">
+        <text><![CDATA[<p>Incorrect. Larman conseille d'utiliser un outil pour générer des diagrammes UML à partir du code existant - diagrammes de packages, de classes et d'interaction - et d'imprimer ces diagrammes sur de grandes feuilles de papier et les accrocher aux murs de la salle de modélisation. </p>]]></text>
+      </feedback>
+    </answer>
+  </multiple_choice_question>
+
+</quiz>
