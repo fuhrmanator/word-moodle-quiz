@@ -70,13 +70,13 @@ Public Class MoodleQuestions
 
     ' Add Multiple Choice Question to the end of the active document
     Public Sub AddMultipleChoiceQ(ByVal control As Office.IRibbonControl)
-        AddParagraphOfStyle(STYLE_MULTICHOICEQ, "Insert Multiple Choice Question")
-        AddParagraphOfStyle(STYLE_CORRECT_MC_ANSWER, "Insert Answer")
-        AddParagraphOfStyle(STYLE_FEEDBACK, "Insert feedback")
-        AddParagraphOfStyle(STYLE_INCORRECT_MC_ANSWER, "Insert Answer")
-        AddParagraphOfStyle(STYLE_FEEDBACK, "Insert feedback")
-        AddParagraphOfStyle(STYLE_INCORRECT_MC_ANSWER, "Insert Answer")
-        AddParagraphOfStyle(STYLE_FEEDBACK, "Insert feedback")
+        AddParagraphOfStyle(STYLE_MULTICHOICEQ, "Insert Multiple Choice Question here")
+        AddParagraphOfStyle(STYLE_CORRECT_MC_ANSWER, "Insert correct answer here")
+        AddParagraphOfStyle(STYLE_FEEDBACK, "Insert feedback explaining why this is a correct answer here")
+        AddParagraphOfStyle(STYLE_INCORRECT_MC_ANSWER, "Insert incorrect answer here")
+        AddParagraphOfStyle(STYLE_FEEDBACK, "Insert feedback explaining why this is an incorrect answer here")
+        AddParagraphOfStyle(STYLE_INCORRECT_MC_ANSWER, "Insert incorrect answer here")
+        AddParagraphOfStyle(STYLE_FEEDBACK, "Insert feedback explaining why this is an incorrect answer here")
     End Sub
 
     ' Add Matching Question to the end of the active document

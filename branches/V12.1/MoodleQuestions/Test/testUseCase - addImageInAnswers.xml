@@ -1,0 +1,399 @@
+﻿<?xml version="1.0"?><quiz><question type="category"><category><text>Question_Category/Question_Subcategory</text></category></question><question type="multichoice">
+	<name>
+		<text>Question test image in one answer</text>
+	</name>
+	<questiontext format="html">
+		<text>Question test image in one answer</text>
+	</questiontext>
+	<image></image>
+	<image_base64></image_base64>
+	<generalfeedback>
+		<text></text>
+	</generalfeedback>
+	<penalty>0.1</penalty>
+	<hidden>0</hidden>
+	<single>true</single>
+	<shuffleanswers>true</shuffleanswers>
+	<answernumbering>none</answernumbering>
+	<answer fraction="100">
+		<text><![CDATA[<p>Rep1<img src="@@PLUGINFILE@@/image.gif" width="88" height="74"/></p>]]></text>
+		<file name="image.gif" path="/" encoding="base64">R0lGODlhWABKAPcAAAAAAAAAMwAAZgAAmQAAzAAA/wArAAArMwArZgArmQArzAAr/wBVAABVMwBV
+ZgBVmQBVzABV/wCAAACAMwCAZgCAmQCAzACA/wCqAACqMwCqZgCqmQCqzACq/wDVAADVMwDVZgDV
+mQDVzADV/wD/AAD/MwD/ZgD/mQD/zAD//zMAADMAMzMAZjMAmTMAzDMA/zMrADMrMzMrZjMrmTMr
+zDMr/zNVADNVMzNVZjNVmTNVzDNV/zOAADOAMzOAZjOAmTOAzDOA/zOqADOqMzOqZjOqmTOqzDOq
+/zPVADPVMzPVZjPVmTPVzDPV/zP/ADP/MzP/ZjP/mTP/zDP//2YAAGYAM2YAZmYAmWYAzGYA/2Yr
+AGYrM2YrZmYrmWYrzGYr/2ZVAGZVM2ZVZmZVmWZVzGZV/2aAAGaAM2aAZmaAmWaAzGaA/2aqAGaq
+M2aqZmaqmWaqzGaq/2bVAGbVM2bVZmbVmWbVzGbV/2b/AGb/M2b/Zmb/mWb/zGb//5kAAJkAM5kA
+ZpkAmZkAzJkA/5krAJkrM5krZpkrmZkrzJkr/5lVAJlVM5lVZplVmZlVzJlV/5mAAJmAM5mAZpmA
+mZmAzJmA/5mqAJmqM5mqZpmqmZmqzJmq/5nVAJnVM5nVZpnVmZnVzJnV/5n/AJn/M5n/Zpn/mZn/
+zJn//8wAAMwAM8wAZswAmcwAzMwA/8wrAMwrM8wrZswrmcwrzMwr/8xVAMxVM8xVZsxVmcxVzMxV
+/8yAAMyAM8yAZsyAmcyAzMyA/8yqAMyqM8yqZsyqmcyqzMyq/8zVAMzVM8zVZszVmczVzMzV/8z/
+AMz/M8z/Zsz/mcz/zMz///8AAP8AM/8AZv8Amf8AzP8A//8rAP8rM/8rZv8rmf8rzP8r//9VAP9V
+M/9VZv9Vmf9VzP9V//+AAP+AM/+AZv+Amf+AzP+A//+qAP+qM/+qZv+qmf+qzP+q///VAP/VM//V
+Zv/Vmf/VzP/V////AP//M///Zv//mf//zP///wAAAAAAAAAAAAAAACH5BAEAAPwALAAAAABYAEoA
+AAiDAAEIHEiwoMGDCBMqXMiwocOHECNKnEixosWLGDNq3Mixo8ePIEOKHEmypMmTKFOqXMmypcuX
+MGPKnEmzps2bOHPq3Mmzp8+fQIMKHUq0qNGjSJMqXcq0qdOnUKNKnUq1qtWrWLNq3cq1q9evYMOK
+HUu2rNmzaNOqXcu2rdu3cOMeDQgAOw==
+</file>
+		<feedback>
+			<text>Feed1</text>
+		</feedback>
+	</answer>
+	<answer fraction="0">
+		<text>Rep2</text>
+		<file name="image.gif" path="/" encoding="base64"></file>
+		<feedback>
+			<text>Feed2</text>
+		</feedback>
+	</answer>
+	<answer fraction="0">
+		<text>Rep3</text>
+		<file name="image.gif" path="/" encoding="base64"></file>
+		<feedback>
+			<text>Feed3</text>
+		</feedback>
+	</answer>
+</question>
+<question type="multichoice">
+	<name>
+		<text>Question test image in two answer</text>
+	</name>
+	<questiontext format="html">
+		<text>Question test image in two answer</text>
+	</questiontext>
+	<image></image>
+	<image_base64></image_base64>
+	<generalfeedback>
+		<text></text>
+	</generalfeedback>
+	<penalty>0.1</penalty>
+	<hidden>0</hidden>
+	<single>true</single>
+	<shuffleanswers>true</shuffleanswers>
+	<answernumbering>none</answernumbering>
+	<answer fraction="100">
+		<text><![CDATA[<p>Rep 1<img src="@@PLUGINFILE@@/image.gif" width="88" height="74"/></p>]]></text>
+		<file name="image.gif" path="/" encoding="base64">R0lGODlhWABKAPcAAAAAAAAAMwAAZgAAmQAAzAAA/wArAAArMwArZgArmQArzAAr/wBVAABVMwBV
+ZgBVmQBVzABV/wCAAACAMwCAZgCAmQCAzACA/wCqAACqMwCqZgCqmQCqzACq/wDVAADVMwDVZgDV
+mQDVzADV/wD/AAD/MwD/ZgD/mQD/zAD//zMAADMAMzMAZjMAmTMAzDMA/zMrADMrMzMrZjMrmTMr
+zDMr/zNVADNVMzNVZjNVmTNVzDNV/zOAADOAMzOAZjOAmTOAzDOA/zOqADOqMzOqZjOqmTOqzDOq
+/zPVADPVMzPVZjPVmTPVzDPV/zP/ADP/MzP/ZjP/mTP/zDP//2YAAGYAM2YAZmYAmWYAzGYA/2Yr
+AGYrM2YrZmYrmWYrzGYr/2ZVAGZVM2ZVZmZVmWZVzGZV/2aAAGaAM2aAZmaAmWaAzGaA/2aqAGaq
+M2aqZmaqmWaqzGaq/2bVAGbVM2bVZmbVmWbVzGbV/2b/AGb/M2b/Zmb/mWb/zGb//5kAAJkAM5kA
+ZpkAmZkAzJkA/5krAJkrM5krZpkrmZkrzJkr/5lVAJlVM5lVZplVmZlVzJlV/5mAAJmAM5mAZpmA
+mZmAzJmA/5mqAJmqM5mqZpmqmZmqzJmq/5nVAJnVM5nVZpnVmZnVzJnV/5n/AJn/M5n/Zpn/mZn/
+zJn//8wAAMwAM8wAZswAmcwAzMwA/8wrAMwrM8wrZswrmcwrzMwr/8xVAMxVM8xVZsxVmcxVzMxV
+/8yAAMyAM8yAZsyAmcyAzMyA/8yqAMyqM8yqZsyqmcyqzMyq/8zVAMzVM8zVZszVmczVzMzV/8z/
+AMz/M8z/Zsz/mcz/zMz///8AAP8AM/8AZv8Amf8AzP8A//8rAP8rM/8rZv8rmf8rzP8r//9VAP9V
+M/9VZv9Vmf9VzP9V//+AAP+AM/+AZv+Amf+AzP+A//+qAP+qM/+qZv+qmf+qzP+q///VAP/VM//V
+Zv/Vmf/VzP/V////AP//M///Zv//mf//zP///wAAAAAAAAAAAAAAACH5BAEAAPwALAAAAABYAEoA
+AAj/AOEJVCdwYEF4BAsmNKjw4EKEDiM2nMiwIkSKFwuugxdPXcd4HD16hLcR5MaSJFN+DLny40iU
+JzmmLDnSJUibKmfK3JjwIUSfBB8GPfgzItCMRY0qXWpwpEqRN3XCzGmzJtSdOk1ShWq1pVSsKCGC
+RDqUKFmkGMsSFYrWolqJRce+3FpV69SYNFtyXRnTbtardefeHNrxYOGEhTU6HCuWIciFiQVuVMiY
+oFyBjwtGdkrYoEvMKSWH1olwpeWUlkVi5mw652meLBGzxmqVcs/RoikThZ1b8c/LMi/yDml44eTh
+jcOG5Sp6MnOspVW7pv10deLPqIlDP2xwsljEo1OD/0582rrjhMtXg+btNPLw0yujZ+aul3hqrdKf
+Fr48NTvWwpPF99FgF5U3l3qeXUQeaLI59ttE3vnn04ILwRdaeQPtV11sMtEXWmu10ZRhe3PxVh9n
+32UWk0y3RadZZ+TFGNxp6AXn2YTSYVhTRhFmpxVj/uHXG0sPJtfdhX6B51x1XckHWYWkCZlhcxMB
+qN2BpUUUlWyVsVggY5/VN+J6XnrXn5c23udkZnPdNlt8QboJnYRZ5lYWbPjBORJQwAlI0JKivaYY
+geL9R5yZHdZo3Ihg7pXlZgZCh2KdZV1X1lsoFqpVnUcixSaRCeK5J4FUfWjhXcRFtV9na06J3ZZH
+Rv/m3o2fisddiw3dmpl9uw6akWpq0tqgna5e2eF/VxlpHouDUbhplsahBNmjao7FHqydVSjlhRB5
+tyis1T37p33kXubUdNUGtamSKc7IV1OSIrijr+Cpy+uDj/X5rYK42cvQjreR6q2EBErr24zQhhve
+tn3JR+S4IGonoqr+KugUT2LO9+WeL0aGW4Fo5hRgrkPRqF9PXQrXmKDCdlxjw5YC56KIjWnsk3Ne
+jTyfth8PtxmaOcYGJJke3ifdwIquDKrRY4U5HZytHQmsbon1yClK1x16JaljAv0dlUZqSPSDx023
+ZICVTgnoioESuelmMnMctMkJ+uunaIf1iiVp2oH/zCXes/mqocG1aVvomyhiRxrMHFLam73ZNgWu
+X/8yNvB0L1YJ70M4m9o0fPZiu22pVv6lNmo/qrsjTtxSqF693YZMecmZr7UrhipnznndoHonJKlt
+ZuQVdngxW2apU89O4O1S686gZomOyXNFiDfE8baRtrudas0KWvKzP8Yubq8N092s+P1y52DahNUW
+KJtRqVz1x7Ndi7DDZIpY+LEtzoowxAFb1IomFTGs/QY5jalZZ6QlriwZTGEe+5r7LEQ7INUldviC
+0pLEpEDn+cVmj/IRskginS5Z637JileN1Ie61+UqhEn5lEXapj+5vEt6gkMZqDqlPHzdKy/k8l0H
+/wnouVTJb2PxyQ+0PhcXkBUpXw2CHcNeGKxg5Y5Ktzuhio71wHOVUGL8whnHFsatA7GuXflJD5S6
+pBwfkit9SHIQ19gSlorY713cqeMGNxcVRC3ISrUyT8Ni1591GStNLqqOAdUCKKihj2a/yokTR0Mz
+EAHRcWwkk8hsw6kA6iWT3SNWb+qow4SxLUfk89IWn2U9sDUxjqYxV7AmZjgbWuxTGvsVTrhWnz22
+CGKgSWR5SBkcmoFuiYLhkcrWeDq3Zapiy+GP1r5UrsdJTjt+AlFlFlSs43XNi+56WPQuZijIdcqI
+pRPk5hJYwlHJTW8yvMzPjBfNKB5kgOZpWgvfePauaFKSOp3LC5Q45SG2Ya5baoERa76FsoEab5Lh
+sxIF79m6FJ5PhqPBzrxwgidqSYl98Gsc4GyjvtClKj8oes+UEkZNrI1rpYxs3ccu+j3hBc5QsSwW
+N6GptfP5pkEYY+auNKo1OdkJijWTJEtTpjoyncuB1eyRwfLFRd2UZ4pX4Vhf5uUzHQq1lrwLZGsC
+KSng7M1wTs1c6lTmrbGGboydW+vhgIfFfoaRd3fV5NeC4zGdJRRBSaRYyL7YVaiqjzdTHQrazJW/
+3jVkSSZbVzxJWLsOipNETEQfCxeFv3JuTadP+py54DlY7TXxkzXCYd02BdnvBAQAOw==
+</file>
+		<feedback>
+			<text>Feed1</text>
+		</feedback>
+	</answer>
+	<answer fraction="0">
+		<text><![CDATA[<p>Rep 2<img src="@@PLUGINFILE@@/image.gif" width="88" height="74"/></p>]]></text>
+		<file name="image.gif" path="/" encoding="base64">R0lGODlhWABKAPcAAAAAAAAAMwAAZgAAmQAAzAAA/wArAAArMwArZgArmQArzAAr/wBVAABVMwBV
+ZgBVmQBVzABV/wCAAACAMwCAZgCAmQCAzACA/wCqAACqMwCqZgCqmQCqzACq/wDVAADVMwDVZgDV
+mQDVzADV/wD/AAD/MwD/ZgD/mQD/zAD//zMAADMAMzMAZjMAmTMAzDMA/zMrADMrMzMrZjMrmTMr
+zDMr/zNVADNVMzNVZjNVmTNVzDNV/zOAADOAMzOAZjOAmTOAzDOA/zOqADOqMzOqZjOqmTOqzDOq
+/zPVADPVMzPVZjPVmTPVzDPV/zP/ADP/MzP/ZjP/mTP/zDP//2YAAGYAM2YAZmYAmWYAzGYA/2Yr
+AGYrM2YrZmYrmWYrzGYr/2ZVAGZVM2ZVZmZVmWZVzGZV/2aAAGaAM2aAZmaAmWaAzGaA/2aqAGaq
+M2aqZmaqmWaqzGaq/2bVAGbVM2bVZmbVmWbVzGbV/2b/AGb/M2b/Zmb/mWb/zGb//5kAAJkAM5kA
+ZpkAmZkAzJkA/5krAJkrM5krZpkrmZkrzJkr/5lVAJlVM5lVZplVmZlVzJlV/5mAAJmAM5mAZpmA
+mZmAzJmA/5mqAJmqM5mqZpmqmZmqzJmq/5nVAJnVM5nVZpnVmZnVzJnV/5n/AJn/M5n/Zpn/mZn/
+zJn//8wAAMwAM8wAZswAmcwAzMwA/8wrAMwrM8wrZswrmcwrzMwr/8xVAMxVM8xVZsxVmcxVzMxV
+/8yAAMyAM8yAZsyAmcyAzMyA/8yqAMyqM8yqZsyqmcyqzMyq/8zVAMzVM8zVZszVmczVzMzV/8z/
+AMz/M8z/Zsz/mcz/zMz///8AAP8AM/8AZv8Amf8AzP8A//8rAP8rM/8rZv8rmf8rzP8r//9VAP9V
+M/9VZv9Vmf9VzP9V//+AAP+AM/+AZv+Amf+AzP+A//+qAP+qM/+qZv+qmf+qzP+q///VAP/VM//V
+Zv/Vmf/VzP/V////AP//M///Zv//mf//zP///wAAAAAAAAAAAAAAACH5BAEAAPwALAAAAABYAEoA
+AAiDAAEIHEiwoMGDCBMqXMiwocOHECNKnEixosWLGDNq3Mixo8ePIEOKHEmypMmTKFOqXMmypcuX
+MGPKnEmzps2bOHPq3Mmzp8+fQIMKHUq0qNGjSJMqXcq0qdOnUKNKnUq1qtWrWLNq3cq1q9evYMOK
+HUu2rNmzaNOqXcu2rdu3cOMeDQgAOw==
+</file>
+		<feedback>
+			<text>Feed2</text>
+		</feedback>
+	</answer>
+	<answer fraction="0">
+		<text>Rep3</text>
+		<file name="image.gif" path="/" encoding="base64"></file>
+		<feedback>
+			<text>Feed3</text>
+		</feedback>
+	</answer>
+</question>
+<question type="multichoice">
+	<name>
+		<text>Question test image in three answer</text>
+	</name>
+	<questiontext format="html">
+		<text>Question test image in three answer</text>
+	</questiontext>
+	<image></image>
+	<image_base64></image_base64>
+	<generalfeedback>
+		<text></text>
+	</generalfeedback>
+	<penalty>0.1</penalty>
+	<hidden>0</hidden>
+	<single>true</single>
+	<shuffleanswers>true</shuffleanswers>
+	<answernumbering>none</answernumbering>
+	<answer fraction="100">
+		<text><![CDATA[<p>Rep1<img src="@@PLUGINFILE@@/image.gif" width="88" height="74"/></p>]]></text>
+		<file name="image.gif" path="/" encoding="base64">R0lGODlhWABKAPcAAAAAAAAAMwAAZgAAmQAAzAAA/wArAAArMwArZgArmQArzAAr/wBVAABVMwBV
+ZgBVmQBVzABV/wCAAACAMwCAZgCAmQCAzACA/wCqAACqMwCqZgCqmQCqzACq/wDVAADVMwDVZgDV
+mQDVzADV/wD/AAD/MwD/ZgD/mQD/zAD//zMAADMAMzMAZjMAmTMAzDMA/zMrADMrMzMrZjMrmTMr
+zDMr/zNVADNVMzNVZjNVmTNVzDNV/zOAADOAMzOAZjOAmTOAzDOA/zOqADOqMzOqZjOqmTOqzDOq
+/zPVADPVMzPVZjPVmTPVzDPV/zP/ADP/MzP/ZjP/mTP/zDP//2YAAGYAM2YAZmYAmWYAzGYA/2Yr
+AGYrM2YrZmYrmWYrzGYr/2ZVAGZVM2ZVZmZVmWZVzGZV/2aAAGaAM2aAZmaAmWaAzGaA/2aqAGaq
+M2aqZmaqmWaqzGaq/2bVAGbVM2bVZmbVmWbVzGbV/2b/AGb/M2b/Zmb/mWb/zGb//5kAAJkAM5kA
+ZpkAmZkAzJkA/5krAJkrM5krZpkrmZkrzJkr/5lVAJlVM5lVZplVmZlVzJlV/5mAAJmAM5mAZpmA
+mZmAzJmA/5mqAJmqM5mqZpmqmZmqzJmq/5nVAJnVM5nVZpnVmZnVzJnV/5n/AJn/M5n/Zpn/mZn/
+zJn//8wAAMwAM8wAZswAmcwAzMwA/8wrAMwrM8wrZswrmcwrzMwr/8xVAMxVM8xVZsxVmcxVzMxV
+/8yAAMyAM8yAZsyAmcyAzMyA/8yqAMyqM8yqZsyqmcyqzMyq/8zVAMzVM8zVZszVmczVzMzV/8z/
+AMz/M8z/Zsz/mcz/zMz///8AAP8AM/8AZv8Amf8AzP8A//8rAP8rM/8rZv8rmf8rzP8r//9VAP9V
+M/9VZv9Vmf9VzP9V//+AAP+AM/+AZv+Amf+AzP+A//+qAP+qM/+qZv+qmf+qzP+q///VAP/VM//V
+Zv/Vmf/VzP/V////AP//M///Zv//mf//zP///wAAAAAAAAAAAAAAACH5BAEAAPwALAAAAABYAEoA
+AAiDAAEIHEiwoMGDCBMqXMiwocOHECNKnEixosWLGDNq3Mixo8ePIEOKHEmypMmTKFOqXMmypcuX
+MGPKnEmzps2bOHPq3Mmzp8+fQIMKHUq0qNGjSJMqXcq0qdOnUKNKnUq1qtWrWLNq3cq1q9evYMOK
+HUu2rNmzaNOqXcu2rdu3cOMeDQgAOw==
+</file>
+		<feedback>
+			<text>Feed1</text>
+		</feedback>
+	</answer>
+	<answer fraction="0">
+		<text><![CDATA[<p>Rep2<img src="@@PLUGINFILE@@/image.gif" width="88" height="74"/></p>]]></text>
+		<file name="image.gif" path="/" encoding="base64">R0lGODlhWABKAPcAAAAAAAAAMwAAZgAAmQAAzAAA/wArAAArMwArZgArmQArzAAr/wBVAABVMwBV
+ZgBVmQBVzABV/wCAAACAMwCAZgCAmQCAzACA/wCqAACqMwCqZgCqmQCqzACq/wDVAADVMwDVZgDV
+mQDVzADV/wD/AAD/MwD/ZgD/mQD/zAD//zMAADMAMzMAZjMAmTMAzDMA/zMrADMrMzMrZjMrmTMr
+zDMr/zNVADNVMzNVZjNVmTNVzDNV/zOAADOAMzOAZjOAmTOAzDOA/zOqADOqMzOqZjOqmTOqzDOq
+/zPVADPVMzPVZjPVmTPVzDPV/zP/ADP/MzP/ZjP/mTP/zDP//2YAAGYAM2YAZmYAmWYAzGYA/2Yr
+AGYrM2YrZmYrmWYrzGYr/2ZVAGZVM2ZVZmZVmWZVzGZV/2aAAGaAM2aAZmaAmWaAzGaA/2aqAGaq
+M2aqZmaqmWaqzGaq/2bVAGbVM2bVZmbVmWbVzGbV/2b/AGb/M2b/Zmb/mWb/zGb//5kAAJkAM5kA
+ZpkAmZkAzJkA/5krAJkrM5krZpkrmZkrzJkr/5lVAJlVM5lVZplVmZlVzJlV/5mAAJmAM5mAZpmA
+mZmAzJmA/5mqAJmqM5mqZpmqmZmqzJmq/5nVAJnVM5nVZpnVmZnVzJnV/5n/AJn/M5n/Zpn/mZn/
+zJn//8wAAMwAM8wAZswAmcwAzMwA/8wrAMwrM8wrZswrmcwrzMwr/8xVAMxVM8xVZsxVmcxVzMxV
+/8yAAMyAM8yAZsyAmcyAzMyA/8yqAMyqM8yqZsyqmcyqzMyq/8zVAMzVM8zVZszVmczVzMzV/8z/
+AMz/M8z/Zsz/mcz/zMz///8AAP8AM/8AZv8Amf8AzP8A//8rAP8rM/8rZv8rmf8rzP8r//9VAP9V
+M/9VZv9Vmf9VzP9V//+AAP+AM/+AZv+Amf+AzP+A//+qAP+qM/+qZv+qmf+qzP+q///VAP/VM//V
+Zv/Vmf/VzP/V////AP//M///Zv//mf//zP///wAAAAAAAAAAAAAAACH5BAEAAPwALAAAAABYAEoA
+AAiDAAEIHEiwoMGDCBMqXMiwocOHECNKnEixosWLGDNq3Mixo8ePIEOKHEmypMmTKFOqXMmypcuX
+MGPKnEmzps2bOHPq3Mmzp8+fQIMKHUq0qNGjSJMqXcq0qdOnUKNKnUq1qtWrWLNq3cq1q9evYMOK
+HUu2rNmzaNOqXcu2rdu3cOMeDQgAOw==
+</file>
+		<feedback>
+			<text>Feed2</text>
+		</feedback>
+	</answer>
+	<answer fraction="0">
+		<text><![CDATA[<p>Rep3  <img src="@@PLUGINFILE@@/image.gif" width="88" height="74"/></p>]]></text>
+		<file name="image.gif" path="/" encoding="base64">R0lGODlhWABKAPcAAAAAAAAAMwAAZgAAmQAAzAAA/wArAAArMwArZgArmQArzAAr/wBVAABVMwBV
+ZgBVmQBVzABV/wCAAACAMwCAZgCAmQCAzACA/wCqAACqMwCqZgCqmQCqzACq/wDVAADVMwDVZgDV
+mQDVzADV/wD/AAD/MwD/ZgD/mQD/zAD//zMAADMAMzMAZjMAmTMAzDMA/zMrADMrMzMrZjMrmTMr
+zDMr/zNVADNVMzNVZjNVmTNVzDNV/zOAADOAMzOAZjOAmTOAzDOA/zOqADOqMzOqZjOqmTOqzDOq
+/zPVADPVMzPVZjPVmTPVzDPV/zP/ADP/MzP/ZjP/mTP/zDP//2YAAGYAM2YAZmYAmWYAzGYA/2Yr
+AGYrM2YrZmYrmWYrzGYr/2ZVAGZVM2ZVZmZVmWZVzGZV/2aAAGaAM2aAZmaAmWaAzGaA/2aqAGaq
+M2aqZmaqmWaqzGaq/2bVAGbVM2bVZmbVmWbVzGbV/2b/AGb/M2b/Zmb/mWb/zGb//5kAAJkAM5kA
+ZpkAmZkAzJkA/5krAJkrM5krZpkrmZkrzJkr/5lVAJlVM5lVZplVmZlVzJlV/5mAAJmAM5mAZpmA
+mZmAzJmA/5mqAJmqM5mqZpmqmZmqzJmq/5nVAJnVM5nVZpnVmZnVzJnV/5n/AJn/M5n/Zpn/mZn/
+zJn//8wAAMwAM8wAZswAmcwAzMwA/8wrAMwrM8wrZswrmcwrzMwr/8xVAMxVM8xVZsxVmcxVzMxV
+/8yAAMyAM8yAZsyAmcyAzMyA/8yqAMyqM8yqZsyqmcyqzMyq/8zVAMzVM8zVZszVmczVzMzV/8z/
+AMz/M8z/Zsz/mcz/zMz///8AAP8AM/8AZv8Amf8AzP8A//8rAP8rM/8rZv8rmf8rzP8r//9VAP9V
+M/9VZv9Vmf9VzP9V//+AAP+AM/+AZv+Amf+AzP+A//+qAP+qM/+qZv+qmf+qzP+q///VAP/VM//V
+Zv/Vmf/VzP/V////AP//M///Zv//mf//zP///wAAAAAAAAAAAAAAACH5BAEAAPwALAAAAABYAEoA
+AAiDAAEIHEiwoMGDCBMqXMiwocOHECNKnEixosWLGDNq3Mixo8ePIEOKHEmypMmTKFOqXMmypcuX
+MGPKnEmzps2bOHPq3Mmzp8+fQIMKHUq0qNGjSJMqXcq0qdOnUKNKnUq1qtWrWLNq3cq1q9evYMOK
+HUu2rNmzaNOqXcu2rdu3cOMeDQgAOw==
+</file>
+		<feedback>
+			<text>Feed3</text>
+		</feedback>
+	</answer>
+</question>
+<question type="multichoice">
+	<name>
+		<text>Question test image in answers and question /</text>
+	</name>
+	<questiontext format="html">
+		<text>Question test image in answers and question</text>
+	</questiontext>
+	<image>Images_forQuizQuestions/Question_Category/Question_Subcategory.gif</image>
+	<image_base64>R0lGODlhWABKAPcAAAAAAAAAMwAAZgAAmQAAzAAA/wArAAArMwArZgArmQArzAAr/wBVAABVMwBV
+ZgBVmQBVzABV/wCAAACAMwCAZgCAmQCAzACA/wCqAACqMwCqZgCqmQCqzACq/wDVAADVMwDVZgDV
+mQDVzADV/wD/AAD/MwD/ZgD/mQD/zAD//zMAADMAMzMAZjMAmTMAzDMA/zMrADMrMzMrZjMrmTMr
+zDMr/zNVADNVMzNVZjNVmTNVzDNV/zOAADOAMzOAZjOAmTOAzDOA/zOqADOqMzOqZjOqmTOqzDOq
+/zPVADPVMzPVZjPVmTPVzDPV/zP/ADP/MzP/ZjP/mTP/zDP//2YAAGYAM2YAZmYAmWYAzGYA/2Yr
+AGYrM2YrZmYrmWYrzGYr/2ZVAGZVM2ZVZmZVmWZVzGZV/2aAAGaAM2aAZmaAmWaAzGaA/2aqAGaq
+M2aqZmaqmWaqzGaq/2bVAGbVM2bVZmbVmWbVzGbV/2b/AGb/M2b/Zmb/mWb/zGb//5kAAJkAM5kA
+ZpkAmZkAzJkA/5krAJkrM5krZpkrmZkrzJkr/5lVAJlVM5lVZplVmZlVzJlV/5mAAJmAM5mAZpmA
+mZmAzJmA/5mqAJmqM5mqZpmqmZmqzJmq/5nVAJnVM5nVZpnVmZnVzJnV/5n/AJn/M5n/Zpn/mZn/
+zJn//8wAAMwAM8wAZswAmcwAzMwA/8wrAMwrM8wrZswrmcwrzMwr/8xVAMxVM8xVZsxVmcxVzMxV
+/8yAAMyAM8yAZsyAmcyAzMyA/8yqAMyqM8yqZsyqmcyqzMyq/8zVAMzVM8zVZszVmczVzMzV/8z/
+AMz/M8z/Zsz/mcz/zMz///8AAP8AM/8AZv8Amf8AzP8A//8rAP8rM/8rZv8rmf8rzP8r//9VAP9V
+M/9VZv9Vmf9VzP9V//+AAP+AM/+AZv+Amf+AzP+A//+qAP+qM/+qZv+qmf+qzP+q///VAP/VM//V
+Zv/Vmf/VzP/V////AP//M///Zv//mf//zP///wAAAAAAAAAAAAAAACH5BAEAAPwALAAAAABYAEoA
+AAj/AOEJVCdwYEF4BAsmNKjw4EKEDiM2nMiwIkSKFwuugxdPXcd4HD16hLcR5MaSJFN+DLny40iU
+JzmmLDnSJUibKmfK3JjwIUSfBB8GPfgzItCMRY0qXWpwpEqRN3XCzGmzJtSdOk1ShWq1pVSsKCGC
+RDqUKFmkGMsSFYrWolqJRce+3FpV69SYNFtyXRnTbtardefeHNrxYOGEhTU6HCuWIciFiQVuVMiY
+oFyBjwtGdkrYoEvMKSWH1olwpeWUlkVi5mw652meLBGzxmqVcs/RoikThZ1b8c/LMi/yDml44eTh
+jcOG5Sp6MnOspVW7pv10deLPqIlDP2xwsljEo1OD/0582rrjhMtXg+btNPLw0yujZ+aul3hqrdKf
+Fr48NTvWwpPF99FgF5U3l3qeXUQeaLI59ttE3vnn04ILwRdaeQPtV11sMtEXWmu10ZRhe3PxVh9n
+32UWk0y3RadZZ+TFGNxp6AXn2YTSYVhTRhFmpxVj/uHXG0sPJtfdhX6B51x1XckHWYWkCZlhcxMB
+qN2BpUUUlWyVsVggY5/VN+J6XnrXn5c23udkZnPdNlt8QboJnYRZ5lYWbPjBORJQwAlI0JKivaYY
+geL9R5yZHdZo3Ihg7pXlZgZCh2KdZV1X1lsoFqpVnUcixSaRCeK5J4FUfWjhXcRFtV9na06J3ZZH
+Rv/m3o2fisddiw3dmpl9uw6akWpq0tqgna5e2eF/VxlpHouDUbhplsahBNmjao7FHqydVSjlhRB5
+tyis1T37p33kXubUdNUGtamSKc7IV1OSIrijr+Cpy+uDj/X5rYK42cvQjreR6q2EBErr24zQhhve
+tn3JR+S4IGonoqr+KugUT2LO9+WeL0aGW4Fo5hRgrkPRqF9PXQrXmKDCdlxjw5YC56KIjWnsk3Ne
+jTyfth8PtxmaOcYGJJke3ifdwIquDKrRY4U5HZytHQmsbon1yClK1x16JaljAv0dlUZqSPSDx023
+ZICVTgnoioESuelmMnMctMkJ+uunaIf1iiVp2oH/zCXes/mqocG1aVvomyhiRxrMHFLam73ZNgWu
+X/8yNvB0L1YJ70M4m9o0fPZiu22pVv6lNmo/qrsjTtxSqF693YZMecmZr7UrhipnznndoHonJKlt
+ZuQVdngxW2apU89O4O1S686gZomOyXNFiDfE8baRtrudas0KWvKzP8Yubq8N092s+P1y52DahNUW
+KJtRqVz1x7Ndi7DDZIpY+LEtzoowxAFb1IomFTGs/QY5jalZZ6QlriwZTGEe+5r7LEQ7INUldviC
+0pLEpEDn+cVmj/IRskginS5Z637JileN1Ie61+UqhEn5lEXapj+5vEt6gkMZqDqlPHzdKy/k8l0H
+/wnouVTJb2PxyQ+0PhcXkBUpXw2CHcNeGKxg5Y5Ktzuhio71wHOVUGL8whnHFsatA7GuXflJD5S6
+pBwfkit9SHIQ19gSlorY713cqeMGNxcVRC3ISrUyT8Ni1591GStNLqqOAdUCKKihj2a/yokTR0Mz
+EAHRcWwkk8hsw6kA6iWT3SNWb+qow4SxLUfk89IWn2U9sDUxjqYxV7AmZjgbWuxTGvsVTrhWnz22
+CGKgSWR5SBkcmoFuiYLhkcrWeDq3Zapiy+GP1r5UrsdJTjt+AlFlFlSs43XNi+56WPQuZijIdcqI
+pRPk5hJYwlHJTW8yvMzPjBfNKB5kgOZpWgvfePauaFKSOp3LC5Q45SG2Ya5baoERa76FsoEab5Lh
+sxIF79m6FJ5PhqPBzrxwgidqSYl98Gsc4GyjvtClKj8oes+UEkZNrI1rpYxs3ccu+j3hBc5QsSwW
+N6GptfP5pkEYY+auNKo1OdkJijWTJEtTpjoyncuB1eyRwfLFRd2UZ4pX4Vhf5uUzHQq1lrwLZGsC
+KSng7M1wTs1c6lTmrbGGboydW+vhgIfFfoaRd3fV5NeC4zGdJRRBSaRYyL7YVaiqjzdTHQrazJW/
+3jVkSSZbVzxJWLsOipNETEQfCxeFv3JuTadP+py54DlY7TXxkzXCYd02BdnvBAQAOw==
+</image_base64>
+	<generalfeedback>
+		<text></text>
+	</generalfeedback>
+	<penalty>0.1</penalty>
+	<hidden>0</hidden>
+	<single>true</single>
+	<shuffleanswers>true</shuffleanswers>
+	<answernumbering>none</answernumbering>
+	<answer fraction="100">
+		<text><![CDATA[<p>Rep1<img src="@@PLUGINFILE@@/image.gif" width="88" height="74"/></p>]]></text>
+		<file name="image.gif" path="/" encoding="base64">R0lGODlhWABKAPcAAAAAAAAAMwAAZgAAmQAAzAAA/wArAAArMwArZgArmQArzAAr/wBVAABVMwBV
+ZgBVmQBVzABV/wCAAACAMwCAZgCAmQCAzACA/wCqAACqMwCqZgCqmQCqzACq/wDVAADVMwDVZgDV
+mQDVzADV/wD/AAD/MwD/ZgD/mQD/zAD//zMAADMAMzMAZjMAmTMAzDMA/zMrADMrMzMrZjMrmTMr
+zDMr/zNVADNVMzNVZjNVmTNVzDNV/zOAADOAMzOAZjOAmTOAzDOA/zOqADOqMzOqZjOqmTOqzDOq
+/zPVADPVMzPVZjPVmTPVzDPV/zP/ADP/MzP/ZjP/mTP/zDP//2YAAGYAM2YAZmYAmWYAzGYA/2Yr
+AGYrM2YrZmYrmWYrzGYr/2ZVAGZVM2ZVZmZVmWZVzGZV/2aAAGaAM2aAZmaAmWaAzGaA/2aqAGaq
+M2aqZmaqmWaqzGaq/2bVAGbVM2bVZmbVmWbVzGbV/2b/AGb/M2b/Zmb/mWb/zGb//5kAAJkAM5kA
+ZpkAmZkAzJkA/5krAJkrM5krZpkrmZkrzJkr/5lVAJlVM5lVZplVmZlVzJlV/5mAAJmAM5mAZpmA
+mZmAzJmA/5mqAJmqM5mqZpmqmZmqzJmq/5nVAJnVM5nVZpnVmZnVzJnV/5n/AJn/M5n/Zpn/mZn/
+zJn//8wAAMwAM8wAZswAmcwAzMwA/8wrAMwrM8wrZswrmcwrzMwr/8xVAMxVM8xVZsxVmcxVzMxV
+/8yAAMyAM8yAZsyAmcyAzMyA/8yqAMyqM8yqZsyqmcyqzMyq/8zVAMzVM8zVZszVmczVzMzV/8z/
+AMz/M8z/Zsz/mcz/zMz///8AAP8AM/8AZv8Amf8AzP8A//8rAP8rM/8rZv8rmf8rzP8r//9VAP9V
+M/9VZv9Vmf9VzP9V//+AAP+AM/+AZv+Amf+AzP+A//+qAP+qM/+qZv+qmf+qzP+q///VAP/VM//V
+Zv/Vmf/VzP/V////AP//M///Zv//mf//zP///wAAAAAAAAAAAAAAACH5BAEAAPwALAAAAABYAEoA
+AAiDAAEIHEiwoMGDCBMqXMiwocOHECNKnEixosWLGDNq3Mixo8ePIEOKHEmypMmTKFOqXMmypcuX
+MGPKnEmzps2bOHPq3Mmzp8+fQIMKHUq0qNGjSJMqXcq0qdOnUKNKnUq1qtWrWLNq3cq1q9evYMOK
+HUu2rNmzaNOqXcu2rdu3cOMeDQgAOw==
+</file>
+		<feedback>
+			<text>Feed1</text>
+		</feedback>
+	</answer>
+	<answer fraction="0">
+		<text><![CDATA[<p>Rep2<img src="@@PLUGINFILE@@/image.gif" width="88" height="74"/></p>]]></text>
+		<file name="image.gif" path="/" encoding="base64">R0lGODlhWABKAPcAAAAAAAAAMwAAZgAAmQAAzAAA/wArAAArMwArZgArmQArzAAr/wBVAABVMwBV
+ZgBVmQBVzABV/wCAAACAMwCAZgCAmQCAzACA/wCqAACqMwCqZgCqmQCqzACq/wDVAADVMwDVZgDV
+mQDVzADV/wD/AAD/MwD/ZgD/mQD/zAD//zMAADMAMzMAZjMAmTMAzDMA/zMrADMrMzMrZjMrmTMr
+zDMr/zNVADNVMzNVZjNVmTNVzDNV/zOAADOAMzOAZjOAmTOAzDOA/zOqADOqMzOqZjOqmTOqzDOq
+/zPVADPVMzPVZjPVmTPVzDPV/zP/ADP/MzP/ZjP/mTP/zDP//2YAAGYAM2YAZmYAmWYAzGYA/2Yr
+AGYrM2YrZmYrmWYrzGYr/2ZVAGZVM2ZVZmZVmWZVzGZV/2aAAGaAM2aAZmaAmWaAzGaA/2aqAGaq
+M2aqZmaqmWaqzGaq/2bVAGbVM2bVZmbVmWbVzGbV/2b/AGb/M2b/Zmb/mWb/zGb//5kAAJkAM5kA
+ZpkAmZkAzJkA/5krAJkrM5krZpkrmZkrzJkr/5lVAJlVM5lVZplVmZlVzJlV/5mAAJmAM5mAZpmA
+mZmAzJmA/5mqAJmqM5mqZpmqmZmqzJmq/5nVAJnVM5nVZpnVmZnVzJnV/5n/AJn/M5n/Zpn/mZn/
+zJn//8wAAMwAM8wAZswAmcwAzMwA/8wrAMwrM8wrZswrmcwrzMwr/8xVAMxVM8xVZsxVmcxVzMxV
+/8yAAMyAM8yAZsyAmcyAzMyA/8yqAMyqM8yqZsyqmcyqzMyq/8zVAMzVM8zVZszVmczVzMzV/8z/
+AMz/M8z/Zsz/mcz/zMz///8AAP8AM/8AZv8Amf8AzP8A//8rAP8rM/8rZv8rmf8rzP8r//9VAP9V
+M/9VZv9Vmf9VzP9V//+AAP+AM/+AZv+Amf+AzP+A//+qAP+qM/+qZv+qmf+qzP+q///VAP/VM//V
+Zv/Vmf/VzP/V////AP//M///Zv//mf//zP///wAAAAAAAAAAAAAAACH5BAEAAPwALAAAAABYAEoA
+AAiDAAEIHEiwoMGDCBMqXMiwocOHECNKnEixosWLGDNq3Mixo8ePIEOKHEmypMmTKFOqXMmypcuX
+MGPKnEmzps2bOHPq3Mmzp8+fQIMKHUq0qNGjSJMqXcq0qdOnUKNKnUq1qtWrWLNq3cq1q9evYMOK
+HUu2rNmzaNOqXcu2rdu3cOMeDQgAOw==
+</file>
+		<feedback>
+			<text>Feed2</text>
+		</feedback>
+	</answer>
+	<answer fraction="0">
+		<text><![CDATA[<p>Rep3 <img src="@@PLUGINFILE@@/image.gif" width="88" height="74"/></p>]]></text>
+		<file name="image.gif" path="/" encoding="base64">R0lGODlhWABKAPcAAAAAAAAAMwAAZgAAmQAAzAAA/wArAAArMwArZgArmQArzAAr/wBVAABVMwBV
+ZgBVmQBVzABV/wCAAACAMwCAZgCAmQCAzACA/wCqAACqMwCqZgCqmQCqzACq/wDVAADVMwDVZgDV
+mQDVzADV/wD/AAD/MwD/ZgD/mQD/zAD//zMAADMAMzMAZjMAmTMAzDMA/zMrADMrMzMrZjMrmTMr
+zDMr/zNVADNVMzNVZjNVmTNVzDNV/zOAADOAMzOAZjOAmTOAzDOA/zOqADOqMzOqZjOqmTOqzDOq
+/zPVADPVMzPVZjPVmTPVzDPV/zP/ADP/MzP/ZjP/mTP/zDP//2YAAGYAM2YAZmYAmWYAzGYA/2Yr
+AGYrM2YrZmYrmWYrzGYr/2ZVAGZVM2ZVZmZVmWZVzGZV/2aAAGaAM2aAZmaAmWaAzGaA/2aqAGaq
+M2aqZmaqmWaqzGaq/2bVAGbVM2bVZmbVmWbVzGbV/2b/AGb/M2b/Zmb/mWb/zGb//5kAAJkAM5kA
+ZpkAmZkAzJkA/5krAJkrM5krZpkrmZkrzJkr/5lVAJlVM5lVZplVmZlVzJlV/5mAAJmAM5mAZpmA
+mZmAzJmA/5mqAJmqM5mqZpmqmZmqzJmq/5nVAJnVM5nVZpnVmZnVzJnV/5n/AJn/M5n/Zpn/mZn/
+zJn//8wAAMwAM8wAZswAmcwAzMwA/8wrAMwrM8wrZswrmcwrzMwr/8xVAMxVM8xVZsxVmcxVzMxV
+/8yAAMyAM8yAZsyAmcyAzMyA/8yqAMyqM8yqZsyqmcyqzMyq/8zVAMzVM8zVZszVmczVzMzV/8z/
+AMz/M8z/Zsz/mcz/zMz///8AAP8AM/8AZv8Amf8AzP8A//8rAP8rM/8rZv8rmf8rzP8r//9VAP9V
+M/9VZv9Vmf9VzP9V//+AAP+AM/+AZv+Amf+AzP+A//+qAP+qM/+qZv+qmf+qzP+q///VAP/VM//V
+Zv/Vmf/VzP/V////AP//M///Zv//mf//zP///wAAAAAAAAAAAAAAACH5BAEAAPwALAAAAABYAEoA
+AAj/AOEJVCdwYEF4BAsmNKjw4EKEDiM2nMiwIkSKFwuugxdPXcd4HD16hLcR5MaSJFN+DLny40iU
+JzmmLDnSJUibKmfK3JjwIUSfBB8GPfgzItCMRY0qXWpwpEqRN3XCzGmzJtSdOk1ShWq1pVSsKCGC
+RDqUKFmkGMsSFYrWolqJRce+3FpV69SYNFtyXRnTbtardefeHNrxYOGEhTU6HCuWIciFiQVuVMiY
+oFyBjwtGdkrYoEvMKSWH1olwpeWUlkVi5mw652meLBGzxmqVcs/RoikThZ1b8c/LMi/yDml44eTh
+jcOG5Sp6MnOspVW7pv10deLPqIlDP2xwsljEo1OD/0582rrjhMtXg+btNPLw0yujZ+aul3hqrdKf
+Fr48NTvWwpPF99FgF5U3l3qeXUQeaLI59ttE3vnn04ILwRdaeQPtV11sMtEXWmu10ZRhe3PxVh9n
+32UWk0y3RadZZ+TFGNxp6AXn2YTSYVhTRhFmpxVj/uHXG0sPJtfdhX6B51x1XckHWYWkCZlhcxMB
+qN2BpUUUlWyVsVggY5/VN+J6XnrXn5c23udkZnPdNlt8QboJnYRZ5lYWbPjBORJQwAlI0JKivaYY
+geL9R5yZHdZo3Ihg7pXlZgZCh2KdZV1X1lsoFqpVnUcixSaRCeK5J4FUfWjhXcRFtV9na06J3ZZH
+Rv/m3o2fisddiw3dmpl9uw6akWpq0tqgna5e2eF/VxlpHouDUbhplsahBNmjao7FHqydVSjlhRB5
+tyis1T37p33kXubUdNUGtamSKc7IV1OSIrijr+Cpy+uDj/X5rYK42cvQjreR6q2EBErr24zQhhve
+tn3JR+S4IGonoqr+KugUT2LO9+WeL0aGW4Fo5hRgrkPRqF9PXQrXmKDCdlxjw5YC56KIjWnsk3Ne
+jTyfth8PtxmaOcYGJJke3ifdwIquDKrRY4U5HZytHQmsbon1yClK1x16JaljAv0dlUZqSPSDx023
+ZICVTgnoioESuelmMnMctMkJ+uunaIf1iiVp2oH/zCXes/mqocG1aVvomyhiRxrMHFLam73ZNgWu
+X/8yNvB0L1YJ70M4m9o0fPZiu22pVv6lNmo/qrsjTtxSqF693YZMecmZr7UrhipnznndoHonJKlt
+ZuQVdngxW2apU89O4O1S686gZomOyXNFiDfE8baRtrudas0KWvKzP8Yubq8N092s+P1y52DahNUW
+KJtRqVz1x7Ndi7DDZIpY+LEtzoowxAFb1IomFTGs/QY5jalZZ6QlriwZTGEe+5r7LEQ7INUldviC
+0pLEpEDn+cVmj/IRskginS5Z637JileN1Ie61+UqhEn5lEXapj+5vEt6gkMZqDqlPHzdKy/k8l0H
+/wnouVTJb2PxyQ+0PhcXkBUpXw2CHcNeGKxg5Y5Ktzuhio71wHOVUGL8whnHFsatA7GuXflJD5S6
+pBwfkit9SHIQ19gSlorY713cqeMGNxcVRC3ISrUyT8Ni1591GStNLqqOAdUCKKihj2a/yokTR0Mz
+EAHRcWwkk8hsw6kA6iWT3SNWb+qow4SxLUfk89IWn2U9sDUxjqYxV7AmZjgbWuxTGvsVTrhWnz22
+CGKgSWR5SBkcmoFuiYLhkcrWeDq3Zapiy+GP1r5UrsdJTjt+AlFlFlSs43XNi+56WPQuZijIdcqI
+pRPk5hJYwlHJTW8yvMzPjBfNKB5kgOZpWgvfePauaFKSOp3LC5Q45SG2Ya5baoERa76FsoEab5Lh
+sxIF79m6FJ5PhqPBzrxwgidqSYl98Gsc4GyjvtClKj8oes+UEkZNrI1rpYxs3ccu+j3hBc5QsSwW
+N6GptfP5pkEYY+auNKo1OdkJijWTJEtTpjoyncuB1eyRwfLFRd2UZ4pX4Vhf5uUzHQq1lrwLZGsC
+KSng7M1wTs1c6lTmrbGGboydW+vhgIfFfoaRd3fV5NeC4zGdJRRBSaRYyL7YVaiqjzdTHQrazJW/
+3jVkSSZbVzxJWLsOipNETEQfCxeFv3JuTadP+py54DlY7TXxkzXCYd02BdnvBAQAOw==
+</file>
+		<feedback>
+			<text>Feed3</text>
+		</feedback>
+	</answer>
+</question>
+</quiz>
