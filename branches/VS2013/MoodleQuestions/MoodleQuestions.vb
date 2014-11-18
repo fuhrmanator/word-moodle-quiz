@@ -39,8 +39,10 @@ Public Class MoodleQuestions
     Implements Office.IRibbonExtensibility
 
     Private ribbon As Office.IRibbonUI
+    Dim enabled As Boolean
 
     Public Sub New()
+        enabled = True
     End Sub
 
     Public Function GetCustomUI(ByVal ribbonID As String) As String Implements Office.IRibbonExtensibility.GetCustomUI
@@ -51,9 +53,9 @@ Public Class MoodleQuestions
     'Create callback methods here. For more information about adding callback methods, visit http://go.microsoft.com/fwlink/?LinkID=271226
     Public Sub Ribbon_Load(ByVal ribbonUI As Office.IRibbonUI)
         Me.ribbon = ribbonUI
+        Globals.ThisDocument.ribbon = Me.ribbon
         Me.ribbon.ActivateTab("MoodleQuestions") 'Make Moodle Questions toolbar active on startup
         updateVersionInfo()
-
     End Sub
 
     Public Function OnLoadImage(imageId As String) As IPictureDisp
@@ -62,6 +64,14 @@ Public Class MoodleQuestions
         tempImage = Microsoft.VisualBasic.Compatibility.VB6.Support.ImageToIPicture(My.Resources.RibbonIcons.ResourceManager.GetObject(imageId))
         Return tempImage
     End Function
+
+    ' Invalidate the Ribbon to refresh the button states
+    'Public Sub InvalidateThisRibbon()
+    '    ' enabled = Not enabled
+    '    Me.ribbon.Invalidate()
+    'End Sub
+
+
     '''''BUTTON callbacks
     ' Add Multiple Choice Question to the end of the active document
     Public Sub displayVersionInfo(ByVal control As Office.IRibbonControl)
@@ -70,14 +80,55 @@ Public Class MoodleQuestions
 
     ' Add Multiple Choice Question to the end of the active document
     Public Sub AddMultipleChoiceQ(ByVal control As Office.IRibbonControl)
-        AddParagraphOfStyle(STYLE_MULTICHOICEQ, "Insert Multiple Choice Question")
-        AddParagraphOfStyle(STYLE_CORRECT_MC_ANSWER, "Insert Answer")
-        AddParagraphOfStyle(STYLE_FEEDBACK, "Insert feedback")
-        AddParagraphOfStyle(STYLE_INCORRECT_MC_ANSWER, "Insert Answer")
-        AddParagraphOfStyle(STYLE_FEEDBACK, "Insert feedback")
-        AddParagraphOfStyle(STYLE_INCORRECT_MC_ANSWER, "Insert Answer")
-        AddParagraphOfStyle(STYLE_FEEDBACK, "Insert feedback")
+        AddParagraphOfStyle(STYLE_MULTICHOICEQ, "Insert Multiple Choice Question here")
+        AddParagraphOfStyle(STYLE_CORRECT_MC_ANSWER, "Insert correct answer here")
+        AddParagraphOfStyle(STYLE_FEEDBACK, "Insert feedback explaining why this is a correct answer here")
+        AddParagraphOfStyle(STYLE_INCORRECT_MC_ANSWER, "Insert incorrect answer here")
+        AddParagraphOfStyle(STYLE_FEEDBACK, "Insert feedback explaining why this is an incorrect answer here")
+        AddParagraphOfStyle(STYLE_INCORRECT_MC_ANSWER, "Insert incorrect answer here")
+        AddParagraphOfStyle(STYLE_FEEDBACK, "Insert feedback explaining why this is an incorrect answer here")
     End Sub
+
+    ' Change the button states in the Ribbon
+    Public Function GetEnabled(ByVal control As Office.IRibbonControl) As Boolean
+        With Globals.ThisDocument.Application.Selection
+            If getSelectionStyle() = STYLE_MULTICHOICEQ Or _
+               getSelectionStyle() = STYLE_CORRECT_MC_ANSWER Or _
+               getSelectionStyle() = STYLE_INCORRECT_MC_ANSWER Or _
+               getSelectionStyle() = STYLE_FEEDBACK Then
+                Select Case control.Id
+                    Case "matching"
+                        enabled = False
+                    Case "shuffleanswers"
+                        enabled = False
+                    Case "TrueStatement"
+                        enabled = False
+                    Case "FalseStatement"
+                        enabled = False
+                    Case "MissingWord"
+                        enabled = False
+                    Case "MarkMissingWord"
+                        enabled = False
+                    Case "shortanswer"
+                        enabled = False
+                    Case "essay"
+                        enabled = False
+                    Case "questionTitle"
+                        enabled = False
+                    Case "feedback"
+                        enabled = False
+                    Case "comment"
+                        enabled = False
+                End Select
+            Else
+                If getSelectionStyle() = "Normal" Then
+                    enabled = True
+                End If
+            End If
+        End With
+
+        Return enabled
+    End Function
 
     ' Add Matching Question to the end of the active document
     Public Sub AddMatchingQ(ByVal control As Office.IRibbonControl)

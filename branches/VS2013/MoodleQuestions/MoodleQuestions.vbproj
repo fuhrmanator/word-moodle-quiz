@@ -168,6 +168,8 @@
       <DependentUpon>MoodleQuestions.docm</DependentUpon>
     </Compile>
     <None Include="MoodleQuestions_TemporaryKey.pfx" />
+    <None Include="Test\testUseCase - addImageInAnswers.docm" />
+    <None Include="Test\testUseCase - addMultipleChoiceQuestion.docm" />
     <None Include="ThisDocument.Designer.xml">
       <DependentUpon>ThisDocument.vb</DependentUpon>
     </None>
@@ -327,6 +329,10 @@
     <None Include="Resources\true.xml" />
   </ItemGroup>
   <ItemGroup />
+  <ItemGroup>
+    <Content Include="Test\testUseCase - addImageInAnswers.xml" />
+    <Content Include="Test\testUseCase - addMultipleChoiceQuestion.xml" />
+  </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
