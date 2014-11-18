@@ -15,11 +15,24 @@
 '************************
 Imports Microsoft.Office.Interop.Word
 Imports MSXML2
+Imports Microsoft.VisualBasic.ApplicationServices
 
 Public Class ThisDocument
 
-    Private Sub ThisDocument_Startup() Handles Me.Startup
+    Public ribbon As Office.IRibbonUI
+    Public WithEvents timer1 As New Timer
 
+    Private Sub ThisDocument_Startup() Handles Me.Startup
+        Me.timer1.Enabled = True
+        AddHandler timer1.Tick, AddressOf OnTimedEvent
+        timer1.Interval = 100
+    End Sub
+
+    ' Invalidate the Ribbon to refresh the button states when change selection 
+    Public Sub OnTimedEvent(source As Object, e As System.EventArgs)
+        If Globals.ThisDocument.Application.MouseAvailable And Me.ribbon IsNot Nothing Then
+            ribbon.Invalidate()
+        End If
     End Sub
 
     Private Sub ThisDocument_Shutdown() Handles Me.Shutdown
