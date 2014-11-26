@@ -16,16 +16,44 @@
 Imports Microsoft.Office.Interop.Word
 Imports MSXML2
 Imports Microsoft.VisualBasic.ApplicationServices
+Imports System.Runtime.InteropServices
 
 Public Class ThisDocument
 
+    ' Allow context-sensitive menu bar
+    Event WindowSelectionChange As ApplicationEvents4_WindowSelectionChangeEventHandler
+    Dim instance As ApplicationEvents4_Event
+    Dim handler As ApplicationEvents4_WindowSelectionChangeEventHandler
+
+    '<ComVisibleAttribute(False)> _
+    'Public Delegate Sub ApplicationEvents4_WindowSelectionChangeEventHandler( _
+    '    Sel As Selection _
+    ')
+    'Usage
+    'Dim instance As New ApplicationEvents4_WindowSelectionChangeEventHandler(AddressOf HandleSelectionChange)
+
+    Public Sub HandleSelectionChange(sel As Selection)
+        System.Diagnostics.Debug.WriteLine("caught WindowSelectionChange Event")
+        Me.ribbon.Invalidate()
+    End Sub
+
+    Public Sub HandleDocumentChange()
+        System.Diagnostics.Debug.WriteLine("caught DocumentChange Event")
+        Me.ribbon.Invalidate()
+    End Sub
+
     Public ribbon As Office.IRibbonUI
-    Public WithEvents timer1 As New Timer
+    'Public WithEvents timer1 As New Timer
 
     Private Sub ThisDocument_Startup() Handles Me.Startup
-        Me.timer1.Enabled = True
-        AddHandler timer1.Tick, AddressOf OnTimedEvent
-        timer1.Interval = 100
+        'Me.timer1.Enabled = True
+        'AddHandler timer1.Tick, AddressOf OnTimedEvent
+        'timer1.Interval = 100
+
+        AddHandler Globals.ThisDocument.Application.WindowSelectionChange, AddressOf HandleSelectionChange
+        'AddHandler Globals.ThisDocument.Application., AddressOf HandleDocumentChange
+
+
     End Sub
 
     ' Invalidate the Ribbon to refresh the button states when change selection 

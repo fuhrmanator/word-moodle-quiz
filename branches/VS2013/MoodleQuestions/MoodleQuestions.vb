@@ -41,16 +41,6 @@ Public Class MoodleQuestions
     Private ribbon As Office.IRibbonUI
     Dim enabled As Boolean
 
-    ' Allow context-sensitive menu bar
-    <ComVisibleAttribute(False)> _
-    Public Delegate Sub ApplicationEvents4_WindowSelectionChangeEventHandler( _
-        Sel As Selection _
-    )
-    'Usage
-    Dim instance As New ApplicationEvents4_WindowSelectionChangeEventHandler(AddressOf HandleSelectionChange)
-    Public Sub HandleSelectionChange(sel As Selection)
-        Me.ribbon.Invalidate()
-    End Sub
 
     Public Sub New()
         enabled = False
@@ -102,6 +92,7 @@ Public Class MoodleQuestions
 
     ' Change the button states in the Ribbon
     Public Function GetEnabled(ByVal control As Office.IRibbonControl) As Boolean
+        System.Diagnostics.Debug.WriteLine("caught GetEnabled for " + control.Id)
         Dim isEnabled As Boolean = False
         Select Case control.Id
             Case "matching"
@@ -109,6 +100,11 @@ Public Class MoodleQuestions
             Case "shuffleanswers"
                 isEnabled = (getSelectionStyle() = STYLE_MULTICHOICEQ Or _
                              getSelectionStyle() = STYLE_MULTICHOICEQ_FIXANSWER)
+            Case "MarkTrueFalse"
+                isEnabled = (getSelectionStyle() = STYLE_CORRECT_MC_ANSWER Or _
+                             getSelectionStyle() = STYLE_INCORRECT_MC_ANSWER Or _
+                             getSelectionStyle() = STYLE_TRUESTATEMENT Or _
+                             getSelectionStyle() = STYLE_FALSESTATEMENT)
             Case "TrueStatement"
                 isEnabled = (isSelectionNormalStyle())
             Case "FalseStatement"
