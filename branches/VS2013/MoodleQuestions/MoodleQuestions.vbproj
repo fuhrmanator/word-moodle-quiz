@@ -15,11 +15,17 @@
     <ProjectGuid>{1764A072-A87B-4CF5-9535-9943C1E8CF9C}</ProjectGuid>
     <SolutionID>5a6f181a-d454-4758-97cb-60f26bd4f598</SolutionID>
     <IsWebBootstrapper>True</IsWebBootstrapper>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>12.0</OldToolsVersion>
+    <VSTO_TrustAssembliesLocation>true</VSTO_TrustAssembliesLocation>
     <BootstrapperEnabled>true</BootstrapperEnabled>
     <PublishUrl>C:\Users\Cris\Google Drive ETSMTL.NET\MoodleQuestionsPublish\</PublishUrl>
     <InstallUrl>https://drive.google.com/folderview%3fid=0B9aAbha28QkacTJJN0RsRy1IX1E&amp;usp=sharing/</InstallUrl>
     <TargetCulture>en</TargetCulture>
-    <ApplicationVersion>1.0.0.1</ApplicationVersion>
+    <ApplicationVersion>1.0.0.2</ApplicationVersion>
     <AutoIncrementApplicationRevision>true</AutoIncrementApplicationRevision>
     <UpdateEnabled>true</UpdateEnabled>
     <UpdateInterval>7</UpdateInterval>
@@ -44,11 +50,21 @@
     <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
       <Visible>False</Visible>
       <ProductName>.NET Framework 3.5 SP1</ProductName>
-      <Install>false</Install>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Office.PIARedist.2007">
+      <Visible>False</Visible>
+      <ProductName>Microsoft Office 2007 Primary Interop Assemblies</ProductName>
+      <Install>true</Install>
     </BootstrapperPackage>
     <BootstrapperPackage Include="Microsoft.VSTORuntime.4.0">
       <Visible>False</Visible>
       <ProductName>Microsoft Visual Studio 2010 Tools pour Office Runtime %28x64 et x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 3.1</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
     <BootstrapperPackage Include="Microsoft.Windows.Installer.4.5">
@@ -71,7 +87,7 @@
     <DocumentationFile>MoodleQuestions.xml</DocumentationFile>
     <RegisterForComInterop>false</RegisterForComInterop>
     <RemoveIntegerChecks>false</RemoveIntegerChecks>
-    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DefineConstants>
@@ -84,7 +100,7 @@
     <DocumentationFile>MoodleQuestions.xml</DocumentationFile>
     <RegisterForComInterop>false</RegisterForComInterop>
     <RemoveIntegerChecks>false</RemoveIntegerChecks>
-    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
   </PropertyGroup>
   <!--
     This section specifies references for the project.
@@ -93,7 +109,26 @@
     <Reference Include="adodb, Version=7.0.3300.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
+    <Reference Include="Microsoft.Office.Interop.Word, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="Microsoft.Office.Tools, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="Microsoft.Office.Tools.Common, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="Microsoft.Vbe.Interop, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
     <Reference Include="Microsoft.VisualBasic.Compatibility" />
+    <Reference Include="Microsoft.VisualStudio.Tools.Applications.Runtime, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="Office, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="stdole, Version=7.0.3300.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Deployment" />
@@ -106,9 +141,6 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Microsoft.Office.Tools.v4.0.Framework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
-    <Reference Include="Microsoft.VisualStudio.Tools.Applications.Runtime, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
-    <Reference Include="Microsoft.Office.Tools, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
-    <Reference Include="Microsoft.Office.Tools.Common, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.Office.Tools.Word, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
   </ItemGroup>
   <ItemGroup>
@@ -117,23 +149,6 @@
     </Reference>
     <Reference Include="Microsoft.Office.Tools.Word.v4.0.Utilities, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <Private>True</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="stdole, Version=7.0.3300.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Office, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c">
-      <Private>False</Private>
-      <EmbedInteropTypes>true</EmbedInteropTypes>
-    </Reference>
-    <Reference Include="Microsoft.Vbe.Interop, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c">
-      <Private>False</Private>
-      <EmbedInteropTypes>true</EmbedInteropTypes>
-    </Reference>
-    <Reference Include="Microsoft.Office.Interop.Word, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c">
-      <Private>False</Private>
-      <EmbedInteropTypes>true</EmbedInteropTypes>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -156,7 +171,6 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>RibbonIcons.Designer.vb</LastGenOutput>
     </EmbeddedResource>
-    <None Include="ForTestingMoodleQuestion.pfx" />
     <None Include="MoodleQuestions.docm" />
     <Compile Include="MoodleQuestions.vb" />
     <Compile Include="RibbonIcons.Designer.vb">
@@ -210,15 +224,6 @@
       <VersionMinor>0</VersionMinor>
       <Lcid>0</Lcid>
       <WrapperTool>tlbimp</WrapperTool>
-      <Isolated>False</Isolated>
-      <EmbedInteropTypes>True</EmbedInteropTypes>
-    </COMReference>
-    <COMReference Include="VBIDE">
-      <Guid>{0002E157-0000-0000-C000-000000000046}</Guid>
-      <VersionMajor>5</VersionMajor>
-      <VersionMinor>3</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>primary</WrapperTool>
       <Isolated>False</Isolated>
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </COMReference>
@@ -365,14 +370,15 @@
     <DelaySign>false</DelaySign>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>ForTestingMoodleQuestion.pfx</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <Import Project="$(VSToolsPath)\OfficeTools\Microsoft.VisualStudio.Tools.Office.targets" Condition="'$(VSToolsPath)' != ''" />
   <ProjectExtensions>
     <VisualStudio>
       <FlavorProperties GUID="{BAA0C2D2-18E2-41B9-852F-F413020CAA33}">
-        <ProjectProperties HostName="MoodleQuestions.docm" HostPackage="{763FDC83-64E5-4651-AC9B-28C4FEB985A1}" OfficeVersion="14.0" VstxVersion="4.0" ApplicationType="DOC" Language="VB" TemplatesPath="VSTOTemplates" DebugInfoExeName="C:\Program Files\Microsoft Office\Office14\WINWORD.EXE" DebugInfoCommandLine="/w &quot;[$OUTPUT]MoodleQuestions.docm&quot;" />
+        <ProjectProperties HostName="MoodleQuestions.docm" HostPackage="{18A3A5AC-5778-4778-901C-ADAAC08E910A}" OfficeVersion="15.0" VstxVersion="4.0" ApplicationType="DOC" Language="VB" TemplatesPath="VSTOTemplates" DebugInfoExeName="D:\Program Files (x86)\Microsoft Office\Office15\WINWORD.EXE" DebugInfoCommandLine="/w &quot;[$OUTPUT]MoodleQuestions.docm&quot;" />
         <Host Name="Word Document" Path=".\MoodleQuestions.docm" PublishedHash="CFECFF3FB805E9A295392C4C85A42160CA201773">
           <HostItem Name="ThisDocument" Code="ThisDocument.vb" CanonicalName="ThisDocument" PublishedHash="7F6F56081CA95DCED33C91680AA20C3010BE4E6B" Blueprint="ThisDocument.Designer.xml" GeneratedCode="ThisDocument.Designer.vb" />
         </Host>

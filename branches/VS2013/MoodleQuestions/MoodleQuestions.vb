@@ -31,8 +31,8 @@
 
 Imports Microsoft.Office.Interop.Word
 Imports stdole
-
 Imports MSXML2
+Imports System.Runtime.InteropServices
 
 <Runtime.InteropServices.ComVisible(True)> _
 Public Class MoodleQuestions
@@ -41,9 +41,21 @@ Public Class MoodleQuestions
     Private ribbon As Office.IRibbonUI
     Dim enabled As Boolean
 
-    Public Sub New()
-        enabled = True
+    ' Allow context-sensitive menu bar
+    <ComVisibleAttribute(False)> _
+    Public Delegate Sub ApplicationEvents4_WindowSelectionChangeEventHandler( _
+        Sel As Selection _
+    )
+    'Usage
+    Dim instance As New ApplicationEvents4_WindowSelectionChangeEventHandler(AddressOf HandleSelectionChange)
+    Public Sub HandleSelectionChange(sel As Selection)
+        Me.ribbon.Invalidate()
     End Sub
+
+    Public Sub New()
+        enabled = False
+    End Sub
+
 
     Public Function GetCustomUI(ByVal ribbonID As String) As String Implements Office.IRibbonExtensibility.GetCustomUI
         Return GetResourceText("MoodleQuestions.MoodleQuestions.xml")
@@ -71,7 +83,6 @@ Public Class MoodleQuestions
     '    Me.ribbon.Invalidate()
     'End Sub
 
-
     '''''BUTTON callbacks
     ' Add Multiple Choice Question to the end of the active document
     Public Sub displayVersionInfo(ByVal control As Office.IRibbonControl)
@@ -91,43 +102,31 @@ Public Class MoodleQuestions
 
     ' Change the button states in the Ribbon
     Public Function GetEnabled(ByVal control As Office.IRibbonControl) As Boolean
-        With Globals.ThisDocument.Application.Selection
-            If getSelectionStyle() = STYLE_MULTICHOICEQ Or _
-               getSelectionStyle() = STYLE_CORRECT_MC_ANSWER Or _
-               getSelectionStyle() = STYLE_INCORRECT_MC_ANSWER Or _
-               getSelectionStyle() = STYLE_FEEDBACK Then
-                Select Case control.Id
-                    Case "matching"
-                        enabled = False
-                    Case "shuffleanswers"
-                        enabled = False
-                    Case "TrueStatement"
-                        enabled = False
-                    Case "FalseStatement"
-                        enabled = False
-                    Case "MissingWord"
-                        enabled = False
-                    Case "MarkMissingWord"
-                        enabled = False
-                    Case "shortanswer"
-                        enabled = False
-                    Case "essay"
-                        enabled = False
-                    Case "questionTitle"
-                        enabled = False
-                    Case "feedback"
-                        enabled = False
-                    Case "comment"
-                        enabled = False
-                End Select
-            Else
-                If getSelectionStyle() = "Normal" Then
-                    enabled = True
-                End If
-            End If
-        End With
+        Dim isEnabled As Boolean = False
+        Select Case control.Id
+            Case "matching"
+                isEnabled = (isSelectionNormalStyle())
+            Case "shuffleanswers"
+                isEnabled = (getSelectionStyle() = STYLE_MULTICHOICEQ Or _
+                             getSelectionStyle() = STYLE_MULTICHOICEQ_FIXANSWER)
+            Case "TrueStatement"
+                isEnabled = (isSelectionNormalStyle())
+            Case "FalseStatement"
+                isEnabled = (isSelectionNormalStyle())
+            Case "MissingWord"
+                isEnabled = (isSelectionNormalStyle())
+            Case "MarkMissingWord"
+                isEnabled = (isSelectionNormalStyle())
+            Case "shortanswer"
+                isEnabled = (isSelectionNormalStyle())
+            Case "essay"
+                isEnabled = (isSelectionNormalStyle())
+            Case "questionTitle"
+            Case "feedback"
+            Case "comment"
+        End Select
 
-        Return enabled
+        Return isEnabled
     End Function
 
     ' Add Matching Question to the end of the active document
@@ -259,7 +258,7 @@ Public Class MoodleQuestions
                getSelectionStyle() = STYLE_INCORRECT_MC_ANSWER Then
                 Globals.ThisDocument.Application.Options.ReplaceSelection = False
                 .TypeText(Text:=(" " & Chr(11)))
-                .Paste()
+                .Paste()  ' don't paste if clipboard is empty, else exception
             Else 'Error - give instructions:
                 MsgBox("Pastes an image from the Clipboard. " & vbCr & _
                        "Place the cursor at the end of the question. ", vbExclamation)
@@ -1305,5 +1304,10 @@ Public Class MoodleQuestions
             End If
         End If
     End Sub
+
+    Private Function isSelectionNormalStyle() As Boolean
+        'Return (Globals.ThisDocument.Application.Selection.Paragraphs(1).Style = Word.WdBuiltinStyle.wdStyleNormal)
+        Return CType(Globals.ThisDocument.Application.Selection.Paragraphs(1).Style, Word.Style).NameLocal = "Normal"
+    End Function
 
 End Class
