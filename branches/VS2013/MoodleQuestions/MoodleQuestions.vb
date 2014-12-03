@@ -27,6 +27,7 @@
 'TODO Understand Numerical Questions: "Q Numerical" is followed by "Short Answer" in the v21 template. Should we make a "A Numerical" for consistency? Might impact "Check Layout" function.
 'TODO Fix XML Export for all question types
 'TODO Selecting a missing word and using the button also selects the space after the word, which cause a problem in <questiontext/text>
+'TODO The carriage return doesn't work for context change
 
 
 Imports Microsoft.Office.Interop.Word
@@ -95,33 +96,42 @@ Public Class MoodleQuestions
         System.Diagnostics.Debug.WriteLine("caught GetEnabled for " + control.Id)
         Dim isEnabled As Boolean = False
         Select Case control.Id
+            Case "MCQ"
+                isEnabled = (isSelectionNormalStyle())
             Case "matching"
                 isEnabled = (isSelectionNormalStyle())
-            Case "shuffleanswers"
-                isEnabled = (getSelectionStyle() = STYLE_MULTICHOICEQ Or _
-                             getSelectionStyle() = STYLE_MULTICHOICEQ_FIXANSWER)
-            Case "MarkTrueFalse"
-                isEnabled = (getSelectionStyle() = STYLE_CORRECT_MC_ANSWER Or _
-                             getSelectionStyle() = STYLE_INCORRECT_MC_ANSWER Or _
-                             getSelectionStyle() = STYLE_TRUESTATEMENT Or _
-                             getSelectionStyle() = STYLE_FALSESTATEMENT)
+            Case "shortanswer"
+                isEnabled = (isSelectionNormalStyle())
+            Case "essay"
+                isEnabled = (isSelectionNormalStyle())
             Case "TrueStatement"
                 isEnabled = (isSelectionNormalStyle())
             Case "FalseStatement"
                 isEnabled = (isSelectionNormalStyle())
             Case "MissingWord"
                 isEnabled = (isSelectionNormalStyle())
+            Case "shuffleanswers"
+                isEnabled = (getSelectionStyle() = STYLE_MULTICHOICEQ Or _
+                             getSelectionStyle() = STYLE_MULTICHOICEQ_FIXANSWER Or _
+                             getSelectionStyle() = STYLE_MATCHINGQ)
+            Case "MarkTrueFalse"
+                isEnabled = (getSelectionStyle() = STYLE_CORRECT_MC_ANSWER Or _
+                             getSelectionStyle() = STYLE_INCORRECT_MC_ANSWER Or _
+                             getSelectionStyle() = STYLE_TRUESTATEMENT Or _
+                             getSelectionStyle() = STYLE_FALSESTATEMENT)
             Case "MarkMissingWord"
-                isEnabled = (isSelectionNormalStyle())
-            Case "shortanswer"
-                isEnabled = (isSelectionNormalStyle())
-            Case "essay"
-                isEnabled = (isSelectionNormalStyle())
+                isEnabled = (getSelectionStyle() = STYLE_MISSINGWORDQ)
+            Case "pasteImage"
+                isEnabled = (getSelectionStyle() = STYLE_MULTICHOICEQ Or _
+                             getSelectionStyle() = STYLE_CORRECT_MC_ANSWER Or _
+                            getSelectionStyle() = STYLE_INCORRECT_MC_ANSWER)
             Case "questionTitle"
+                isEnabled = (isSelectionNormalStyle())
             Case "feedback"
+                isEnabled = (isSelectionNormalStyle())
             Case "comment"
+                isEnabled = (isSelectionNormalStyle())
         End Select
-
         Return isEnabled
     End Function
 

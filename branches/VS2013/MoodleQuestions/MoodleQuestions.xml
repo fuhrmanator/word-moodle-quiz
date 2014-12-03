@@ -2,34 +2,37 @@
 <customUI xmlns="http://schemas.microsoft.com/office/2009/07/customui" onLoad="Ribbon_Load" loadImage="OnLoadImage">
   <ribbon>
     <tabs>
-      <tab id="MoodleQuestions" label="Moodle Questions">
-        <group id="MoodleQuiz" label="MoodleQuiz">
+      <tab id="MoodleQuiz" label="MoodleQuiz">
+        <group id="InsertQuestions" label="Insert Questions">
           <button id="MCQ" label="Multiple Choice" size="large" onAction="AddMultipleChoiceQ" screentip="Multiple Choice" image="multiplechoice"
                  showImage="true" visible="true" supertip="Inserts a multiple choice question at the cursor location." getEnabled="GetEnabled"/>
           <button id="matching" label="Matching" size="large" onAction="AddMatchingQ" image="matching_a" getEnabled="GetEnabled"/>
-          <button id="shuffleanswers" label="Shuffle Answers" size="large" onAction="ChangeShuffleanswerTrueFalse" image="shuffleanswers" getEnabled="GetEnabled"/>
-          <button id="MarkTrueFalse" label="Toggle answer" size="large" onAction="ToggleAnswer" image="ToggleAnswer" getEnabled="GetEnabled"/>
-          <button id="TrueStatement" label="True Statement" size="large" onAction="AddTrueStatement" image="_true" getEnabled="GetEnabled"/>
-          <button id="FalseStatement" label="False Statement" size="large" onAction="AddFalseStatement" image="_false" getEnabled="GetEnabled"/>
-          <separator id="MdlQzSep1" />
-          <button id="MissingWord" label="Missing Word" size="large" onAction="AddMissingWordQ" image="missingword" getEnabled="GetEnabled" />
-          <button id="MarkMissingWord" label="Mark Missing Word" size="large" onAction="ToggleMissingWord" image="markmissing" getEnabled="GetEnabled" />
-          <separator id="MdlQzSep2" />
-          <button id="numerical" label="Numerical" size="large" onAction="AddNumericalQ" image="numerical" getEnabled="GetEnabled"/>
-          <button id="numericaltolerance" label="Numerical Tolerance" size="large" onAction="AddNumericalTolerance" image="tolerance" getEnabled="GetEnabled"/>
-          <separator id="MdlQzSep3" />
           <button id="shortanswer" label="Short Answer" size="large" onAction="AddShortAnswerQ" image="shortanswer"  getEnabled="GetEnabled" />
           <button id="essay" label="Essay" size="large" onAction="AddEssay" image="essay"  getEnabled="GetEnabled" />
-          <separator id="MdlQzSep4" />
+          <button id="numerical" label="Numerical" size="large" onAction="AddNumericalQ" image="numerical" getEnabled="GetEnabled"/>
+          <button id="TrueStatement" label="True Statement" size="large" onAction="AddTrueStatement" image="_true" getEnabled="GetEnabled"/>
+          <button id="FalseStatement" label="False Statement" size="large" onAction="AddFalseStatement" image="_false" getEnabled="GetEnabled"/>
+          <button id="MissingWord" label="Missing Word" size="large" onAction="AddMissingWordQ" image="missingword" getEnabled="GetEnabled" />
+        </group>
+        <group id="ConfigureQuestions" label="Configure Questions">
+          <button id="shuffleanswers" label="Shuffle Answers" size="large" onAction="ChangeShuffleanswerTrueFalse" image="shuffleanswers" getEnabled="GetEnabled"/>
+          <button id="MarkTrueFalse" label="Toggle answer" size="large" onAction="ToggleAnswer" image="ToggleAnswer" getEnabled="GetEnabled"/>
+         <separator id="MdlQzSep2" />
+          <button id="MarkMissingWord" label="Mark Missing Word" size="large" onAction="ToggleMissingWord" image="markmissing" getEnabled="GetEnabled" />
+          <button id="numericaltolerance" label="Numerical Tolerance" size="large" onAction="AddNumericalTolerance" image="tolerance" getEnabled="GetEnabled"/>
+          <separator id="MdlQzSep3" />
           <button id="pasteImage" label="Paste Image" size="large" onAction="PasteImage" image="pasteimage" getEnabled="GetEnabled" />
           <button id="questionTitle" label="Question Name" size="large" onAction="AddQuestionTitle" image="questiontitle"  getEnabled="GetEnabled"/>
           <button id="feedback" label="Answer Feedback" size="large" onAction="AddAnswerFeedback" image="feedback"  getEnabled="GetEnabled" />
           <button id="comment" label="Comment (not imported)" size="large" onAction="AddComment" image="comment" getEnabled="GetEnabled" />
-          <separator id="MdlQzSep5" />
-          <button id="cleanup" label="Check Layout" size="large" onAction="check" imageMso="FileCompatibilityCheckerWord" getEnabled="GetEnabled"/>
-          <button id="export" label="Export to XML" size="large" onAction="export" imageMso="ExportXmlFile" getEnabled="GetEnabled"/>
-          <button id="about" label="About..." size="large" onAction="displayVersionInfo" imageMso="AdvertisePublishAs" getEnabled="GetEnabled"/>
+        </group>       
+        <group id="Export" label="Export">
+          <button id="cleanup" label="Check Layout" size="large" onAction="check" imageMso="FileCompatibilityCheckerWord"/>
+          <button id="export" label="Export to XML" size="large" onAction="export" imageMso="ExportXmlFile"/>
         </group>
+        <group id="About" label="About">
+          <button id="about" label="About..." size="large" onAction="displayVersionInfo" imageMso="AdvertisePublishAs"/>
+        </group>           
       </tab>
     </tabs>
   </ribbon>
