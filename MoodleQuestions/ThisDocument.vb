@@ -24,6 +24,7 @@ Public Class ThisDocument
     Event WindowSelectionChange As ApplicationEvents4_WindowSelectionChangeEventHandler
     Dim instance As ApplicationEvents4_Event
     Dim handler As ApplicationEvents4_WindowSelectionChangeEventHandler
+    Dim previousSelectionStyle As String
 
     '<ComVisibleAttribute(False)> _
     'Public Delegate Sub ApplicationEvents4_WindowSelectionChangeEventHandler( _
@@ -33,7 +34,7 @@ Public Class ThisDocument
     'Dim instance As New ApplicationEvents4_WindowSelectionChangeEventHandler(AddressOf HandleSelectionChange)
 
     Public Sub HandleSelectionChange(sel As Selection)
-        System.Diagnostics.Debug.WriteLine("caught WindowSelectionChange Event")
+        'System.Diagnostics.Debug.WriteLine("caught WindowSelectionChange Event")
         Me.ribbon.Invalidate()
     End Sub
 
@@ -43,14 +44,14 @@ Public Class ThisDocument
     End Sub
 
     Public ribbon As Office.IRibbonUI
-    'Public WithEvents timer1 As New Timer
+    Public WithEvents pollSelectionChangeTimer As New Timer
 
     Private Sub ThisDocument_Startup() Handles Me.Startup
-        'Me.timer1.Enabled = True
-        'AddHandler timer1.Tick, AddressOf OnTimedEvent
-        'timer1.Interval = 100
+        Me.pollSelectionChangeTimer.Enabled = True
+        AddHandler pollSelectionChangeTimer.Tick, AddressOf OnTimedEvent
+        pollSelectionChangeTimer.Interval = 100
 
-        AddHandler Globals.ThisDocument.Application.WindowSelectionChange, AddressOf HandleSelectionChange
+        'AddHandler Globals.ThisDocument.Application.WindowSelectionChange, AddressOf HandleSelectionChange
         'AddHandler Globals.ThisDocument.Application., AddressOf HandleDocumentChange
 
 
@@ -58,8 +59,13 @@ Public Class ThisDocument
 
     ' Invalidate the Ribbon to refresh the button states when change selection 
     Public Sub OnTimedEvent(source As Object, e As System.EventArgs)
-        If Globals.ThisDocument.Application.MouseAvailable And Me.ribbon IsNot Nothing Then
-            ribbon.Invalidate()
+        Dim currentSelectionStyle = CType(Globals.ThisDocument.Application.Selection.Paragraphs.Style, Word.Style).NameLocal
+        Dim isSelectionDifferent As Boolean = Not currentSelectionStyle = previousSelectionStyle
+        If isSelectionDifferent Then
+            previousSelectionStyle = currentSelectionStyle
+            If Globals.ThisDocument.Application.MouseAvailable And Me.ribbon IsNot Nothing Then
+                ribbon.Invalidate()
+            End If
         End If
     End Sub
 
