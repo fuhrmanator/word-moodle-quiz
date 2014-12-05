@@ -111,20 +111,20 @@ Public Class MoodleQuestions
             Case "MissingWord"
                 isEnabled = (isSelectionNormalStyle())
             Case "shuffleanswers"
-                isEnabled = (getSelectionStyle() = STYLE_MULTICHOICEQ Or _
-                             getSelectionStyle() = STYLE_MULTICHOICEQ_FIXANSWER Or _
-                             getSelectionStyle() = STYLE_MATCHINGQ)
+                isEnabled = (getSelectionStyleName() = STYLE_MULTICHOICEQ Or _
+                             getSelectionStyleName() = STYLE_MULTICHOICEQ_FIXANSWER Or _
+                             getSelectionStyleName() = STYLE_MATCHINGQ)
             Case "MarkTrueFalse"
-                isEnabled = (getSelectionStyle() = STYLE_CORRECT_MC_ANSWER Or _
-                             getSelectionStyle() = STYLE_INCORRECT_MC_ANSWER Or _
-                             getSelectionStyle() = STYLE_TRUESTATEMENT Or _
-                             getSelectionStyle() = STYLE_FALSESTATEMENT)
+                isEnabled = (getSelectionStyleName() = STYLE_CORRECT_MC_ANSWER Or _
+                             getSelectionStyleName() = STYLE_INCORRECT_MC_ANSWER Or _
+                             getSelectionStyleName() = STYLE_TRUESTATEMENT Or _
+                             getSelectionStyleName() = STYLE_FALSESTATEMENT)
             Case "MarkMissingWord"
-                isEnabled = (getSelectionStyle() = STYLE_MISSINGWORDQ)
+                isEnabled = (getSelectionStyleName() = STYLE_MISSINGWORDQ)
             Case "pasteImage"
-                isEnabled = (getSelectionStyle() = STYLE_MULTICHOICEQ Or _
-                             getSelectionStyle() = STYLE_CORRECT_MC_ANSWER Or _
-                            getSelectionStyle() = STYLE_INCORRECT_MC_ANSWER)
+                isEnabled = (getSelectionStyleName() = STYLE_MULTICHOICEQ Or _
+                             getSelectionStyleName() = STYLE_CORRECT_MC_ANSWER Or _
+                            getSelectionStyleName() = STYLE_INCORRECT_MC_ANSWER)
             Case "questionTitle"
                 isEnabled = (isSelectionNormalStyle())
             Case "feedback"
@@ -162,7 +162,7 @@ Public Class MoodleQuestions
     End Sub
     Public Sub ToggleMissingWord(ByVal control As Office.IRibbonControl)
         ' Only applies to questions of STYLE_MISSINGWORDQ
-        If (getSelectionStyle() = STYLE_MISSINGWORDQ) Then
+        If (getSelectionStyleName() = STYLE_MISSINGWORDQ) Then
             ' get only the first word of the selection
             Dim aRange As Microsoft.Office.Interop.Word.Range = getDocumentSelectionRange()
             aRange.Start = Globals.ThisDocument.Application.Selection.Words(1).Start
@@ -182,11 +182,11 @@ Public Class MoodleQuestions
 
     'TODO make sure only answers that can get feedback are allowed
     Public Sub AddAnswerFeedback(ByVal control As Office.IRibbonControl)
-        If getSelectionStyle() = STYLE_CORRECT_MC_ANSWER Or _
-           getSelectionStyle() = STYLE_INCORRECT_MC_ANSWER Or _
-           getSelectionStyle() = STYLE_TRUESTATEMENT Or _
-           getSelectionStyle() = STYLE_FALSESTATEMENT Or _
-           getSelectionStyle() = STYLE_SHORT_ANSWER Then
+        If getSelectionStyleName() = STYLE_CORRECT_MC_ANSWER Or _
+           getSelectionStyleName() = STYLE_INCORRECT_MC_ANSWER Or _
+           getSelectionStyleName() = STYLE_TRUESTATEMENT Or _
+           getSelectionStyleName() = STYLE_FALSESTATEMENT Or _
+           getSelectionStyleName() = STYLE_SHORT_ANSWER Then
             InsertParagraphAfterCurrentParagraph("Insert feedback of the previous choice or answer here.", _
                              STYLE_FEEDBACK)
             MsgBox("Feedback is")
@@ -200,7 +200,7 @@ Public Class MoodleQuestions
     End Sub
     ' Add tolerance
     Public Sub AddNumericalTolerance(ByVal control As Office.IRibbonControl)
-        If getSelectionStyle() = STYLE_SHORT_ANSWER Then
+        If getSelectionStyleName() = STYLE_SHORT_ANSWER Then
             InsertParagraphAfterCurrentParagraph("Replace me with Tolerance for the answer as a Decimal. Eg: 0.01", _
                              STYLE_NUM_TOLERANCE)
         Else 'Error: Give Instructions:
@@ -211,17 +211,17 @@ Public Class MoodleQuestions
 
     ' Add QuestionName / Question Title
     Public Sub AddQuestionTitle(ByVal control As Office.IRibbonControl)
-        If getSelectionStyle() = STYLE_ANSWERWEIGHT Or _
-           getSelectionStyle() = STYLE_SHORTANSWERQ Or _
-           getSelectionStyle() = STYLE_MISSINGWORDQ Or _
-           getSelectionStyle() = STYLE_CORRECT_MC_ANSWER Or _
-           getSelectionStyle() = STYLE_NUM_TOLERANCE Or _
-           getSelectionStyle() = STYLE_INCORRECT_MC_ANSWER Or _
-           getSelectionStyle() = STYLE_TRUESTATEMENT Or _
-           getSelectionStyle() = STYLE_SHORT_ANSWER Or _
-           getSelectionStyle() = STYLE_FALSESTATEMENT Or _
-           getSelectionStyle() = STYLE_RIGHT_MATCH Or _
-           getSelectionStyle() = STYLE_BLANK_WORD Then
+        If getSelectionStyleName() = STYLE_ANSWERWEIGHT Or _
+           getSelectionStyleName() = STYLE_SHORTANSWERQ Or _
+           getSelectionStyleName() = STYLE_MISSINGWORDQ Or _
+           getSelectionStyleName() = STYLE_CORRECT_MC_ANSWER Or _
+           getSelectionStyleName() = STYLE_NUM_TOLERANCE Or _
+           getSelectionStyleName() = STYLE_INCORRECT_MC_ANSWER Or _
+           getSelectionStyleName() = STYLE_TRUESTATEMENT Or _
+           getSelectionStyleName() = STYLE_SHORT_ANSWER Or _
+           getSelectionStyleName() = STYLE_FALSESTATEMENT Or _
+           getSelectionStyleName() = STYLE_RIGHT_MATCH Or _
+           getSelectionStyleName() = STYLE_BLANK_WORD Then
             InsertParagraphAfterCurrentParagraph("Add a question title.", STYLE_QUESTIONNAME)
         Else 'Error: Give Instructions:
             MsgBox("Feedback to insert at the end of the last response selected. " & vbCr & _
@@ -251,17 +251,17 @@ Public Class MoodleQuestions
         '  TODO for test: tester tous les types d'extension d'images
 
         With Globals.ThisDocument.Application.Selection
-            If getSelectionStyle() = STYLE_SHORTANSWERQ Or _
-               getSelectionStyle() = STYLE_MISSINGWORDQ Or _
-               getSelectionStyle() = STYLE_MULTICHOICEQ Or _
-               getSelectionStyle() = STYLE_MATCHINGQ Or _
-               getSelectionStyle() = STYLE_NUMERICALQ Or _
-               getSelectionStyle() = STYLE_TRUESTATEMENT Or _
-               getSelectionStyle() = STYLE_FALSESTATEMENT Or _
-               getSelectionStyle() = STYLE_MULTICHOICEQ_FIXANSWER Or _
-               getSelectionStyle() = STYLE_MATCHINGQ_FIXANSWER Or _
-               getSelectionStyle() = STYLE_CORRECT_MC_ANSWER Or _
-               getSelectionStyle() = STYLE_INCORRECT_MC_ANSWER Then
+            If getSelectionStyleName() = STYLE_SHORTANSWERQ Or _
+               getSelectionStyleName() = STYLE_MISSINGWORDQ Or _
+               getSelectionStyleName() = STYLE_MULTICHOICEQ Or _
+               getSelectionStyleName() = STYLE_MATCHINGQ Or _
+               getSelectionStyleName() = STYLE_NUMERICALQ Or _
+               getSelectionStyleName() = STYLE_TRUESTATEMENT Or _
+               getSelectionStyleName() = STYLE_FALSESTATEMENT Or _
+               getSelectionStyleName() = STYLE_MULTICHOICEQ_FIXANSWER Or _
+               getSelectionStyleName() = STYLE_MATCHINGQ_FIXANSWER Or _
+               getSelectionStyleName() = STYLE_CORRECT_MC_ANSWER Or _
+               getSelectionStyleName() = STYLE_INCORRECT_MC_ANSWER Then
                 Globals.ThisDocument.Application.Options.ReplaceSelection = False
                 .TypeText(Text:=(" " & Chr(11)))
                 .Paste()  ' don't paste if clipboard is empty, else exception
@@ -274,7 +274,7 @@ Public Class MoodleQuestions
 
     Public Sub ToggleAnswer(ByVal control As Office.IRibbonControl)
         'Toggles MCQ answer (right-wrong) or switches true and false statements.
-        Dim theStyle As String = getSelectionStyle()
+        Dim theStyle As String = getSelectionStyleName()
 
         If theStyle = STYLE_CORRECT_MC_ANSWER Then
             setSelectionParagraphStyle(STYLE_INCORRECT_MC_ANSWER)
@@ -293,13 +293,13 @@ Public Class MoodleQuestions
 
     Public Sub ChangeShuffleanswerTrueFalse(ByVal control As Office.IRibbonControl)
 
-        If getSelectionStyle() = STYLE_MATCHINGQ Then
+        If getSelectionStyleName() = STYLE_MATCHINGQ Then
             setSelectionParagraphStyle(STYLE_MATCHINGQ_FIXANSWER)
-        ElseIf getSelectionStyle() = STYLE_MATCHINGQ_FIXANSWER Then
+        ElseIf getSelectionStyleName() = STYLE_MATCHINGQ_FIXANSWER Then
             setSelectionParagraphStyle(STYLE_MATCHINGQ)
-        ElseIf getSelectionStyle() = STYLE_MULTICHOICEQ Then
+        ElseIf getSelectionStyleName() = STYLE_MULTICHOICEQ Then
             setSelectionParagraphStyle(STYLE_MULTICHOICEQ_FIXANSWER)
-        ElseIf getSelectionStyle() = STYLE_MULTICHOICEQ_FIXANSWER Then
+        ElseIf getSelectionStyleName() = STYLE_MULTICHOICEQ_FIXANSWER Then
             setSelectionParagraphStyle(STYLE_MULTICHOICEQ)
 
         Else 'Error: give instructions:
@@ -724,22 +724,22 @@ Public Class MoodleQuestions
     Public Sub SetAnswerWeights() ' aStyle, startPoint, endPoint)
         Dim startPoint, endPoint, rightScore, wrongScore, rightCount, wrongCount As Integer
 
-        If getSelectionStyle() = STYLE_MULTICHOICEQ Or STYLE_MULTICHOICEQ_FIXANSWER Then
+        If getSelectionStyleName() = STYLE_MULTICHOICEQ Or STYLE_MULTICHOICEQ_FIXANSWER Then
             startPoint = Globals.ThisDocument.Application.Selection.Paragraphs(1).Range.Start
             rightCount = 0
             wrongCount = 0
             Globals.ThisDocument.Application.Selection.MoveDown(Unit:=WdUnits.wdParagraph, Count:=1)
 
-            Do While getSelectionStyle() = STYLE_CORRECT_MC_ANSWER Or _
-                  getSelectionStyle() = STYLE_INCORRECT_MC_ANSWER Or _
-                  getSelectionStyle() = STYLE_FEEDBACK Or _
-                  getSelectionStyle() = STYLE_ANSWERWEIGHT
+            Do While getSelectionStyleName() = STYLE_CORRECT_MC_ANSWER Or _
+                  getSelectionStyleName() = STYLE_INCORRECT_MC_ANSWER Or _
+                  getSelectionStyleName() = STYLE_FEEDBACK Or _
+                  getSelectionStyleName() = STYLE_ANSWERWEIGHT
 
                 'Delete empty paragraphs
                 If Globals.ThisDocument.Application.Selection.Paragraphs(1).Range = vbCr Then
                     Globals.ThisDocument.Application.Selection.Paragraphs(1).Range.Delete() ' delete all empty paragraphs
                     ' Remove old answer weights
-                ElseIf getSelectionStyle() = STYLE_ANSWERWEIGHT Then
+                ElseIf getSelectionStyleName() = STYLE_ANSWERWEIGHT Then
                     With Globals.ThisDocument.Application.Selection.Find
                         .ClearFormatting()
                         .Style = STYLE_ANSWERWEIGHT
@@ -752,9 +752,9 @@ Public Class MoodleQuestions
                 End If
 
                 ' Count the number of right and wrong answers
-                If getSelectionStyle() = STYLE_CORRECT_MC_ANSWER Then
+                If getSelectionStyleName() = STYLE_CORRECT_MC_ANSWER Then
                     rightCount = rightCount + 1
-                ElseIf getSelectionStyle() = STYLE_INCORRECT_MC_ANSWER Then
+                ElseIf getSelectionStyleName() = STYLE_INCORRECT_MC_ANSWER Then
                     wrongCount = wrongCount + 1
                 End If
 
@@ -1241,7 +1241,7 @@ Public Class MoodleQuestions
         Err.Clear()
     End Function
 
-    Private Function getSelectionStyle() As String
+    Private Function getSelectionStyleName() As String
         Return CType(Globals.ThisDocument.Application.Selection.Paragraphs.Style, Word.Style).NameLocal
     End Function
 
@@ -1313,7 +1313,10 @@ Public Class MoodleQuestions
 
     Private Function isSelectionNormalStyle() As Boolean
         'Return (Globals.ThisDocument.Application.Selection.Paragraphs(1).Style = Word.WdBuiltinStyle.wdStyleNormal)
-        Return CType(Globals.ThisDocument.Application.Selection.Paragraphs(1).Style, Word.Style).NameLocal = "Normal"
+        'Return CType(Globals.ThisDocument.Application.Selection.Paragraphs(1).Style, Word.Style).NameLocal = "Normal"
+        Dim normalStyle As Style = Globals.ThisDocument.ThisApplication.ActiveDocument.Styles(Word.WdBuiltinStyle.wdStyleNormal)
+        Dim selectionStyle As Style = CType(Globals.ThisDocument.Application.Selection.Paragraphs(1).Style, Word.Style)
+        Return selectionStyle.NameLocal.Equals(normalStyle.NameLocal) 'http://stackoverflow.com/a/27295771/1168342
     End Function
 
 End Class
