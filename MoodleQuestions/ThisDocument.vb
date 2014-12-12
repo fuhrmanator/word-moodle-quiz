@@ -59,12 +59,17 @@ Public Class ThisDocument
 
     ' Invalidate the Ribbon to refresh the button states when change selection 
     Public Sub OnTimedEvent(source As Object, e As System.EventArgs)
-        Dim currentSelectionStyle = CType(Globals.ThisDocument.Application.Selection.Paragraphs.Style, Word.Style).NameLocal
-        Dim isSelectionDifferent As Boolean = Not currentSelectionStyle = previousSelectionStyle
-        If isSelectionDifferent Then
-            previousSelectionStyle = currentSelectionStyle
-            If Globals.ThisDocument.Application.MouseAvailable And Me.ribbon IsNot Nothing Then
-                ribbon.Invalidate()
+        Dim currentSelectionParagraphStyle = Globals.ThisDocument.Application.Selection.Paragraphs.Style
+        Dim currentSelectionStyle As String
+        Dim isSelectionDifferent As Boolean
+        If Not IsNothing(currentSelectionParagraphStyle) Then
+            currentSelectionStyle = CType(currentSelectionParagraphStyle, Word.Style).NameLocal
+            isSelectionDifferent = Not currentSelectionStyle = previousSelectionStyle
+            If isSelectionDifferent Then
+                previousSelectionStyle = currentSelectionStyle
+                If Globals.ThisDocument.Application.MouseAvailable And Me.ribbon IsNot Nothing Then
+                    ribbon.Invalidate()
+                End If
             End If
         End If
     End Sub
