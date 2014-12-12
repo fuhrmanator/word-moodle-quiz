@@ -5,14 +5,14 @@
       <tab id="MoodleQuiz" label="MoodleQuiz">
         <group id="InsertQuestions" label="Insert Questions">
           <button id="MCQ" label="Multiple Choice" size="large" onAction="AddMultipleChoiceQ" screentip="Multiple Choice" image="multiplechoice"
-                 showImage="true" visible="true" supertip="Inserts a multiple choice question at the cursor location." getEnabled="GetEnabled"/>
-          <button id="matching" label="Matching" size="large" onAction="AddMatchingQ" image="matching_a" getEnabled="GetEnabled"/>
-          <button id="shortanswer" label="Short Answer" size="large" onAction="AddShortAnswerQ" image="shortanswer"  getEnabled="GetEnabled" />
-          <button id="essay" label="Essay" size="large" onAction="AddEssay" image="essay"  getEnabled="GetEnabled" />
-          <button id="numerical" label="Numerical" size="large" onAction="AddNumericalQ" image="numerical" getEnabled="GetEnabled"/>
-          <button id="TrueStatement" label="True Statement" size="large" onAction="AddTrueStatement" image="_true" getEnabled="GetEnabled"/>
-          <button id="FalseStatement" label="False Statement" size="large" onAction="AddFalseStatement" image="_false" getEnabled="GetEnabled"/>
-          <button id="MissingWord" label="Missing Word" size="large" onAction="AddMissingWordQ" image="missingword" getEnabled="GetEnabled" />
+                 showImage="true" visible="true" supertip="Inserts a multiple choice question at the cursor location." />
+          <button id="matching" label="Matching" size="large" onAction="AddMatchingQ" image="matching_a" />
+          <button id="shortanswer" label="Short Answer" size="large" onAction="AddShortAnswerQ" image="shortanswer" />
+          <button id="essay" label="Essay" size="large" onAction="AddEssay" image="essay" />
+          <button id="numerical" label="Numerical" size="large" onAction="AddNumericalQ" image="numerical" />
+          <button id="TrueStatement" label="True Statement" size="large" onAction="AddTrueStatement" image="_true" />
+          <button id="FalseStatement" label="False Statement" size="large" onAction="AddFalseStatement" image="_false" />
+          <button id="MissingWord" label="Missing Word" size="large" onAction="AddMissingWordQ" image="missingword" />
         </group>
         <group id="ConfigureQuestions" label="Configure Questions">
           <button id="shuffleanswers" label="Shuffle Answers" size="large" onAction="ChangeShuffleanswerTrueFalse" image="shuffleanswers" getEnabled="GetEnabled"/>
@@ -24,7 +24,6 @@
           <button id="pasteImage" label="Paste Image" size="large" onAction="PasteImage" image="pasteimage" getEnabled="GetEnabled" />
           <button id="questionTitle" label="Question Name" size="large" onAction="AddQuestionTitle" image="questiontitle"  getEnabled="GetEnabled"/>
           <button id="feedback" label="Answer Feedback" size="large" onAction="AddAnswerFeedback" image="feedback"  getEnabled="GetEnabled" />
-          <button id="comment" label="Comment (not imported)" size="large" onAction="AddComment" image="comment" getEnabled="GetEnabled" />
         </group>       
         <group id="Export" label="Export">
           <button id="cleanup" label="Check Layout" size="large" onAction="check" imageMso="FileCompatibilityCheckerWord"/>
