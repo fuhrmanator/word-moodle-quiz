@@ -112,7 +112,7 @@ Public Class MoodleQuestions
             .Previous()
         End With
     End Sub
-  
+
     ' Add Multiple Choice Question to the end of the active document
     Public Sub AddMultipleChoiceQ(ByVal control As Office.IRibbonControl)
         Dim currentselection As Word.Selection = Globals.ThisDocument.Application.Selection
@@ -140,25 +140,26 @@ Public Class MoodleQuestions
     Public Function GetEnabled(ByVal control As Office.IRibbonControl) As Boolean
         System.Diagnostics.Debug.WriteLine("caught GetEnabled for " + control.Id)
         Dim isEnabled As Boolean = False
+        Dim selectionStyleName As String = getSelectionStyleName()
         Select Case control.Id
             Case "shuffleanswers"
-                isEnabled = (getSelectionStyleName() = STYLE_MULTICHOICEQ Or _
-                             getSelectionStyleName() = STYLE_MULTICHOICEQ_FIXANSWER Or _
-                             getSelectionStyleName() = STYLE_MATCHINGQ)
+                isEnabled = (selectionStyleName = STYLE_MULTICHOICEQ Or _
+                             selectionStyleName = STYLE_MULTICHOICEQ_FIXANSWER Or _
+                             selectionStyleName = STYLE_MATCHINGQ)
             Case "MarkTrueFalse"
-                isEnabled = (getSelectionStyleName() = STYLE_CORRECT_MC_ANSWER Or _
-                             getSelectionStyleName() = STYLE_INCORRECT_MC_ANSWER Or _
-                             getSelectionStyleName() = STYLE_TRUESTATEMENT Or _
-                             getSelectionStyleName() = STYLE_FALSESTATEMENT)
+                isEnabled = (selectionStyleName = STYLE_CORRECT_MC_ANSWER Or _
+                             selectionStyleName = STYLE_INCORRECT_MC_ANSWER Or _
+                             selectionStyleName = STYLE_TRUESTATEMENT Or _
+                             selectionStyleName = STYLE_FALSESTATEMENT)
             Case "MarkMissingWord"
-                isEnabled = (getSelectionStyleName() = STYLE_MISSINGWORDQ)
+                isEnabled = (selectionStyleName = STYLE_MISSINGWORDQ)
             Case "pasteImage"
-                isEnabled = (getSelectionStyleName() = STYLE_MULTICHOICEQ Or _
-                             getSelectionStyleName() = STYLE_CORRECT_MC_ANSWER Or _
-                            getSelectionStyleName() = STYLE_INCORRECT_MC_ANSWER)
+                isEnabled = (selectionStyleName = STYLE_MULTICHOICEQ Or _
+                             selectionStyleName = STYLE_CORRECT_MC_ANSWER Or _
+                            selectionStyleName = STYLE_INCORRECT_MC_ANSWER)
             Case "questionTitle"
-                isEnabled = (getSelectionStyle() = STYLE_MULTICHOICEQ Or _
-                             getSelectionStyle() = STYLE_FEEDBACK Or _
+                isEnabled = (selectionStyleName = STYLE_MULTICHOICEQ Or _
+                             selectionStyleName = STYLE_FEEDBACK Or _
                              isSelectionNormalStyle())
             Case "feedback"
                 isEnabled = (isSelectionNormalStyle())
@@ -1270,7 +1271,11 @@ Public Class MoodleQuestions
     End Function
 
     Private Function getSelectionStyleName() As String
-        Return CType(Globals.ThisDocument.Application.Selection.Paragraphs.Style, Word.Style).NameLocal
+        If IsNothing(Globals.ThisDocument.Application.Selection.Paragraphs.Style) Then
+            Return ""
+        Else
+            Return CType(Globals.ThisDocument.Application.Selection.Paragraphs.Style, Word.Style).NameLocal
+        End If
     End Function
 
     Private Sub setSelectionParagraphStyle(theStyle As String)
