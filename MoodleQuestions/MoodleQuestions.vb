@@ -68,20 +68,14 @@ Public Class MoodleQuestions
         Return tempImage
     End Function
 
-    ' Invalidate the Ribbon to refresh the button states
-    'Public Sub InvalidateThisRibbon()
-    '    ' enabled = Not enabled
-    '    Me.ribbon.Invalidate()
-    'End Sub
-
     '''''BUTTON callbacks
     ' Add Multiple Choice Question to the end of the active document
     Public Sub displayVersionInfo(ByVal control As Office.IRibbonControl)
         MsgBox("About MoodleQuestions..." & vbCrLf & "Published version: " & VERSION_INFO & vbCrLf & SOURCE_CODE_URL)
     End Sub
 
-    ' Add Multiple Choice Question to the end of the active document
-    Public Sub AddMultipleChoiceQ(ByVal control As Office.IRibbonControl)
+
+    Public Sub AddMultipleChoiceQText()
         AddParagraphOfStyle(STYLE_MULTICHOICEQ, "Insert Multiple Choice Question here")
         AddParagraphOfStyle(STYLE_CORRECT_MC_ANSWER, "Insert correct answer here")
         AddParagraphOfStyle(STYLE_FEEDBACK, "Insert feedback explaining why this is a correct answer here")
@@ -91,25 +85,62 @@ Public Class MoodleQuestions
         AddParagraphOfStyle(STYLE_FEEDBACK, "Insert feedback explaining why this is an incorrect answer here")
     End Sub
 
+    Dim rng As Word.Range
+    Private Function FindLoop() As Boolean
+        rng = Globals.ThisDocument.Application.Selection.Range
+        Dim para = Globals.ThisDocument.Application.Selection.Paragraphs
+        Dim styleQuestionFound As Boolean = False
+        With rng.Find
+            .ClearFormatting() 'Clear formatting from previous searches
+            .Forward = True
+            .Style = STYLE_MULTICHOICEQ
+            .Execute() 'Execute the search 
+            .Format = True
+            If .Found = True Then
+                styleQuestionFound = True
+            End If
+        End With
+        Return styleQuestionFound
+    End Function
+
+    Public Sub AddParagraphOfStyleInSelectedRangeBefore(aStyle, text)
+        With rng
+            .InsertParagraphBefore()
+            .Style = aStyle
+            .InsertBefore(text)
+            .Select()
+            .Previous()
+        End With
+    End Sub
+  
+    ' Add Multiple Choice Question to the end of the active document
+    Public Sub AddMultipleChoiceQ(ByVal control As Office.IRibbonControl)
+        Dim currentselection As Word.Selection = Globals.ThisDocument.Application.Selection
+        If isSelectionNormalStyle() Then
+            AddMultipleChoiceQText()
+        Else
+            If FindLoop() Then
+                AddParagraphOfStyleInSelectedRangeBefore(STYLE_MULTICHOICEQ, "test2")
+                InsertParagraphAfterCurrentParagraph("Insert correct answer here", "A Correct Choice")
+                InsertParagraphAfterCurrentParagraph("Insert feedback explaining why this is a correct answer here", "A Feedback")
+                InsertParagraphAfterCurrentParagraph("Insert incorrect answer here", "A Incorrect Choice")
+                InsertParagraphAfterCurrentParagraph("Insert feedback explaining why this is a correct answer here", "A Feedback")
+                InsertParagraphAfterCurrentParagraph("Insert incorrect answer here", "A Incorrect Choice")
+                InsertParagraphAfterCurrentParagraph("Insert feedback explaining why this is a correct answer here", "A Feedback")
+            Else
+                moveCursorToEndOfDocument()
+                AddMultipleChoiceQText()
+            End If
+
+        End If
+
+    End Sub
+
     ' Change the button states in the Ribbon
     Public Function GetEnabled(ByVal control As Office.IRibbonControl) As Boolean
         System.Diagnostics.Debug.WriteLine("caught GetEnabled for " + control.Id)
         Dim isEnabled As Boolean = False
         Select Case control.Id
-            Case "MCQ"
-                isEnabled = (isSelectionNormalStyle())
-            Case "matching"
-                isEnabled = (isSelectionNormalStyle())
-            Case "shortanswer"
-                isEnabled = (isSelectionNormalStyle())
-            Case "essay"
-                isEnabled = (isSelectionNormalStyle())
-            Case "TrueStatement"
-                isEnabled = (isSelectionNormalStyle())
-            Case "FalseStatement"
-                isEnabled = (isSelectionNormalStyle())
-            Case "MissingWord"
-                isEnabled = (isSelectionNormalStyle())
             Case "shuffleanswers"
                 isEnabled = (getSelectionStyleName() = STYLE_MULTICHOICEQ Or _
                              getSelectionStyleName() = STYLE_MULTICHOICEQ_FIXANSWER Or _
@@ -126,10 +157,10 @@ Public Class MoodleQuestions
                              getSelectionStyleName() = STYLE_CORRECT_MC_ANSWER Or _
                             getSelectionStyleName() = STYLE_INCORRECT_MC_ANSWER)
             Case "questionTitle"
-                isEnabled = (isSelectionNormalStyle())
+                isEnabled = (getSelectionStyle() = STYLE_MULTICHOICEQ Or _
+                             getSelectionStyle() = STYLE_FEEDBACK Or _
+                             isSelectionNormalStyle())
             Case "feedback"
-                isEnabled = (isSelectionNormalStyle())
-            Case "comment"
                 isEnabled = (isSelectionNormalStyle())
         End Select
         Return isEnabled
@@ -195,7 +226,6 @@ Public Class MoodleQuestions
             MsgBox("Feedback is placed at the end of the last possible response. " & vbCr & _
                    "It doesn't work for True/False questions." & vbCr & _
                    "Place the cursor on top of the question or answer you are giving feedback for.", vbExclamation)
-
         End If
     End Sub
     ' Add tolerance
@@ -242,9 +272,9 @@ Public Class MoodleQuestions
     End Sub
 
     ' Add a comment
-    Public Sub AddComment(ByVal control As Office.IRibbonControl)
-        AddParagraphOfStyle(STYLE_COMMENT, "")
-    End Sub
+    'Public Sub AddComment(ByVal control As Office.IRibbonControl)
+    '    AddParagraphOfStyle(STYLE_COMMENT, "")
+    'End Sub
     Public Sub PasteImage(ByVal control As Office.IRibbonControl)
         '  Adds an image from the clipboard into a question.
         '  Globals.ThisDocument.Application.Selection.Paragraphs.Style = TYLE_SHORTANSWERQ
@@ -333,8 +363,6 @@ Public Class MoodleQuestions
         Else
             MsgBox("The export operation can not be started until everything is OK" & vbCr & "and there is at least one question.", vbCritical, "Error")
         End If
-
-
     End Sub
 
 #End Region
@@ -379,7 +407,7 @@ Public Class MoodleQuestions
     Public Const STYLE_LEFT_MATCH = "A Matching Left"
     Public Const STYLE_RIGHT_MATCH = "A Matching Right"
     Public Const STYLE_BLANK_WORD = "MissingWord"  'this string used in an XSLT template
-    Public Const STYLE_COMMENT = "Comment"
+    ' Public Const STYLE_COMMENT = "Comment"
     ' Supplement(ed by) Daniel
     Public Const STYLE_MULTICHOICEQ_FIXANSWER = "Q Multi Choice FixAnswer"
     Public Const STYLE_MATCHINGQ_FIXANSWER = "Q Matching FixAnswer"
@@ -1129,11 +1157,11 @@ Public Class MoodleQuestions
                     xmlnod.attributes.getNamedItem("fraction").text = "100"
                     xmlnod.selectSingleNode("text").text = misword
 
-                Case STYLE_COMMENT
-                    Dim Comment As String
-                    Comment = "<!-- " & RemoveCR(para.Range.Text) & " -->"
-                    objStream.WriteText(Comment & vbCr & vbCr)
-                    dd.loadXML("")
+                    'Case STYLE_COMMENT
+                    '    Dim Comment As String
+                    '    Comment = "<!-- " & RemoveCR(para.Range.Text) & " -->"
+                    '    objStream.WriteText(Comment & vbCr & vbCr)
+                    '    dd.loadXML("")
 
                 Case Else
                     dd.loadXML("")
@@ -1264,7 +1292,7 @@ Public Class MoodleQuestions
         Return Globals.ThisDocument.Application.ActiveDocument.Range.End
     End Function
 
-    Private Function getDocumentRange(startPoint As Integer, endPoint As Integer) As Microsoft.Office.Interop.Word.Range
+    Public Function getDocumentRange(startPoint As Integer, endPoint As Integer) As Microsoft.Office.Interop.Word.Range
         Return Globals.ThisDocument.Application.ActiveDocument.Range(startPoint, endPoint)
     End Function
 
