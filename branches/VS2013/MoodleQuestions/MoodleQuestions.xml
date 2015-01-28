@@ -4,8 +4,10 @@
     <tabs>
       <tab id="MoodleQuiz" label="MoodleQuiz">
         <group id="InsertQuestions" label="Insert Questions">
-          <button id="MCQ" label="Multiple Choice" size="large" onAction="AddMultipleChoiceQ" screentip="Multiple Choice" imageMso="SmartArtAddBullet"
-                 showImage="true" visible="true" supertip="Inserts a multiple choice question at the cursor location." />
+<<<<<<< .mine           <button id="category" label="Category" size="large" onAction="AddCategoryQ" imageMso="OrganizationChartInsertCoworker" />
+          <button id="MCQ" label="Multiple Choice" size="large" onAction="AddMultipleChoiceQ" screentip="Multiple Choice" image="multiplechoice"
+=======          <button id="MCQ" label="Multiple Choice" size="large" onAction="AddMultipleChoiceQ" screentip="Multiple Choice" imageMso="SmartArtAddBullet"
+>>>>>>> .theirs                 showImage="true" visible="true" supertip="Inserts a multiple choice question at the cursor location." />
           <button id="matching" label="Matching" size="large" onAction="AddMatchingQ" image="MatchingShapes" />
           <button id="shortanswer" label="Short Answer" size="large" onAction="AddShortAnswerQ" image="shortanswer" />
           <button id="essay" label="Essay" size="large" onAction="AddEssay" imageMso="TextBoxInsertMenu" />
