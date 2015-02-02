@@ -75,35 +75,6 @@ Public Class MoodleQuestions
     End Sub
 
 
-   
-    Dim rng As Word.Range
-    Private Function FindLoop(aStyle) As Boolean
-        'rng = Globals.ThisDocument.Application.Selection.Range
-        Dim styleQuestionFound As Boolean = False
-        With rng.Find
-            .ClearFormatting() 'Clear formatting from previous searches
-            .Forward = True
-            .Style = aStyle
-            .Execute() 'Execute the search 
-            .Format = True
-            If .Found = True Then
-                styleQuestionFound = True
-            End If
-        End With
-        Return styleQuestionFound
-    End Function
-
-    Public Sub AddParagraphOfStyleInSelectedRangeBefore(aStyle, text)
-        With rng
-            .InsertParagraphBefore()
-            .Style = aStyle
-            .InsertBefore(text)
-            .Select()
-            .Previous()
-        End With
-    End Sub
-
-
     ' Change the button states in the Ribbon
     Public Function GetEnabled(ByVal control As Office.IRibbonControl) As Boolean
         System.Diagnostics.Debug.WriteLine("caught GetEnabled for " + control.Id)
@@ -126,16 +97,29 @@ Public Class MoodleQuestions
                              selectionStyleName = STYLE_CORRECT_MC_ANSWER Or _
                             selectionStyleName = STYLE_INCORRECT_MC_ANSWER)
             Case "questionTitle"
-<<<<<<< .mine                isEnabled = (getSelectionStyleName() = STYLE_MULTICHOICEQ Or _
+                isEnabled = (getSelectionStyleName() = STYLE_MULTICHOICEQ Or _
                              getSelectionStyleName() = STYLE_FEEDBACK Or _
-=======                isEnabled = (selectionStyleName = STYLE_MULTICHOICEQ Or _
-                             selectionStyleName = STYLE_FEEDBACK Or _
->>>>>>> .theirs                             isSelectionNormalStyle())
+                             isSelectionNormalStyle())
             Case "feedback"
                 isEnabled = (isSelectionNormalStyle())
         End Select
         Return isEnabled
     End Function
+
+    Dim rng As Word.Range
+    Public Sub AddParagraphOfStyleInSelectedRangeBefore(aStyle, text)
+        With rng
+            .InsertParagraphBefore()
+            .Style = aStyle
+            .InsertBefore(text)
+            .Select()
+            .Previous()
+        End With
+    End Sub
+
+    Public Sub AddCategoryQ(ByVal control As Office.IRibbonControl)
+        AddParagraphOfStyle(STYLE_CATEGORYQ, "Insert Category here")
+    End Sub
 
     ' Add Multiple Choice Question to the end of the active document
     Public Sub AddMultipleChoiceQText()
@@ -148,22 +132,39 @@ Public Class MoodleQuestions
         AddParagraphOfStyle(STYLE_FEEDBACK, "Insert feedback explaining why this is an incorrect answer here")
     End Sub
 
+    Dim foundedRng As Word.Range
+    ' Check if the specified style is found in the range
+    Function StyleFound(aStyle) As Boolean
+        With rng.Find
+            .ClearFormatting()
+            .Text = ""
+            .Replacement.Text = ""
+            .Forward = True
+            .Style = aStyle
+            .Format = True
+            .Execute() '(Wrap:=Microsoft.Office.Interop.Word.WdFindWrap.wdFindStop)
+        End With
+        'MsgBox "Style: " & aStyle & " Found: " & aRange.Find.Found
+        StyleFound = rng.Find.Found
+    End Function
+
     Public Sub AddMultipleChoiceQ(ByVal control As Office.IRibbonControl)
         rng = Globals.ThisDocument.Application.Selection.Range
+
         If isSelectionNormalStyle() Then
             AddMultipleChoiceQText()
         Else
-            If FindLoop(STYLE_MULTICHOICEQ) Or FindLoop(STYLE_MATCHINGQ) Or FindLoop(STYLE_SHORTANSWERQ) Or _
-            FindLoop(STYLE_ESSAY) Or FindLoop(STYLE_TRUESTATEMENT) Or _
-            FindLoop(STYLE_FALSESTATEMENT) Or FindLoop(STYLE_MISSINGWORDQ) Or FindLoop(STYLE_NUMERICALQ) Then
+            If StyleFound(STYLE_MULTICHOICEQ) Or StyleFound(STYLE_MATCHINGQ) Or StyleFound(STYLE_SHORTANSWERQ) Or _
+                StyleFound(STYLE_ESSAY) Or StyleFound(STYLE_TRUESTATEMENT) Or _
+                StyleFound(STYLE_FALSESTATEMENT) Or StyleFound(STYLE_MISSINGWORDQ) Or StyleFound(STYLE_NUMERICALQ) Or StyleFound(STYLE_CATEGORYQ) Then
 
                 AddParagraphOfStyleInSelectedRangeBefore(STYLE_MULTICHOICEQ, "test2")
                 InsertParagraphAfterCurrentParagraph("Insert correct answer here", "A Correct Choice")
                 InsertParagraphAfterCurrentParagraph("Insert feedback explaining why this is a correct answer here", "A Feedback")
                 InsertParagraphAfterCurrentParagraph("Insert incorrect answer here", "A Incorrect Choice")
-                InsertParagraphAfterCurrentParagraph("Insert feedback explaining why this is a correct answer here", "A Feedback")
+                InsertParagraphAfterCurrentParagraph("Insert feedback explaining why this is an incorrect answer here", "A Feedback")
                 InsertParagraphAfterCurrentParagraph("Insert incorrect answer here", "A Incorrect Choice")
-                InsertParagraphAfterCurrentParagraph("Insert feedback explaining why this is a correct answer here", "A Feedback")
+                InsertParagraphAfterCurrentParagraph("Insert feedback explaining why this is an incorrect answer here", "A Feedback")
             Else
                 moveCursorToEndOfDocument()
                 AddMultipleChoiceQText()
@@ -173,99 +174,109 @@ Public Class MoodleQuestions
 
     ' Add Matching Question to the end of the active document
     Public Sub AddMatchingQ(ByVal control As Office.IRibbonControl)
-        If rng Is Nothing Then 'check if it's the first inserted question
-            rng = Globals.ThisDocument.Application.Selection.Range
-        End If
-        If isSelectionNormalStyle() Then
-            AddParagraphOfStyle(STYLE_MATCHINGQ, "Insert Matching Question")
-        Else
-            If FindLoop(STYLE_MULTICHOICEQ) Or FindLoop(STYLE_MATCHINGQ) Or FindLoop(STYLE_SHORTANSWERQ) Or _
-                FindLoop(STYLE_ESSAY) Or FindLoop(STYLE_TRUESTATEMENT) Or _
-                FindLoop(STYLE_FALSESTATEMENT) Or FindLoop(STYLE_MISSINGWORDQ) Then
-                AddParagraphOfStyleInSelectedRangeBefore(STYLE_MATCHINGQ, "Insert Matching Question")
-            Else
-                moveCursorToEndOfDocument()
-                AddParagraphOfStyle(STYLE_MATCHINGQ, "Insert Matching Question")
-            End If
-        End If
+        AddParagraphOfStyle(STYLE_MATCHINGQ, "Insert Matching Question")
+
+        'If rng Is Nothing Then 'check if it's the first inserted question
+        '    rng = Globals.ThisDocument.Application.Selection.Range
+        'End If
+        'If isSelectionNormalStyle() Then
+        '    AddParagraphOfStyle(STYLE_MATCHINGQ, "Insert Matching Question")
+        'Else
+        '    If StyleFound(STYLE_MULTICHOICEQ, rng) Or StyleFound(STYLE_MATCHINGQ, rng) Or StyleFound(STYLE_SHORTANSWERQ, rng) Or _
+        '        StyleFound(STYLE_ESSAY, rng) Or StyleFound(STYLE_TRUESTATEMENT, rng) Or _
+        '        StyleFound(STYLE_FALSESTATEMENT, rng) Or StyleFound(STYLE_MISSINGWORDQ, rng) Or StyleFound(STYLE_NUMERICALQ, rng) Then
+        '        AddParagraphOfStyleInSelectedRangeBefore(STYLE_MATCHINGQ, "Insert Matching Question")
+        '    Else
+        '        moveCursorToEndOfDocument()
+        '        AddParagraphOfStyle(STYLE_MATCHINGQ, "Insert Matching Question")
+        '    End If
+        'End If
     End Sub
 
     ' Add Numerical Question to the end of the active document
     Public Sub AddNumericalQ(ByVal control As Office.IRibbonControl)
-        If rng Is Nothing Then 'check if it's the first inserted question
-            rng = Globals.ThisDocument.Application.Selection.Range
-        End If
-        If isSelectionNormalStyle() Then
-            AddParagraphOfStyle(STYLE_NUMERICALQ, "Insert Numerical Question")
-        Else
-            If FindLoop(STYLE_MULTICHOICEQ) Or FindLoop(STYLE_MATCHINGQ) Or FindLoop(STYLE_SHORTANSWERQ) Or _
-                FindLoop(STYLE_ESSAY) Or FindLoop(STYLE_TRUESTATEMENT) Or _
-                FindLoop(STYLE_FALSESTATEMENT) Or FindLoop(STYLE_MISSINGWORDQ) Or FindLoop(STYLE_NUMERICALQ) Then
-                AddParagraphOfStyleInSelectedRangeBefore(STYLE_NUMERICALQ, "Insert Numerical Question")
-            Else
-                moveCursorToEndOfDocument()
-                AddParagraphOfStyle(STYLE_NUMERICALQ, "Insert Numerical Question")
-            End If
-        End If
+        AddParagraphOfStyle(STYLE_NUMERICALQ, "Insert Numerical Question")
+
+        'If rng Is Nothing Then 'check if it's the first inserted question
+        '    rng = Globals.ThisDocument.Application.Selection.Range
+        'End If
+        'If isSelectionNormalStyle() Then
+        '    AddParagraphOfStyle(STYLE_NUMERICALQ, "Insert Numerical Question")
+        'Else
+        '    If StyleFound(STYLE_MULTICHOICEQ, rng) Or StyleFound(STYLE_MATCHINGQ, rng) Or StyleFound(STYLE_SHORTANSWERQ, rng) Or _
+        '        StyleFound(STYLE_ESSAY, rng) Or StyleFound(STYLE_TRUESTATEMENT, rng) Or _
+        '        StyleFound(STYLE_FALSESTATEMENT, rng) Or StyleFound(STYLE_MISSINGWORDQ, rng) Or StyleFound(STYLE_NUMERICALQ, rng) Then
+        '        AddParagraphOfStyleInSelectedRangeBefore(STYLE_NUMERICALQ, "Insert Numerical Question")
+        '    Else
+        '        moveCursorToEndOfDocument()
+        '        AddParagraphOfStyle(STYLE_NUMERICALQ, "Insert Numerical Question")
+        '    End If
+        'End If
     End Sub
 
 
     ' Add Short Answer Question to the end of the active document
     Public Sub AddShortAnswerQ(ByVal control As Office.IRibbonControl)
-        If rng Is Nothing Then 'check if it's the first inserted question
-            rng = Globals.ThisDocument.Application.Selection.Range
-        End If
-        If isSelectionNormalStyle() Then
-            AddParagraphOfStyle(STYLE_SHORTANSWERQ, "Insert Short Answer Question")
-        Else
-            If FindLoop(STYLE_MULTICHOICEQ) Or FindLoop(STYLE_MATCHINGQ) Or FindLoop(STYLE_SHORTANSWERQ) Or _
-                FindLoop(STYLE_ESSAY) Or FindLoop(STYLE_TRUESTATEMENT) Or _
-                FindLoop(STYLE_FALSESTATEMENT) Or FindLoop(STYLE_MISSINGWORDQ) Or FindLoop(STYLE_NUMERICALQ) Then
-                AddParagraphOfStyleInSelectedRangeBefore(STYLE_SHORTANSWERQ, "Insert Short Answer Question")
-            Else
-                moveCursorToEndOfDocument()
-                AddParagraphOfStyle(STYLE_SHORTANSWERQ, "Insert Short Answer Question")
-            End If
-        End If
+        AddParagraphOfStyle(STYLE_SHORTANSWERQ, "Insert Short Answer Question")
+
+        'If rng Is Nothing Then 'check if it's the first inserted question
+        '    rng = Globals.ThisDocument.Application.Selection.Range
+        'End If
+        'If isSelectionNormalStyle() Then
+        '    AddParagraphOfStyle(STYLE_SHORTANSWERQ, "Insert Short Answer Question")
+        'Else
+        '    If FindLoop(STYLE_MULTICHOICEQ) Or FindLoop(STYLE_MATCHINGQ) Or FindLoop(STYLE_SHORTANSWERQ) Or _
+        '        FindLoop(STYLE_ESSAY) Or FindLoop(STYLE_TRUESTATEMENT) Or _
+        '        FindLoop(STYLE_FALSESTATEMENT) Or FindLoop(STYLE_MISSINGWORDQ) Or FindLoop(STYLE_NUMERICALQ) Then
+        '        AddParagraphOfStyleInSelectedRangeBefore(STYLE_SHORTANSWERQ, "Insert Short Answer Question")
+        '    Else
+        '        moveCursorToEndOfDocument()
+        '        AddParagraphOfStyle(STYLE_SHORTANSWERQ, "Insert Short Answer Question")
+        '    End If
+        'End If
     End Sub
 
     ' Add Missing Word Question
     Public Sub AddMissingWordQ(ByVal control As Office.IRibbonControl)
-        If rng Is Nothing Then
-            rng = Globals.ThisDocument.Application.Selection.Range
-        End If
+        AddParagraphOfStyle(STYLE_MISSINGWORDQ, "Insert Missing Word Question. Then select the missing word!") ' "Insert Missing Word Question. Then select the missing word!")
 
-        If isSelectionNormalStyle() Then
-            AddParagraphOfStyle(STYLE_MISSINGWORDQ, "Insert Missing Word Question. Then select the missing word!")
-        Else
-            If FindLoop(STYLE_MULTICHOICEQ) Or FindLoop(STYLE_MATCHINGQ) Or FindLoop(STYLE_SHORTANSWERQ) Or _
-                FindLoop(STYLE_ESSAY) Or FindLoop(STYLE_TRUESTATEMENT) Or _
-                FindLoop(STYLE_FALSESTATEMENT) Or FindLoop(STYLE_MISSINGWORDQ) Or FindLoop(STYLE_NUMERICALQ) Then
-                AddParagraphOfStyleInSelectedRangeBefore(STYLE_MISSINGWORDQ, "Insert Missing Word Question. Then select the missing word!")
-            Else
-                moveCursorToEndOfDocument()
-                AddParagraphOfStyle(STYLE_MISSINGWORDQ, "Insert Missing Word Question. Then select the missing word!") ' "Insert Missing Word Question. Then select the missing word!")
-            End If
-        End If
+        'If rng Is Nothing Then
+        '    rng = Globals.ThisDocument.Application.Selection.Range
+        'End If
+
+        'If isSelectionNormalStyle() Then
+        '    AddParagraphOfStyle(STYLE_MISSINGWORDQ, "Insert Missing Word Question. Then select the missing word!")
+        'Else
+        '    If FindLoop(STYLE_MULTICHOICEQ) Or FindLoop(STYLE_MATCHINGQ) Or FindLoop(STYLE_SHORTANSWERQ) Or _
+        '        FindLoop(STYLE_ESSAY) Or FindLoop(STYLE_TRUESTATEMENT) Or _
+        '        FindLoop(STYLE_FALSESTATEMENT) Or FindLoop(STYLE_MISSINGWORDQ) Or FindLoop(STYLE_NUMERICALQ) Then
+        '        AddParagraphOfStyleInSelectedRangeBefore(STYLE_MISSINGWORDQ, "Insert Missing Word Question. Then select the missing word!")
+        '    Else
+        '        moveCursorToEndOfDocument()
+        '        AddParagraphOfStyle(STYLE_MISSINGWORDQ, "Insert Missing Word Question. Then select the missing word!") ' "Insert Missing Word Question. Then select the missing word!")
+        '    End If
+        'End If
     End Sub
 
     ' Add an Essay
     Public Sub AddEssay(ByVal control As Office.IRibbonControl)
-        If rng Is Nothing Then 'check if it's the first inserted question
-            rng = Globals.ThisDocument.Application.Selection.Range
-        End If
-        If isSelectionNormalStyle() Then
-            AddParagraphOfStyle(STYLE_ESSAY, "Insert An Essay question here (an Open Question). [This can not be the last question in the document.]")
-        Else
-            If FindLoop(STYLE_MULTICHOICEQ) Or FindLoop(STYLE_MATCHINGQ) Or FindLoop(STYLE_SHORTANSWERQ) Or _
-                FindLoop(STYLE_ESSAY) Or FindLoop(STYLE_TRUESTATEMENT) Or _
-                FindLoop(STYLE_FALSESTATEMENT) Or FindLoop(STYLE_MISSINGWORDQ) Or FindLoop(STYLE_NUMERICALQ) Then
-                AddParagraphOfStyleInSelectedRangeBefore(STYLE_ESSAY, "Insert An Essay question here (an Open Question). [This can not be the last question in the document.]")
-            Else
-                moveCursorToEndOfDocument()
-                AddParagraphOfStyle(STYLE_ESSAY, "Insert An Essay question here (an Open Question). [This can not be the last question in the document.]")
-            End If
-        End If
+        AddParagraphOfStyle(STYLE_ESSAY, "Insert An Essay question here (an Open Question). [This can not be the last question in the document.]")
+
+        'If rng Is Nothing Then 'check if it's the first inserted question
+        '    rng = Globals.ThisDocument.Application.Selection.Range
+        'End If
+        'If isSelectionNormalStyle() Then
+        '    AddParagraphOfStyle(STYLE_ESSAY, "Insert An Essay question here (an Open Question). [This can not be the last question in the document.]")
+        'Else
+        '    If FindLoop(STYLE_MULTICHOICEQ) Or FindLoop(STYLE_MATCHINGQ) Or FindLoop(STYLE_SHORTANSWERQ) Or _
+        '        FindLoop(STYLE_ESSAY) Or FindLoop(STYLE_TRUESTATEMENT) Or _
+        '        FindLoop(STYLE_FALSESTATEMENT) Or FindLoop(STYLE_MISSINGWORDQ) Or FindLoop(STYLE_NUMERICALQ) Then
+        '        AddParagraphOfStyleInSelectedRangeBefore(STYLE_ESSAY, "Insert An Essay question here (an Open Question). [This can not be the last question in the document.]")
+        '    Else
+        '        moveCursorToEndOfDocument()
+        '        AddParagraphOfStyle(STYLE_ESSAY, "Insert An Essay question here (an Open Question). [This can not be the last question in the document.]")
+        '    End If
+        'End If
     End Sub
     Public Sub ToggleMissingWord(ByVal control As Office.IRibbonControl)
         ' Only applies to questions of STYLE_MISSINGWORDQ
@@ -283,8 +294,6 @@ Public Class MoodleQuestions
         Else
             MsgBox("Select a word inside a Missing-word question first.", vbExclamation)
         End If
-
-
     End Sub
 
     'TODO make sure only answers that can get feedback are allowed
@@ -339,42 +348,46 @@ Public Class MoodleQuestions
 
     ' Add a true statement of the true-false question
     Public Sub AddTrueStatement(ByVal control As Office.IRibbonControl)
-        If rng Is Nothing Then
-            rng = Globals.ThisDocument.Application.Selection.Range
-        End If
+        AddParagraphOfStyle(STYLE_TRUESTATEMENT, "True-false question: insert a TRUE statement here (not at the end of the document)")
 
-        If isSelectionNormalStyle() Then
-            AddParagraphOfStyle(STYLE_TRUESTATEMENT, "True-false question: insert a TRUE statement here (not at the end of the document)")
-        Else
-            If FindLoop(STYLE_MULTICHOICEQ) Or FindLoop(STYLE_MATCHINGQ) Or FindLoop(STYLE_SHORTANSWERQ) Or _
-                FindLoop(STYLE_ESSAY) Or FindLoop(STYLE_TRUESTATEMENT) Or _
-                FindLoop(STYLE_FALSESTATEMENT) Or FindLoop(STYLE_MISSINGWORDQ) Or FindLoop(STYLE_NUMERICALQ) Then
-                AddParagraphOfStyleInSelectedRangeBefore(STYLE_TRUESTATEMENT, "True-false question: insert a TRUE statement here (not at the end of the document)")
-            Else
-                moveCursorToEndOfDocument()
-                AddParagraphOfStyle(STYLE_TRUESTATEMENT, "True-false question: insert a TRUE statement here (not at the end of the document)")
-            End If
-        End If
+        'If rng Is Nothing Then
+        '    rng = Globals.ThisDocument.Application.Selection.Range
+        'End If
+
+        'If isSelectionNormalStyle() Then
+        '    AddParagraphOfStyle(STYLE_TRUESTATEMENT, "True-false question: insert a TRUE statement here (not at the end of the document)")
+        'Else
+        '    If FindLoop(STYLE_MULTICHOICEQ) Or FindLoop(STYLE_MATCHINGQ) Or FindLoop(STYLE_SHORTANSWERQ) Or _
+        '        FindLoop(STYLE_ESSAY) Or FindLoop(STYLE_TRUESTATEMENT) Or _
+        '        FindLoop(STYLE_FALSESTATEMENT) Or FindLoop(STYLE_MISSINGWORDQ) Or FindLoop(STYLE_NUMERICALQ) Then
+        '        AddParagraphOfStyleInSelectedRangeBefore(STYLE_TRUESTATEMENT, "True-false question: insert a TRUE statement here (not at the end of the document)")
+        '    Else
+        '        moveCursorToEndOfDocument()
+        '        AddParagraphOfStyle(STYLE_TRUESTATEMENT, "True-false question: insert a TRUE statement here (not at the end of the document)")
+        '    End If
+        'End If
     End Sub
 
     ' Add a false statement of the true-false question
     Public Sub AddFalseStatement(ByVal control As Office.IRibbonControl)
-        If rng Is Nothing Then
-            rng = Globals.ThisDocument.Application.Selection.Range
-        End If
+        AddParagraphOfStyle(STYLE_FALSESTATEMENT, "True-false question: insert a FALSE statement here (not at the end of the document)")
 
-        If isSelectionNormalStyle() Then
-            AddParagraphOfStyle(STYLE_FALSESTATEMENT, "True-false question: insert a FALSE statement here (not at the end of the document)")
-        Else
-            If FindLoop(STYLE_MULTICHOICEQ) Or FindLoop(STYLE_MATCHINGQ) Or FindLoop(STYLE_SHORTANSWERQ) Or _
-                FindLoop(STYLE_ESSAY) Or FindLoop(STYLE_TRUESTATEMENT) Or _
-                FindLoop(STYLE_FALSESTATEMENT) Or FindLoop(STYLE_MISSINGWORDQ) Or FindLoop(STYLE_NUMERICALQ) Then
-                AddParagraphOfStyleInSelectedRangeBefore(STYLE_FALSESTATEMENT, "True-false question: insert a FALSE statement here (not at the end of the document)")
-            Else
-                moveCursorToEndOfDocument()
-                AddParagraphOfStyle(STYLE_FALSESTATEMENT, "True-false question: insert a FALSE statement here (not at the end of the document)")
-            End If
-        End If
+        'If rng Is Nothing Then
+        '    rng = Globals.ThisDocument.Application.Selection.Range
+        'End If
+
+        'If isSelectionNormalStyle() Then
+        '    AddParagraphOfStyle(STYLE_FALSESTATEMENT, "True-false question: insert a FALSE statement here (not at the end of the document)")
+        'Else
+        '    If StyleFound(STYLE_MULTICHOICEQ, rng) Or StyleFound(STYLE_MATCHINGQ, rng) Or StyleFound(STYLE_SHORTANSWERQ, rng) Or _
+        '        StyleFound(STYLE_ESSAY, rng) Or StyleFound(STYLE_TRUESTATEMENT, rng) Or _
+        '        StyleFound(STYLE_FALSESTATEMENT, rng) Or StyleFound(STYLE_MISSINGWORDQ, rng) Or StyleFound(STYLE_NUMERICALQ, rng) Then
+        '        AddParagraphOfStyleInSelectedRangeBefore(STYLE_FALSESTATEMENT, "True-false question: insert a FALSE statement here (not at the end of the document)")
+        '    Else
+        '        moveCursorToEndOfDocument()
+        '        AddParagraphOfStyle(STYLE_FALSESTATEMENT, "True-false question: insert a FALSE statement here (not at the end of the document)")
+        '    End If
+        'End If
 
     End Sub
 
@@ -401,7 +414,11 @@ Public Class MoodleQuestions
                getSelectionStyleName() = STYLE_INCORRECT_MC_ANSWER Then
                 Globals.ThisDocument.Application.Options.ReplaceSelection = False
                 .TypeText(Text:=(" " & Chr(11)))
-                .Paste()  ' don't paste if clipboard is empty, else exception
+                If (Not Clipboard.ContainsText) Then
+                    .Paste()  ' don't paste if clipboard is empty, else exception
+                Else
+                    MsgBox("Image not found", vbExclamation)
+                End If
             Else 'Error - give instructions:
                 MsgBox("Pastes an image from the Clipboard. " & vbCr & _
                        "Place the cursor at the end of the question. ", vbExclamation)
@@ -501,6 +518,7 @@ Public Class MoodleQuestions
     Public Const STYLE_FEEDBACK = "A Feedback"
     Public Const STYLE_ANSWERWEIGHT = "A Weight"
 
+    Public Const STYLE_CATEGORYQ = "Q Category"
     Public Const STYLE_SHORTANSWERQ = "Q Short Answer"
     Public Const STYLE_MULTICHOICEQ = "Q Multi Choice"
     Public Const STYLE_MATCHINGQ = "Q Matching"
@@ -535,13 +553,17 @@ Public Class MoodleQuestions
     ' Inserted text is selected
     Public Sub AddParagraphOfStyle(aStyle, text)
         Dim myRange As Word.Range = Globals.ThisDocument.Application.Selection.Range
-        With myRange
-            .InsertParagraphAfter() '.InsertBefore(text)
-            .Move(Unit:=WdUnits.wdParagraph, Count:=1)
-            .Style = aStyle
-            .Text = text
-            .Select()
-        End With
+        Try
+            With myRange
+                .InsertParagraphAfter() '.InsertBefore(text)
+                .Move(Unit:=WdUnits.wdParagraph, Count:=1)
+                .Style = aStyle
+                .Text = text
+                .Select()
+            End With
+        Catch ex As System.Runtime.InteropServices.COMException
+            MessageBox.Show(aStyle + " style doesn't exist") 'ex.Message)
+        End Try
     End Sub
 
     ' Moodle requires a dot (.) as a decimal separator. Thus, all comma separators need to
@@ -586,20 +608,6 @@ Public Class MoodleQuestions
         CountStylesInRange = counter
     End Function
 
-    ' Check if the specified style is found in the range
-    Function StyleFound(aStyle As Microsoft.Office.Interop.Word.Style, aRange As Microsoft.Office.Interop.Word.Range) As Boolean
-        With aRange.Find
-            .ClearFormatting()
-            .Text = ""
-            .Replacement.Text = ""
-            .Forward = True
-            .Style = aStyle
-            .Format = True
-            .Execute(Wrap:=Microsoft.Office.Interop.Word.WdFindWrap.wdFindStop)
-        End With
-        'MsgBox "Style: " & aStyle & " Found: " & aRange.Find.Found
-        StyleFound = aRange.Find.Found
-    End Function
 
     ' Removes answer weights from the selection
     Public Sub RemoveAnswerWeightsFromTheSelection()
@@ -636,7 +644,9 @@ Public Class MoodleQuestions
             If para.Range.Text = vbCr Then
                 para.Range.Delete() ' delete all empty paragraphs
                 If questionType = "" Then questionType = para.Range.Style.NameLocal
-            ElseIf para.Range.Style.NameLocal = STYLE_MULTICHOICEQ Or _
+                ' #modif category
+            ElseIf para.Range.Style.NameLocal = STYLE_CATEGORYQ Or _
+                   para.Range.Style.NameLocal = STYLE_MULTICHOICEQ Or _
                    para.Range.Style.NameLocal = STYLE_MULTICHOICEQ_FIXANSWER Or _
                    para.Range.Style.NameLocal = STYLE_MATCHINGQ Or _
                    para.Range.Style.NameLocal = STYLE_MATCHINGQ_FIXANSWER Or _
@@ -712,7 +722,18 @@ Public Class MoodleQuestions
         '      "Start: " & startPoint & " End: " & endPoint
         isOk = True 'no errors
 
-        If questionType = STYLE_MULTICHOICEQ Or _
+        ' #modif category
+        If questionType = STYLE_CATEGORYQ Then
+
+            ' Check that there are right anwers specified
+            rightCount = CountStylesInRange(STYLE_MULTICHOICEQ, startPoint, endPoint)
+
+            'If rightCount = 0 Then
+            '    aRange.Select()
+            '    MsgBox("Error, no question defined.", vbExclamation)
+            '    isOk = False
+            'End If
+        ElseIf questionType = STYLE_MULTICHOICEQ Or _
           questionType = STYLE_MULTICHOICEQ_FIXANSWER Then
 
             ' Check that there are right anwers specified
@@ -990,7 +1011,6 @@ Public Class MoodleQuestions
 
     Public Sub Convert2XML()
 
-
         ' Macro recorded on 21.12.2008 by Daniel Refresh Header (translation?)
         Globals.ThisDocument.Application.ActiveWindow.ActivePane.View.SeekView = WdSeekView.wdSeekCurrentPageHeader
         Globals.ThisDocument.Application.Selection.Fields.Update()
@@ -1025,12 +1045,12 @@ Public Class MoodleQuestions
 
         'specify XML version and that it is a quiz
         objStream.WriteText("<?xml version=""1.0""?><quiz>" & vbCr)
-        'write the categories from the header
-        objStream.WriteText("<question type=""category"">" & vbCr)
-        objStream.WriteText("<category>" & vbCr)
-        objStream.WriteText("<text>" & header & "</text>" & vbCr)
-        objStream.WriteText("</category>" & vbCr)
-        objStream.WriteText("</question>" & vbCr & vbCr)
+        ''write the categories from the header '#modif category
+        'objStream.WriteText("<question type=""category"">" & vbCr)
+        'objStream.WriteText("<category>" & vbCr)
+        'objStream.WriteText("<text>" & header & "</text>" & vbCr)
+        'objStream.WriteText("</category>" & vbCr)
+        'objStream.WriteText("</question>" & vbCr & vbCr)
 
         Dim dd As MSXML2.DOMDocument60
         Dim xmlnod As MSXML2.IXMLDOMNode
@@ -1049,6 +1069,15 @@ Public Class MoodleQuestions
             dd = New MSXML2.DOMDocument60
 
             Select Case para.Range.Style.NameLocal
+
+
+                Case STYLE_CATEGORYQ
+                    'write the categories '#modif category
+                    objStream.WriteText("<question type=""category"">" & vbCr)
+                    objStream.WriteText("<category>" & vbCr)
+                    objStream.WriteText("<text>" & RemoveCR(para.Range.Text) & "</text>" & vbCr)
+                    objStream.WriteText("</category>" & vbCr)
+                    objStream.WriteText("</question>" & vbCr & vbCr)
 
                 Case STYLE_SHORTANSWERQ
                     xmlResource = My.Resources.Shortanswer_xml
