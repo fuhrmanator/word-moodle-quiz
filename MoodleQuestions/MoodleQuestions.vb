@@ -541,6 +541,9 @@ Public Class MoodleQuestions
     Public Const STYLE_QUESTIONNAME = "Questionname"
     'from v12
     Public Const STYLE_ESSAY = "Q Essay"
+    '#modif feedback
+    Public Const STYLE_FEEDBACK_FS = "A Feedback FS"
+    Public Const STYLE_FEEDBACK_TS = "A Feedback TS"
 
     ' saves the current question type
     Dim questionType As String
@@ -770,7 +773,7 @@ Public Class MoodleQuestions
     ' Returns true if the question is OK, otherwise
     Function CheckQuestion(startPoint As Integer, endPoint As Integer) As Boolean
         Dim isOk As Boolean
-        Dim rightCount, rightPairCount, leftPairCount, wordCount As Integer
+        Dim rightCount, rightPairCount, leftPairCount, wordCount, feedbackCount, wrongCount As Integer
 
         Dim aRange As Range
 
@@ -799,6 +802,15 @@ Public Class MoodleQuestions
             If rightCount = 0 Then
                 aRange.Select()
                 MsgBox("Error, no correct answer defined.", vbExclamation)
+                isOk = False
+            End If
+
+            ' Check that there are right feedback specified #modif feedback
+            feedbackCount = CountStylesInRange(STYLE_FEEDBACK, startPoint, endPoint)
+            wrongCount = CountStylesInRange(STYLE_INCORRECT_MC_ANSWER, startPoint, endPoint)
+            If feedbackCount <> rightCount + wrongCount Then
+                aRange.Select()
+                MsgBox("Error, no correct feedback defined.", vbExclamation)
                 isOk = False
             End If
 
@@ -851,8 +863,11 @@ Public Class MoodleQuestions
             End If
 
         ElseIf questionType = STYLE_TRUESTATEMENT Or _
-               questionType = STYLE_FALSESTATEMENT Or _
-               questionType = STYLE_ESSAY Then
+               questionType = STYLE_FALSESTATEMENT Then
+
+            '  feedbackCount = CountStylesInRange(STYLE_FEEDBACK, startPoint, endPoint)
+
+        ElseIf questionType = STYLE_ESSAY Then
             'nothing to check for answers to these ones. Figure out what the issue is with being last question in test and fix here?
 
             ' UNDEFINED QUESTION TYPE
@@ -1201,10 +1216,24 @@ Public Class MoodleQuestions
                     Loop
 
                 Case STYLE_FALSESTATEMENT
-                    xmlResource = My.Resources.False_xml
+                     xmlResource = My.Resources.False_xml
                     loadXML(xmlResource, dd)
                     ProcessCommonTags(dd, para)
                     paralookahead = para.Next
+                    xmlnod = dd.documentElement.selectSingleNode("answer")
+                    If xmlnod.attributes.getNamedItem("fraction").text = "100" Then
+                        If paralookahead.Style.NameLocal = STYLE_FEEDBACK_FS Then
+                            If paralookahead.Range.Text = "" Then
+                                MsgBox("feedback dosn't exist")
+                            Else
+                                ' Set XML <feedback> text
+                                xmlnod.selectSingleNode("feedback/text").text = RemoveCR(paralookahead.Range.Text)
+                                paralookahead = paralookahead.Next
+                            End If
+                        End If
+                        dd.documentElement.appendChild(xmlnod)
+                    End If
+
 
                 Case STYLE_TRUESTATEMENT
                     xmlResource = My.Resources.True_xml
@@ -1212,6 +1241,19 @@ Public Class MoodleQuestions
                     ProcessCommonTags(dd, para)
                     paralookahead = para.Next
 
+                    xmlnod = dd.documentElement.selectSingleNode("answer")
+                    If xmlnod.attributes.getNamedItem("fraction").text = "100" Then
+                        If paralookahead.Style.NameLocal = STYLE_FEEDBACK_TS Then
+                            If paralookahead.Range.Text = "" Then
+                                MsgBox("feedback dosn't exist")
+                            Else
+                                ' Set XML <feedback> text
+                                xmlnod.selectSingleNode("feedback/text").text = RemoveCR(paralookahead.Range.Text)
+                                paralookahead = paralookahead.Next
+                            End If
+                        End If
+                        dd.documentElement.appendChild(xmlnod)
+                    End If
 
                 Case STYLE_MULTICHOICEQ_FIXANSWER, STYLE_MULTICHOICEQ
                     If para.Range.Style.NameLocal = STYLE_MULTICHOICEQ_FIXANSWER Then
@@ -1263,16 +1305,19 @@ Public Class MoodleQuestions
                         paralookahead = paralookahead.Next
                         ' Answer Feedback Style processing here
                         If paralookahead.Style.NameLocal = STYLE_FEEDBACK Then
-                            ' Set XML <feedback> text
-                            xmlnod.selectSingleNode("feedback/text").text = RemoveCR(paralookahead.Range.Text)
-                            paralookahead = paralookahead.Next
+                            If paralookahead.Range.Text = "" Then
+                                MsgBox("feedback dosn't exist")
+                            Else
+                                ' Set XML <feedback> text
+                                xmlnod.selectSingleNode("feedback/text").text = RemoveCR(paralookahead.Range.Text)
+                                paralookahead = paralookahead.Next
+                            End If
                         End If
 
                         dd.documentElement.appendChild(xmlnod)
                         xmlnod = xmlnod.cloneNode(True)
 
                         xmlnod.selectSingleNode("text").text = Nothing
-
                         If paralookahead Is Nothing Then Exit Do
                     Loop
 
