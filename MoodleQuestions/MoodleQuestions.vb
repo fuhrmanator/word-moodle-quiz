@@ -353,6 +353,8 @@ Public Class MoodleQuestions
     Public Sub AddTrueStatement(ByVal control As Office.IRibbonControl)
         If isSelectionNormalStyle() Then
             InsertParagraphAfterCurrentParagraph("True-false question: insert a TRUE statement here (not at the end of the document)", "Q True Statement")
+            InsertParagraphAfterCurrentParagraph("Insert feedback explaining why this is a True statement here", "A Feedback TS")
+            InsertParagraphAfterCurrentParagraph("Insert feedback explaining why this is a False statement here", "A Feedback FS")
         Else
             Dim min As Integer = Math.Min(StyleFound(STYLE_CATEGORYQ), QuestionStyleFound(styleList))
             Dim max As Integer = Math.Max(StyleFound(STYLE_CATEGORYQ), QuestionStyleFound(styleList))
@@ -361,11 +363,17 @@ Public Class MoodleQuestions
             If StyleFound(STYLE_CATEGORYQ) = -1 And QuestionStyleFound(styleList) = -1 Then
                 moveCursorToEndOfDocument()
                 InsertParagraphAfterCurrentParagraph("True-false question: insert a TRUE statement here (not at the end of the document)", "Q True Statement")
+                InsertParagraphAfterCurrentParagraph("Insert feedback explaining why this is a True statement here", "A Feedback TS")
+                InsertParagraphAfterCurrentParagraph("Insert feedback explaining why this is a False statement here", "A Feedback FS")
                 'one of the two style found
             ElseIf min = -1 Then
                 InsertParagraphOfStyleInSelectedRangeBefore(STYLE_TRUESTATEMENT, "True-false question: insert a TRUE statement here (not at the end of the document)", max)
+                InsertParagraphAfterCurrentParagraph("Insert feedback explaining why this is a True statement here", "A Feedback TS")
+                InsertParagraphAfterCurrentParagraph("Insert feedback explaining why this is a False statement here", "A Feedback FS")
             Else  'both styles found
                 InsertParagraphOfStyleInSelectedRangeBefore(STYLE_TRUESTATEMENT, "True-false question: insert a TRUE statement here (not at the end of the document)", min)
+                InsertParagraphAfterCurrentParagraph("Insert feedback explaining why this is a True statement here", "A Feedback TS")
+                InsertParagraphAfterCurrentParagraph("Insert feedback explaining why this is a False statement here", "A Feedback FS")
             End If
         End If
     End Sub
@@ -374,6 +382,8 @@ Public Class MoodleQuestions
     Public Sub AddFalseStatement(ByVal control As Office.IRibbonControl)
          If isSelectionNormalStyle() Then
             InsertParagraphAfterCurrentParagraph("True-false question: insert a FALSE statement here (not at the end of the document)", "Q False Statement")
+            InsertParagraphAfterCurrentParagraph("Insert feedback explaining why this is a True statement here", "A Feedback TS")
+            InsertParagraphAfterCurrentParagraph("Insert feedback explaining why this is a False statement here", "A Feedback FS")
         Else
             Dim min As Integer = Math.Min(StyleFound(STYLE_CATEGORYQ), QuestionStyleFound(styleList))
             Dim max As Integer = Math.Max(StyleFound(STYLE_CATEGORYQ), QuestionStyleFound(styleList))
@@ -382,11 +392,17 @@ Public Class MoodleQuestions
             If StyleFound(STYLE_CATEGORYQ) = -1 And QuestionStyleFound(styleList) = -1 Then
                 moveCursorToEndOfDocument()
                 InsertParagraphAfterCurrentParagraph("True-false question: insert a FALSE statement here (not at the end of the document)", "Q False Statement")
+                InsertParagraphAfterCurrentParagraph("Insert feedback explaining why this is a True statement here", "A Feedback TS")
+                InsertParagraphAfterCurrentParagraph("Insert feedback explaining why this is a False statement here", "A Feedback FS")
                 'one of the two style found
             ElseIf min = -1 Then
                 InsertParagraphOfStyleInSelectedRangeBefore(STYLE_FALSESTATEMENT, "True-false question: insert a FALSE statement here (not at the end of the document)", max)
+                InsertParagraphAfterCurrentParagraph("Insert feedback explaining why this is a True statement here", "A Feedback TS")
+                InsertParagraphAfterCurrentParagraph("Insert feedback explaining why this is a False statement here", "A Feedback FS")
             Else  'both styles found
                 InsertParagraphOfStyleInSelectedRangeBefore(STYLE_FALSESTATEMENT, "True-false question: insert a FALSE statement here (not at the end of the document)", min)
+                InsertParagraphAfterCurrentParagraph("Insert feedback explaining why this is a True statement here", "A Feedback TS")
+                InsertParagraphAfterCurrentParagraph("Insert feedback explaining why this is a False statement here", "A Feedback FS")
             End If
         End If
 
@@ -640,11 +656,11 @@ Public Class MoodleQuestions
 
         Dim find As Integer = 0
         Dim rangeFound(7) As Integer
-        Dim min As Integer = 8000
+        Dim min As Integer = 3000
         Dim i As Integer = 0
         For Each element As String In styleList
             rng = Globals.ThisDocument.Application.Selection.Range
-            rng.Start = rng.Start + 10
+            rng.Start = rng.Start + 1
             With rng.Find
                 .ClearFormatting()
                 .Style = element
@@ -773,7 +789,7 @@ Public Class MoodleQuestions
     ' Returns true if the question is OK, otherwise
     Function CheckQuestion(startPoint As Integer, endPoint As Integer) As Boolean
         Dim isOk As Boolean
-        Dim rightCount, rightPairCount, leftPairCount, wordCount, feedbackCount, wrongCount As Integer
+        Dim rightCount, rightPairCount, leftPairCount, wordCount, feedbackCount, wrongCount, feedbackTSCount, feedbackFSCount As Integer
 
         Dim aRange As Range
 
@@ -788,11 +804,6 @@ Public Class MoodleQuestions
 
             rightCount = CountStylesInRange(STYLE_MULTICHOICEQ, startPoint, endPoint)
 
-            'If rightCount = 0 Then
-            '    aRange.Select()
-            '    MsgBox("Error, no question defined.", vbExclamation)
-            '    isOk = False
-            'End If
         ElseIf questionType = STYLE_MULTICHOICEQ Or _
           questionType = STYLE_MULTICHOICEQ_FIXANSWER Then
 
@@ -808,10 +819,12 @@ Public Class MoodleQuestions
             ' Check that there are right feedback specified #modif feedback
             feedbackCount = CountStylesInRange(STYLE_FEEDBACK, startPoint, endPoint)
             wrongCount = CountStylesInRange(STYLE_INCORRECT_MC_ANSWER, startPoint, endPoint)
-            If feedbackCount <> rightCount + wrongCount Then
+            If feedbackCount <> rightCount + wrongCount And feedbackCount > 0 Then
                 aRange.Select()
-                MsgBox("Error, no correct feedback defined.", vbExclamation)
+                MsgBox("Error, no feedback was supplied for one of answer for this question.", vbExclamation)
                 isOk = False
+                'ElseIf feedbackCount = 0 Then
+                '    isOk = True
             End If
 
         ElseIf questionType = STYLE_SHORTANSWERQ Then
@@ -864,6 +877,15 @@ Public Class MoodleQuestions
 
         ElseIf questionType = STYLE_TRUESTATEMENT Or _
                questionType = STYLE_FALSESTATEMENT Then
+            ' Check that there are right feedback specified #modif feedback
+            feedbackTSCount = CountStylesInRange(STYLE_FEEDBACK_TS, startPoint, endPoint)
+            feedbackFSCount = CountStylesInRange(STYLE_FEEDBACK_FS, startPoint, endPoint)
+
+            If feedbackTSCount = feedbackFSCount = 1 Then
+                aRange.Select()
+                MsgBox("Error, no correct feedback defined.", vbExclamation)
+                isOk = False
+            End If
 
             '  feedbackCount = CountStylesInRange(STYLE_FEEDBACK, startPoint, endPoint)
 
@@ -944,7 +966,6 @@ Public Class MoodleQuestions
             .Style = aStyle
             .InsertBefore(text)
             .Select()
-
         End With
         '  rng = aRange
     End Sub
@@ -1150,6 +1171,7 @@ Public Class MoodleQuestions
 
         Dim rac, wac As Integer
         Dim xmlResource As String
+        Dim i As Integer = 0
 
         For Each para In getDocumentParagraphs() '?handle each paragraph separately.
             dd = New MSXML2.DOMDocument60
@@ -1220,19 +1242,35 @@ Public Class MoodleQuestions
                     loadXML(xmlResource, dd)
                     ProcessCommonTags(dd, para)
                     paralookahead = para.Next
-                    xmlnod = dd.documentElement.selectSingleNode("answer")
-                    If xmlnod.attributes.getNamedItem("fraction").text = "100" Then
-                        If paralookahead.Style.NameLocal = STYLE_FEEDBACK_FS Then
-                            If paralookahead.Range.Text = "" Then
-                                MsgBox("feedback dosn't exist")
-                            Else
-                                ' Set XML <feedback> text
-                                xmlnod.selectSingleNode("feedback/text").text = RemoveCR(paralookahead.Range.Text)
-                                paralookahead = paralookahead.Next
+                    Do While i < 2
+                        xmlnod = dd.documentElement.selectSingleNode("answer")
+                        If xmlnod.attributes.getNamedItem("fraction").text = "100" Then
+                            If paralookahead.Style.NameLocal = STYLE_FEEDBACK_FS Then
+                                If paralookahead.Range.Text = "" Then
+                                    MsgBox("no feedback was supplied for the false statement")
+                                Else
+                                    ' Set XML <feedback> text
+                                    xmlnod.selectSingleNode("feedback/text").text = RemoveCR(paralookahead.Range.Text)
+                                    paralookahead = paralookahead.Next
+                                End If
                             End If
+                            dd.documentElement.appendChild(xmlnod)
                         End If
-                        dd.documentElement.appendChild(xmlnod)
-                    End If
+                        If xmlnod.attributes.getNamedItem("fraction").text = "0" Then
+                            'xmlnod.selectSingleNode("text").text = "True"
+                            If paralookahead.Style.NameLocal = STYLE_FEEDBACK_TS Then
+                                If paralookahead.Range.Text = "" Then
+                                    MsgBox("no feedback was supplied for the false statement")
+                                Else
+                                    ' Set XML <feedback> text
+                                    xmlnod.selectSingleNode("feedback/text").text = RemoveCR(paralookahead.Range.Text)
+                                    paralookahead = paralookahead.Next
+                                End If
+                            End If
+                            dd.documentElement.appendChild(xmlnod)
+                        End If
+                        i += 1
+                    Loop
 
 
                 Case STYLE_TRUESTATEMENT
@@ -1240,20 +1278,35 @@ Public Class MoodleQuestions
                     loadXML(xmlResource, dd)
                     ProcessCommonTags(dd, para)
                     paralookahead = para.Next
-
-                    xmlnod = dd.documentElement.selectSingleNode("answer")
-                    If xmlnod.attributes.getNamedItem("fraction").text = "100" Then
-                        If paralookahead.Style.NameLocal = STYLE_FEEDBACK_TS Then
-                            If paralookahead.Range.Text = "" Then
-                                MsgBox("feedback dosn't exist")
-                            Else
-                                ' Set XML <feedback> text
-                                xmlnod.selectSingleNode("feedback/text").text = RemoveCR(paralookahead.Range.Text)
-                                paralookahead = paralookahead.Next
+                    i = 0
+                    Do While i < 2
+                        xmlnod = dd.documentElement.selectSingleNode("answer")
+                        If xmlnod.attributes.getNamedItem("fraction").text = "100" Then
+                            If paralookahead.Style.NameLocal = STYLE_FEEDBACK_TS Then
+                                If paralookahead.Range.Text = "" Then
+                                    MsgBox("no feedback was supplied for the true statement")
+                                Else
+                                    ' Set XML <feedback> text
+                                    xmlnod.selectSingleNode("feedback/text").text = RemoveCR(paralookahead.Range.Text)
+                                    paralookahead = paralookahead.Next
+                                End If
                             End If
+                            dd.documentElement.appendChild(xmlnod)
                         End If
-                        dd.documentElement.appendChild(xmlnod)
-                    End If
+                        If xmlnod.attributes.getNamedItem("fraction").text = "0" Then
+                            If paralookahead.Style.NameLocal = STYLE_FEEDBACK_FS Then
+                                If paralookahead.Range.Text = "" Then
+                                    MsgBox("no feedback was supplied for the false statement")
+                                Else
+                                    ' Set XML <feedback> text
+                                    xmlnod.selectSingleNode("feedback/text").text = RemoveCR(paralookahead.Range.Text)
+                                    paralookahead = paralookahead.Next
+                                End If
+                            End If
+                            dd.documentElement.appendChild(xmlnod)
+                        End If
+                        i += 1
+                    Loop
 
                 Case STYLE_MULTICHOICEQ_FIXANSWER, STYLE_MULTICHOICEQ
                     If para.Range.Style.NameLocal = STYLE_MULTICHOICEQ_FIXANSWER Then
@@ -1303,17 +1356,19 @@ Public Class MoodleQuestions
                         ' fin bloc to insert image in answer
 
                         paralookahead = paralookahead.Next
+
                         ' Answer Feedback Style processing here
-                        If paralookahead.Style.NameLocal = STYLE_FEEDBACK Then
-                            If paralookahead.Range.Text = "" Then
-                                MsgBox("feedback dosn't exist")
-                            Else
-                                ' Set XML <feedback> text
-                                xmlnod.selectSingleNode("feedback/text").text = RemoveCR(paralookahead.Range.Text)
-                                paralookahead = paralookahead.Next
+                        If paralookahead IsNot Nothing Then
+                            If paralookahead.Style.NameLocal = STYLE_FEEDBACK Then
+                                If paralookahead.Range.Text = "" Then
+                                    MsgBox("feedback dosn't exist")
+                                Else
+                                    ' Set XML <feedback> text
+                                    xmlnod.selectSingleNode("feedback/text").text = RemoveCR(paralookahead.Range.Text)
+                                    paralookahead = paralookahead.Next
+                                End If
                             End If
                         End If
-
                         dd.documentElement.appendChild(xmlnod)
                         xmlnod = xmlnod.cloneNode(True)
 
