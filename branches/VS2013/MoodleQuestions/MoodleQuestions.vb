@@ -999,7 +999,7 @@ Public Class MoodleQuestions
                   getSelectionStyleName() = STYLE_ANSWERWEIGHT
 
                 'Delete empty paragraphs
-                If Globals.ThisDocument.Application.Selection.Paragraphs(1).Range = vbCr Then
+                If Globals.ThisDocument.Application.Selection.Paragraphs(1).Range.Text = vbCr Then
                     Globals.ThisDocument.Application.Selection.Paragraphs(1).Range.Delete() ' delete all empty paragraphs
                     ' Remove old answer weights
                 ElseIf getSelectionStyleName() = STYLE_ANSWERWEIGHT Then
