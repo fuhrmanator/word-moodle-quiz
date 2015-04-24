@@ -64,7 +64,9 @@ Public Class MoodleQuestions
             .Move(Unit:=WdUnits.wdParagraph, Count:=+1)
             .Select()
         End With
+
     End Sub
+   
 
     Public Function OnLoadImage(imageId As String) As IPictureDisp
         Dim tempImage As stdole.IPictureDisp = Nothing
@@ -72,6 +74,9 @@ Public Class MoodleQuestions
         tempImage = Microsoft.VisualBasic.Compatibility.VB6.Support.ImageToIPicture(My.Resources.RibbonIcons.ResourceManager.GetObject(imageId))
         Return tempImage
     End Function
+
+
+
 
     '''''BUTTON callbacks
     ' Add Multiple Choice Question to the end of the active document
@@ -180,7 +185,7 @@ Public Class MoodleQuestions
     Public Sub AddMatchingQ(ByVal control As Office.IRibbonControl)
         If isSelectionNormalStyle() Then
             InsertParagraphAfterCurrentParagraph("Insert Matching Question", "Q Matching")
-        Else 
+        Else
             Dim min As Integer = Math.Min(StyleFound(STYLE_CATEGORYQ), QuestionStyleFound(styleList))
             Dim max As Integer = Math.Max(StyleFound(STYLE_CATEGORYQ), QuestionStyleFound(styleList))
 
@@ -223,6 +228,7 @@ Public Class MoodleQuestions
     Public Sub AddShortAnswerQ(ByVal control As Office.IRibbonControl)
         If isSelectionNormalStyle() Then
             InsertParagraphAfterCurrentParagraph("Insert Short Answer Question", "Q Short Answer")
+            InsertParagraphAfterCurrentParagraph("Insert Short Answer here", "A Short Answer")
         Else
             Dim min As Integer = Math.Min(StyleFound(STYLE_CATEGORYQ), QuestionStyleFound(styleList))
             Dim max As Integer = Math.Max(StyleFound(STYLE_CATEGORYQ), QuestionStyleFound(styleList))
@@ -231,11 +237,14 @@ Public Class MoodleQuestions
             If StyleFound(STYLE_CATEGORYQ) = -1 And QuestionStyleFound(styleList) = -1 Then
                 moveCursorToEndOfDocument()
                 InsertParagraphAfterCurrentParagraph("Insert Short Answer Question", "Q Short Answer")
+                InsertParagraphAfterCurrentParagraph("Insert Short Answer here", "A Short Answer")
                 'one of the two style found
             ElseIf min = -1 Then
                 InsertParagraphOfStyleInSelectedRangeBefore(STYLE_SHORTANSWERQ, "Insert Short Answer Question", max)
+                InsertParagraphAfterCurrentParagraph("Insert Short Answer here", "A Short Answer")
             Else  'both styles found
                 InsertParagraphOfStyleInSelectedRangeBefore(STYLE_SHORTANSWERQ, "Insert Short Answer Question", min)
+                InsertParagraphAfterCurrentParagraph("Insert Short Answer here", "A Short Answer")
             End If
         End If
     End Sub
@@ -354,7 +363,7 @@ Public Class MoodleQuestions
         If isSelectionNormalStyle() Then
             InsertParagraphAfterCurrentParagraph("True-false question: insert a TRUE statement here (not at the end of the document)", "Q True Statement")
             InsertParagraphAfterCurrentParagraph("Insert feedback explaining why this is a True statement here", "A Feedback TS")
-            InsertParagraphAfterCurrentParagraph("Insert feedback explaining why this is a False statement here", "A Feedback FS")
+            InsertParagraphAfterCurrentParagraph("Insert feedback explaining why this is a not False statement here", "A Feedback FS")
         Else
             Dim min As Integer = Math.Min(StyleFound(STYLE_CATEGORYQ), QuestionStyleFound(styleList))
             Dim max As Integer = Math.Max(StyleFound(STYLE_CATEGORYQ), QuestionStyleFound(styleList))
@@ -364,25 +373,25 @@ Public Class MoodleQuestions
                 moveCursorToEndOfDocument()
                 InsertParagraphAfterCurrentParagraph("True-false question: insert a TRUE statement here (not at the end of the document)", "Q True Statement")
                 InsertParagraphAfterCurrentParagraph("Insert feedback explaining why this is a True statement here", "A Feedback TS")
-                InsertParagraphAfterCurrentParagraph("Insert feedback explaining why this is a False statement here", "A Feedback FS")
+                InsertParagraphAfterCurrentParagraph("Insert feedback explaining why this is not a False statement here", "A Feedback FS")
                 'one of the two style found
             ElseIf min = -1 Then
                 InsertParagraphOfStyleInSelectedRangeBefore(STYLE_TRUESTATEMENT, "True-false question: insert a TRUE statement here (not at the end of the document)", max)
                 InsertParagraphAfterCurrentParagraph("Insert feedback explaining why this is a True statement here", "A Feedback TS")
-                InsertParagraphAfterCurrentParagraph("Insert feedback explaining why this is a False statement here", "A Feedback FS")
+                InsertParagraphAfterCurrentParagraph("Insert feedback explaining why this is not a False statement here", "A Feedback FS")
             Else  'both styles found
                 InsertParagraphOfStyleInSelectedRangeBefore(STYLE_TRUESTATEMENT, "True-false question: insert a TRUE statement here (not at the end of the document)", min)
                 InsertParagraphAfterCurrentParagraph("Insert feedback explaining why this is a True statement here", "A Feedback TS")
-                InsertParagraphAfterCurrentParagraph("Insert feedback explaining why this is a False statement here", "A Feedback FS")
+                InsertParagraphAfterCurrentParagraph("Insert feedback explaining why this is not a False statement here", "A Feedback FS")
             End If
         End If
     End Sub
 
     ' Add a false statement of the true-false question
     Public Sub AddFalseStatement(ByVal control As Office.IRibbonControl)
-         If isSelectionNormalStyle() Then
+        If isSelectionNormalStyle() Then
             InsertParagraphAfterCurrentParagraph("True-false question: insert a FALSE statement here (not at the end of the document)", "Q False Statement")
-            InsertParagraphAfterCurrentParagraph("Insert feedback explaining why this is a True statement here", "A Feedback TS")
+            InsertParagraphAfterCurrentParagraph("Insert feedback explaining why this is not a True statement here", "A Feedback TS")
             InsertParagraphAfterCurrentParagraph("Insert feedback explaining why this is a False statement here", "A Feedback FS")
         Else
             Dim min As Integer = Math.Min(StyleFound(STYLE_CATEGORYQ), QuestionStyleFound(styleList))
@@ -392,16 +401,16 @@ Public Class MoodleQuestions
             If StyleFound(STYLE_CATEGORYQ) = -1 And QuestionStyleFound(styleList) = -1 Then
                 moveCursorToEndOfDocument()
                 InsertParagraphAfterCurrentParagraph("True-false question: insert a FALSE statement here (not at the end of the document)", "Q False Statement")
-                InsertParagraphAfterCurrentParagraph("Insert feedback explaining why this is a True statement here", "A Feedback TS")
+                InsertParagraphAfterCurrentParagraph("Insert feedback explaining why this is not a True statement here", "A Feedback TS")
                 InsertParagraphAfterCurrentParagraph("Insert feedback explaining why this is a False statement here", "A Feedback FS")
                 'one of the two style found
             ElseIf min = -1 Then
                 InsertParagraphOfStyleInSelectedRangeBefore(STYLE_FALSESTATEMENT, "True-false question: insert a FALSE statement here (not at the end of the document)", max)
-                InsertParagraphAfterCurrentParagraph("Insert feedback explaining why this is a True statement here", "A Feedback TS")
+                InsertParagraphAfterCurrentParagraph("Insert feedback explaining why this is not a True statement here", "A Feedback TS")
                 InsertParagraphAfterCurrentParagraph("Insert feedback explaining why this is a False statement here", "A Feedback FS")
             Else  'both styles found
                 InsertParagraphOfStyleInSelectedRangeBefore(STYLE_FALSESTATEMENT, "True-false question: insert a FALSE statement here (not at the end of the document)", min)
-                InsertParagraphAfterCurrentParagraph("Insert feedback explaining why this is a True statement here", "A Feedback TS")
+                InsertParagraphAfterCurrentParagraph("Insert feedback explaining why this is not a True statement here", "A Feedback TS")
                 InsertParagraphAfterCurrentParagraph("Insert feedback explaining why this is a False statement here", "A Feedback FS")
             End If
         End If
@@ -434,7 +443,7 @@ Public Class MoodleQuestions
                 If (Not Clipboard.ContainsText) Then
                     .Paste()  ' don't paste if clipboard is empty, else exception
                 Else
-                    MsgBox("Image not found", vbExclamation)
+                    MsgBox("Clipboard does not contain an image. ", vbExclamation)
                 End If
             Else 'Error - give instructions:
                 MsgBox("Pastes an image from the Clipboard. " & vbCr & _
@@ -772,6 +781,13 @@ Public Class MoodleQuestions
                 isOK = CheckQuestion(startOfQuestion, getDocumentRangeEnd())
             End If
 
+            'Check if Category Style exist
+            If StyleFound(STYLE_CATEGORYQ) = -1 Then
+                MsgBox("We must have Ctegory style in your style list")
+                isOK = False
+            End If
+
+
             If isOK = False Then Exit For ' Exit if error is found
 
         Next para
@@ -967,7 +983,7 @@ Public Class MoodleQuestions
             .InsertBefore(text)
             .Select()
         End With
-        '  rng = aRange
+
     End Sub
 
     ' Inserts text before range found
@@ -1238,7 +1254,7 @@ Public Class MoodleQuestions
                     Loop
 
                 Case STYLE_FALSESTATEMENT
-                     xmlResource = My.Resources.False_xml
+                    xmlResource = My.Resources.False_xml
                     loadXML(xmlResource, dd)
                     ProcessCommonTags(dd, para)
                     paralookahead = para.Next
@@ -1278,6 +1294,8 @@ Public Class MoodleQuestions
                     loadXML(xmlResource, dd)
                     ProcessCommonTags(dd, para)
                     paralookahead = para.Next
+
+
                     i = 0
                     Do While i < 2
                         xmlnod = dd.documentElement.selectSingleNode("answer")
