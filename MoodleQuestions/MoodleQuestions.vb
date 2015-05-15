@@ -35,6 +35,7 @@ Imports stdole
 Imports MSXML2
 Imports System.Runtime.InteropServices
 Imports System.Collections
+Imports System.Windows.Forms.VisualStyles.VisualStyleElement.ListView
 
 <Runtime.InteropServices.ComVisible(True)> _
 Public Class MoodleQuestions
@@ -64,19 +65,65 @@ Public Class MoodleQuestions
             .Move(Unit:=WdUnits.wdParagraph, Count:=+1)
             .Select()
         End With
-
+        
+        CheckStyle()
     End Sub
-   
+
 
     Public Function OnLoadImage(imageId As String) As IPictureDisp
         Dim tempImage As stdole.IPictureDisp = Nothing
         'load image from resources file
         tempImage = Microsoft.VisualBasic.Compatibility.VB6.Support.ImageToIPicture(My.Resources.RibbonIcons.ResourceManager.GetObject(imageId))
         Return tempImage
+
     End Function
 
+    Public Sub CheckStyle()
+        Dim styleCollection As New Microsoft.VisualBasic.Collection()
+        Dim defaultstyleCollection As New Microsoft.VisualBasic.Collection()
 
+        styleCollection.Add("Q Multi Choice")
+        styleCollection.Add("Q Multi Choice FixAnswer")
+        styleCollection.Add("Q Matching")
+        styleCollection.Add("A Correct Choice")
+        styleCollection.Add("A Incorrect Choice")
+        styleCollection.Add("Q True Statement")
+        styleCollection.Add("Q False Statement")
+        styleCollection.Add("Q Missing Word")
+        styleCollection.Add("A Feedback")
+        styleCollection.Add("Q Category")
+        styleCollection.Add("Q Short Answer")
+        styleCollection.Add("A Short Answer")
+        styleCollection.Add("Q Numerical")
+        styleCollection.Add("Q Matching FixAnswer")
+        styleCollection.Add("A Matching Left")
+        styleCollection.Add("A Matching Right")
+        styleCollection.Add("MissingWord")
+        styleCollection.Add("Questionname")
+        styleCollection.Add("Q Essay")
+        styleCollection.Add("A Feedback FS")
+        styleCollection.Add("A Feedback TS")
 
+        For Each styleName In Globals.ThisDocument.Styles
+            defaultstyleCollection.Add(styleName.NameLocal)
+        Next
+
+        Dim found As Boolean = False
+        For Each item As String In styleCollection
+            For Each itemDef As String In defaultstyleCollection
+                If item = itemDef Then
+                    found = True
+                    Exit For
+                End If
+            Next
+            If found = False Then
+                MsgBox("Missing style: " + item)
+                ' Exit For
+            End If
+            found = False
+        Next
+
+    End Sub
 
     '''''BUTTON callbacks
     ' Add Multiple Choice Question to the end of the active document
@@ -126,6 +173,7 @@ Public Class MoodleQuestions
         InsertParagraphAfterCurrentParagraph("Insert feedback explaining why this is an incorrect answer here", "A Feedback")
         InsertParagraphAfterCurrentParagraph("Insert incorrect answer here", "A Incorrect Choice")
         AddParagraphOfStyle(STYLE_FEEDBACK, "Insert feedback explaining why this is an incorrect answer here")
+
     End Sub
 
 
