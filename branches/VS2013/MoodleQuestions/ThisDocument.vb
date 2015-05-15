@@ -75,7 +75,7 @@ Public Class ThisDocument
     End Sub
 
     Private Sub ThisDocument_Shutdown() Handles Me.Shutdown
-        Globals.ThisDocument.Application.NormalTemplate.Save()
+        ' Globals.ThisDocument.Application.NormalTemplate.Save()
     End Sub
 
     ' Moodle Quiz Ribbon see http://msdn.microsoft.com/en-us/library/aa942955.aspx for design info
