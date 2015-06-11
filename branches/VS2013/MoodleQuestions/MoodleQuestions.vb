@@ -32,10 +32,11 @@
 
 Imports Microsoft.Office.Interop.Word
 Imports stdole
-Imports MSXML2
+'Imports MSXML2
 Imports System.Runtime.InteropServices
 Imports System.Collections
 Imports System.Windows.Forms.VisualStyles.VisualStyleElement.ListView
+Imports System.Xml
 
 <Runtime.InteropServices.ComVisible(True)> _
 Public Class MoodleQuestions
@@ -65,7 +66,7 @@ Public Class MoodleQuestions
             .Move(Unit:=WdUnits.wdParagraph, Count:=+1)
             .Select()
         End With
-        
+
         CheckStyle()
     End Sub
 
@@ -182,10 +183,10 @@ Public Class MoodleQuestions
             AddMultipleChoiceQText()
         Else
 
-            Dim min As Integer = Math.Min(StyleFound(STYLE_CATEGORYQ), QuestionStyleFound(styleList))
-            Dim max As Integer = Math.Max(StyleFound(STYLE_CATEGORYQ), QuestionStyleFound(styleList))
+            Dim min As Integer = Math.Min(StyleUsed(STYLE_CATEGORYQ), QuestionStyleFound(styleList))
+            Dim max As Integer = Math.Max(StyleUsed(STYLE_CATEGORYQ), QuestionStyleFound(styleList))
             'both styles not found
-            If StyleFound(STYLE_CATEGORYQ) = -1 And QuestionStyleFound(styleList) = -1 Then
+            If StyleUsed(STYLE_CATEGORYQ) = -1 And QuestionStyleFound(styleList) = -1 Then
                 moveCursorToEndOfDocument()
                 AddMultipleChoiceQText()
                 'one of the two style found
@@ -214,10 +215,10 @@ Public Class MoodleQuestions
             InsertParagraphAfterCurrentParagraph("Question_Category/Question_Subcategory", "Q Category")
             '  AddParagraphOfStyle(STYLE_CATEGORYQ, "Question_Category/Question_Subcategory")
         Else
-            Dim min As Integer = Math.Min(StyleFound(STYLE_CATEGORYQ), QuestionStyleFound(styleList))
-            Dim max As Integer = Math.Max(StyleFound(STYLE_CATEGORYQ), QuestionStyleFound(styleList))
+            Dim min As Integer = Math.Min(StyleUsed(STYLE_CATEGORYQ), QuestionStyleFound(styleList))
+            Dim max As Integer = Math.Max(StyleUsed(STYLE_CATEGORYQ), QuestionStyleFound(styleList))
             'both styles not found
-            If StyleFound(STYLE_CATEGORYQ) = -1 And QuestionStyleFound(styleList) = -1 Then
+            If StyleUsed(STYLE_CATEGORYQ) = -1 And QuestionStyleFound(styleList) = -1 Then
                 moveCursorToEndOfDocument()
                 InsertParagraphAfterCurrentParagraph("Question_Category/Question_Subcategory", "Q Category")
                 'one of the two style found
@@ -234,11 +235,11 @@ Public Class MoodleQuestions
         If isSelectionNormalStyle() Then
             InsertParagraphAfterCurrentParagraph("Insert Matching Question", "Q Matching")
         Else
-            Dim min As Integer = Math.Min(StyleFound(STYLE_CATEGORYQ), QuestionStyleFound(styleList))
-            Dim max As Integer = Math.Max(StyleFound(STYLE_CATEGORYQ), QuestionStyleFound(styleList))
+            Dim min As Integer = Math.Min(StyleUsed(STYLE_CATEGORYQ), QuestionStyleFound(styleList))
+            Dim max As Integer = Math.Max(StyleUsed(STYLE_CATEGORYQ), QuestionStyleFound(styleList))
 
             'both styles not found
-            If StyleFound(STYLE_CATEGORYQ) = -1 And QuestionStyleFound(styleList) = -1 Then
+            If StyleUsed(STYLE_CATEGORYQ) = -1 And QuestionStyleFound(styleList) = -1 Then
                 moveCursorToEndOfDocument()
                 InsertParagraphAfterCurrentParagraph("Insert Matching Question", "Q Matching")
                 'one of the two style found
@@ -255,11 +256,11 @@ Public Class MoodleQuestions
         If isSelectionNormalStyle() Then
             InsertParagraphAfterCurrentParagraph("Insert Numerical Question", "Q Numerical")
         Else
-            Dim min As Integer = Math.Min(StyleFound(STYLE_CATEGORYQ), QuestionStyleFound(styleList))
-            Dim max As Integer = Math.Max(StyleFound(STYLE_CATEGORYQ), QuestionStyleFound(styleList))
+            Dim min As Integer = Math.Min(StyleUsed(STYLE_CATEGORYQ), QuestionStyleFound(styleList))
+            Dim max As Integer = Math.Max(StyleUsed(STYLE_CATEGORYQ), QuestionStyleFound(styleList))
 
             'both styles not found
-            If StyleFound(STYLE_CATEGORYQ) = -1 And QuestionStyleFound(styleList) = -1 Then
+            If StyleUsed(STYLE_CATEGORYQ) = -1 And QuestionStyleFound(styleList) = -1 Then
                 moveCursorToEndOfDocument()
                 InsertParagraphAfterCurrentParagraph("Insert Numerical Question", "Q Numerical")
                 'one of the two style found
@@ -278,11 +279,11 @@ Public Class MoodleQuestions
             InsertParagraphAfterCurrentParagraph("Insert Short Answer Question", "Q Short Answer")
             InsertParagraphAfterCurrentParagraph("Insert Short Answer here", "A Short Answer")
         Else
-            Dim min As Integer = Math.Min(StyleFound(STYLE_CATEGORYQ), QuestionStyleFound(styleList))
-            Dim max As Integer = Math.Max(StyleFound(STYLE_CATEGORYQ), QuestionStyleFound(styleList))
+            Dim min As Integer = Math.Min(StyleUsed(STYLE_CATEGORYQ), QuestionStyleFound(styleList))
+            Dim max As Integer = Math.Max(StyleUsed(STYLE_CATEGORYQ), QuestionStyleFound(styleList))
 
             'both styles not found
-            If StyleFound(STYLE_CATEGORYQ) = -1 And QuestionStyleFound(styleList) = -1 Then
+            If StyleUsed(STYLE_CATEGORYQ) = -1 And QuestionStyleFound(styleList) = -1 Then
                 moveCursorToEndOfDocument()
                 InsertParagraphAfterCurrentParagraph("Insert Short Answer Question", "Q Short Answer")
                 InsertParagraphAfterCurrentParagraph("Insert Short Answer here", "A Short Answer")
@@ -302,11 +303,11 @@ Public Class MoodleQuestions
         If isSelectionNormalStyle() Then
             InsertParagraphAfterCurrentParagraph("Insert Missing Word Question. Then select the missing word!", "Q Missing Word")
         Else
-            Dim min As Integer = Math.Min(StyleFound(STYLE_CATEGORYQ), QuestionStyleFound(styleList))
-            Dim max As Integer = Math.Max(StyleFound(STYLE_CATEGORYQ), QuestionStyleFound(styleList))
+            Dim min As Integer = Math.Min(StyleUsed(STYLE_CATEGORYQ), QuestionStyleFound(styleList))
+            Dim max As Integer = Math.Max(StyleUsed(STYLE_CATEGORYQ), QuestionStyleFound(styleList))
 
             'both styles not found
-            If StyleFound(STYLE_CATEGORYQ) = -1 And QuestionStyleFound(styleList) = -1 Then
+            If StyleUsed(STYLE_CATEGORYQ) = -1 And QuestionStyleFound(styleList) = -1 Then
                 moveCursorToEndOfDocument()
                 InsertParagraphAfterCurrentParagraph("Insert Missing Word Question. Then select the missing word!", "Q Missing Word")
                 'one of the two style found
@@ -323,11 +324,11 @@ Public Class MoodleQuestions
         If isSelectionNormalStyle() Then
             InsertParagraphAfterCurrentParagraph("Insert An Essay question here (an Open Question). [This can not be the last question in the document.]", "Q Essay")
         Else
-            Dim min As Integer = Math.Min(StyleFound(STYLE_CATEGORYQ), QuestionStyleFound(styleList))
-            Dim max As Integer = Math.Max(StyleFound(STYLE_CATEGORYQ), QuestionStyleFound(styleList))
+            Dim min As Integer = Math.Min(StyleUsed(STYLE_CATEGORYQ), QuestionStyleFound(styleList))
+            Dim max As Integer = Math.Max(StyleUsed(STYLE_CATEGORYQ), QuestionStyleFound(styleList))
 
             'both styles not found
-            If StyleFound(STYLE_CATEGORYQ) = -1 And QuestionStyleFound(styleList) = -1 Then
+            If StyleUsed(STYLE_CATEGORYQ) = -1 And QuestionStyleFound(styleList) = -1 Then
                 moveCursorToEndOfDocument()
                 InsertParagraphAfterCurrentParagraph("Insert An Essay question here (an Open Question). [This can not be the last question in the document.]", "Q Essay")
                 'one of the two style found
@@ -413,11 +414,11 @@ Public Class MoodleQuestions
             InsertParagraphAfterCurrentParagraph("Insert feedback explaining why this is a True statement here", "A Feedback TS")
             InsertParagraphAfterCurrentParagraph("Insert feedback explaining why this is a not False statement here", "A Feedback FS")
         Else
-            Dim min As Integer = Math.Min(StyleFound(STYLE_CATEGORYQ), QuestionStyleFound(styleList))
-            Dim max As Integer = Math.Max(StyleFound(STYLE_CATEGORYQ), QuestionStyleFound(styleList))
+            Dim min As Integer = Math.Min(StyleUsed(STYLE_CATEGORYQ), QuestionStyleFound(styleList))
+            Dim max As Integer = Math.Max(StyleUsed(STYLE_CATEGORYQ), QuestionStyleFound(styleList))
 
             'both styles not found
-            If StyleFound(STYLE_CATEGORYQ) = -1 And QuestionStyleFound(styleList) = -1 Then
+            If StyleUsed(STYLE_CATEGORYQ) = -1 And QuestionStyleFound(styleList) = -1 Then
                 moveCursorToEndOfDocument()
                 InsertParagraphAfterCurrentParagraph("True-false question: insert a TRUE statement here (not at the end of the document)", "Q True Statement")
                 InsertParagraphAfterCurrentParagraph("Insert feedback explaining why this is a True statement here", "A Feedback TS")
@@ -442,11 +443,11 @@ Public Class MoodleQuestions
             InsertParagraphAfterCurrentParagraph("Insert feedback explaining why this is not a True statement here", "A Feedback TS")
             InsertParagraphAfterCurrentParagraph("Insert feedback explaining why this is a False statement here", "A Feedback FS")
         Else
-            Dim min As Integer = Math.Min(StyleFound(STYLE_CATEGORYQ), QuestionStyleFound(styleList))
-            Dim max As Integer = Math.Max(StyleFound(STYLE_CATEGORYQ), QuestionStyleFound(styleList))
+            Dim min As Integer = Math.Min(StyleUsed(STYLE_CATEGORYQ), QuestionStyleFound(styleList))
+            Dim max As Integer = Math.Max(StyleUsed(STYLE_CATEGORYQ), QuestionStyleFound(styleList))
 
             'both styles not found
-            If StyleFound(STYLE_CATEGORYQ) = -1 And QuestionStyleFound(styleList) = -1 Then
+            If StyleUsed(STYLE_CATEGORYQ) = -1 And QuestionStyleFound(styleList) = -1 Then
                 moveCursorToEndOfDocument()
                 InsertParagraphAfterCurrentParagraph("True-false question: insert a FALSE statement here (not at the end of the document)", "Q False Statement")
                 InsertParagraphAfterCurrentParagraph("Insert feedback explaining why this is not a True statement here", "A Feedback TS")
@@ -687,10 +688,9 @@ Public Class MoodleQuestions
         CountStylesInRange = counter
     End Function
     ' Check if the Category style is found in the range 
-    Function StyleFound(aStyle) As Integer
+    Function StyleUsed(aStyle As Object) As Integer
         Dim rng As Word.Range
-        rng = Globals.ThisDocument.Application.Selection.Range
-        rng.Start = rng.Start + 10
+        rng = Globals.ThisDocument.Application.ActiveDocument.Range
 
         With rng.Find
             .ClearFormatting()
@@ -830,7 +830,7 @@ Public Class MoodleQuestions
             End If
 
             'Check if Category Style exist
-            If StyleFound(STYLE_CATEGORYQ) = -1 Then
+            If StyleUsed(STYLE_CATEGORYQ) = -1 Then
                 MsgBox("We must have Ctegory style in your style list")
                 isOK = False
             End If
@@ -1223,8 +1223,8 @@ Public Class MoodleQuestions
         'objStream.WriteText("</category>" & vbCr)
         'objStream.WriteText("</question>" & vbCr & vbCr)
 
-        Dim dd As MSXML2.DOMDocument60
-        Dim xmlnod As MSXML2.IXMLDOMNode
+        Dim dd As Xml.XmlDocument
+        Dim xmlnod As Xml.XmlNode
 
         'Dim dd As Xml.XmlDocument
         'Dim xmlnod As XMLNode
@@ -1238,7 +1238,7 @@ Public Class MoodleQuestions
         Dim i As Integer = 0
 
         For Each para In getDocumentParagraphs() '?handle each paragraph separately.
-            dd = New MSXML2.DOMDocument60
+            dd = New Xml.XmlDocument
 
             Select Case para.Range.Style.NameLocal
 
@@ -1260,8 +1260,8 @@ Public Class MoodleQuestions
                     xmlnod = dd.documentElement.selectSingleNode("answer")
                     dd.documentElement.removeChild(xmlnod)
                     Do While (paralookahead.Style.NameLocal = STYLE_SHORT_ANSWER)
-                        xmlnod.attributes.getNamedItem("fraction").text = "100"
-                        xmlnod.selectSingleNode("text").text = RemoveCR(paralookahead.Range.Text)
+                        xmlnod.Attributes.GetNamedItem("fraction").InnerText = "100"
+                        xmlnod.SelectSingleNode("text").InnerText = RemoveCR(paralookahead.Range.Text)
                         dd.documentElement.appendChild(xmlnod)
 
                         xmlnod = xmlnod.cloneNode(True)
@@ -1285,15 +1285,15 @@ Public Class MoodleQuestions
                     dd.documentElement.removeChild(xmlnod)
 
                     Do While (paralookahead.Style.NameLocal = STYLE_SHORT_ANSWER)
-                        xmlnod.attributes.getNamedItem("fraction").text = "100"
-                        xmlnod.selectSingleNode("text").text = RemoveCR(paralookahead.Range.Text)
+                        xmlnod.Attributes.GetNamedItem("fraction").Value = "100"
+                        xmlnod.SelectSingleNode("text").InnerText = RemoveCR(paralookahead.Range.Text)
                         paralookahead = paralookahead.Next
                         If Not paralookahead Is Nothing Then
                             If (paralookahead.Style.NameLocal = STYLE_NUM_TOLERANCE) Then
-                                xmlnod.selectSingleNode("tolerance").text = RemoveCR(paralookahead.Range.Text)
+                                xmlnod.SelectSingleNode("tolerance").InnerText = RemoveCR(paralookahead.Range.Text)
                                 paralookahead = paralookahead.Next
                             Else
-                                xmlnod.selectSingleNode("tolerance").text = "0"
+                                xmlnod.SelectSingleNode("tolerance").InnerText = "0"
                             End If
                         End If
                         dd.documentElement.appendChild(xmlnod)
@@ -1308,30 +1308,30 @@ Public Class MoodleQuestions
                     paralookahead = para.Next
                     Do While i < 2
                         xmlnod = dd.documentElement.selectSingleNode("answer")
-                        If xmlnod.attributes.getNamedItem("fraction").text = "100" Then
+                        If xmlnod.Attributes.GetNamedItem("fraction").InnerText = "100" Then
                             If paralookahead.Style.NameLocal = STYLE_FEEDBACK_FS Then
                                 If paralookahead.Range.Text = "" Then
                                     MsgBox("no feedback was supplied for the false statement")
                                 Else
                                     ' Set XML <feedback> text
-                                    xmlnod.selectSingleNode("feedback/text").text = RemoveCR(paralookahead.Range.Text)
+                                    xmlnod.SelectSingleNode("feedback/text").InnerText = RemoveCR(paralookahead.Range.Text)
                                     paralookahead = paralookahead.Next
                                 End If
                             End If
-                            dd.documentElement.appendChild(xmlnod)
+                            dd.DocumentElement.AppendChild(xmlnod)
                         End If
-                        If xmlnod.attributes.getNamedItem("fraction").text = "0" Then
+                        If xmlnod.Attributes.GetNamedItem("fraction").InnerText = "0" Then
                             'xmlnod.selectSingleNode("text").text = "True"
                             If paralookahead.Style.NameLocal = STYLE_FEEDBACK_TS Then
                                 If paralookahead.Range.Text = "" Then
                                     MsgBox("no feedback was supplied for the false statement")
                                 Else
                                     ' Set XML <feedback> text
-                                    xmlnod.selectSingleNode("feedback/text").text = RemoveCR(paralookahead.Range.Text)
+                                    xmlnod.SelectSingleNode("feedback/text").InnerText = RemoveCR(paralookahead.Range.Text)
                                     paralookahead = paralookahead.Next
                                 End If
                             End If
-                            dd.documentElement.appendChild(xmlnod)
+                            dd.DocumentElement.AppendChild(xmlnod)
                         End If
                         i += 1
                     Loop
@@ -1347,29 +1347,29 @@ Public Class MoodleQuestions
                     i = 0
                     Do While i < 2
                         xmlnod = dd.documentElement.selectSingleNode("answer")
-                        If xmlnod.attributes.getNamedItem("fraction").text = "100" Then
+                        If xmlnod.Attributes.GetNamedItem("fraction").InnerText = "100" Then
                             If paralookahead.Style.NameLocal = STYLE_FEEDBACK_TS Then
                                 If paralookahead.Range.Text = "" Then
                                     MsgBox("no feedback was supplied for the true statement")
                                 Else
                                     ' Set XML <feedback> text
-                                    xmlnod.selectSingleNode("feedback/text").text = RemoveCR(paralookahead.Range.Text)
+                                    xmlnod.SelectSingleNode("feedback/text").InnerText = RemoveCR(paralookahead.Range.Text)
                                     paralookahead = paralookahead.Next
                                 End If
                             End If
-                            dd.documentElement.appendChild(xmlnod)
+                            dd.DocumentElement.AppendChild(xmlnod)
                         End If
-                        If xmlnod.attributes.getNamedItem("fraction").text = "0" Then
+                        If xmlnod.Attributes.GetNamedItem("fraction").InnerText = "0" Then
                             If paralookahead.Style.NameLocal = STYLE_FEEDBACK_FS Then
                                 If paralookahead.Range.Text = "" Then
                                     MsgBox("no feedback was supplied for the false statement")
                                 Else
                                     ' Set XML <feedback> text
-                                    xmlnod.selectSingleNode("feedback/text").text = RemoveCR(paralookahead.Range.Text)
+                                    xmlnod.SelectSingleNode("feedback/text").InnerText = RemoveCR(paralookahead.Range.Text)
                                     paralookahead = paralookahead.Next
                                 End If
                             End If
-                            dd.documentElement.appendChild(xmlnod)
+                            dd.DocumentElement.AppendChild(xmlnod)
                         End If
                         i += 1
                     Loop
@@ -1392,10 +1392,10 @@ Public Class MoodleQuestions
 
                     Do While (paralookahead.Style.NameLocal = STYLE_CORRECT_MC_ANSWER) Or (paralookahead.Style.NameLocal = STYLE_INCORRECT_MC_ANSWER)
                         If paralookahead.Style.NameLocal = STYLE_CORRECT_MC_ANSWER Then
-                            xmlnod.attributes.getNamedItem("fraction").text = "100"
+                            xmlnod.Attributes.GetNamedItem("fraction").InnerText = "100"
                             rac = rac + 1
                         Else
-                            xmlnod.attributes.getNamedItem("fraction").text = "0"
+                            xmlnod.Attributes.GetNamedItem("fraction").InnerText = "0"
                             wac = wac + 1
                         End If
                         ' xmlnod.selectSingleNode("text").text = RemoveCR(paralookahead.Range.Text)
@@ -1404,7 +1404,7 @@ Public Class MoodleQuestions
                         'processing <image>'
 
                         'Create a CData section. 
-                        Dim CDATASection As IXMLDOMCDATASection
+                        Dim CDATASection As XmlCDataSection
                         CDATASection = dd.createCDATASection("<p>" & XSLT_Range(paralookahead.Range, My.Resources.FormattedText_xslt) & "<img src=""@@PLUGINFILE@@/image.gif"" width=""88"" height=""74""/></p>")
                         xmlnod.selectSingleNode("text").appendChild(CDATASection)
                         If Not XSLT_Range(paralookahead.Range, My.Resources.PictureName_xslt) = "" Then 'if it is NOT null/empty
@@ -1414,10 +1414,10 @@ Public Class MoodleQuestions
                             stringlength = Len(header)
                             header = Left(header, stringlength - 1)
                             'processing <image_base64>'
-                            xmlnod.selectSingleNode("file").text = XSLT_Range(paralookahead.Range, My.Resources.Picture_xslt)
+                            xmlnod.SelectSingleNode("file").InnerText = XSLT_Range(paralookahead.Range, My.Resources.Picture_xslt)
                         Else
-                            xmlnod.selectSingleNode("text").text = RemoveCR(paralookahead.Range.Text)
-                            xmlnod.selectSingleNode("file").text = ""
+                            xmlnod.SelectSingleNode("text").InnerText = RemoveCR(paralookahead.Range.Text)
+                            xmlnod.SelectSingleNode("file").InnerText = ""
                         End If
                         ' fin bloc to insert image in answer
 
@@ -1430,7 +1430,7 @@ Public Class MoodleQuestions
                                     MsgBox("feedback dosn't exist")
                                 Else
                                     ' Set XML <feedback> text
-                                    xmlnod.selectSingleNode("feedback/text").text = RemoveCR(paralookahead.Range.Text)
+                                    xmlnod.SelectSingleNode("feedback/text").InnerText = RemoveCR(paralookahead.Range.Text)
                                     paralookahead = paralookahead.Next
                                 End If
                             End If
@@ -1438,13 +1438,13 @@ Public Class MoodleQuestions
                         dd.documentElement.appendChild(xmlnod)
                         xmlnod = xmlnod.cloneNode(True)
 
-                        xmlnod.selectSingleNode("text").text = Nothing
+                        xmlnod.SelectSingleNode("text").InnerText = Nothing
                         If paralookahead Is Nothing Then Exit Do
                     Loop
 
                     If rac > 1 Then
                         ' multiple correct/incorrect answers
-                        dd.documentElement.selectSingleNode("single").text = "false"
+                        dd.DocumentElement.SelectSingleNode("single").InnerText = "false"
                         ' re-looping for setting multi-true-answer fractions
                         For Each mansw In dd.documentElement.selectNodes("answer")
                             With mansw.Attributes.getNamedItem("fraction")
@@ -1473,11 +1473,11 @@ Public Class MoodleQuestions
                     Do While (paralookahead.Style.NameLocal = STYLE_LEFT_MATCH)
                         'process left
                         Dim leftQuestion As String = RemoveCR(paralookahead.Range.Text)
-                        xmlnod.selectSingleNode("text").text = leftQuestion
+                        xmlnod.SelectSingleNode("text").InnerText = leftQuestion
                         paralookahead = paralookahead.Next
                         'process right
                         If paralookahead.Style.NameLocal = STYLE_RIGHT_MATCH Then
-                            xmlnod.selectSingleNode("answer").selectSingleNode("text").text = RemoveCR(paralookahead.Range.Text)
+                            xmlnod.SelectSingleNode("answer").SelectSingleNode("text").InnerText = RemoveCR(paralookahead.Range.Text)
                             paralookahead = paralookahead.Next
                         Else
                             'error, right is not matching left (should be found in check prior to calling here)
@@ -1521,14 +1521,14 @@ Public Class MoodleQuestions
                         If theChar.Style.NameLocal = STYLE_BLANK_WORD Then misword = misword & theChar.Text
                     Next theChar
                     ProcessCommonTags(dd, para)  ' XSLT template will swap out missing word
-                    dd.documentElement.selectSingleNode("name").selectSingleNode("text").text = _
-                        Replace(dd.documentElement.selectSingleNode("name").selectSingleNode("text").text, misword, "__________")
+                    dd.DocumentElement.SelectSingleNode("name").SelectSingleNode("text").InnerText = _
+                        Replace(dd.DocumentElement.SelectSingleNode("name").SelectSingleNode("text").Value, misword, "__________")
 
                     ' processing each <answer>'
                     paralookahead = para.Next
                     xmlnod = dd.documentElement.selectSingleNode("answer")
-                    xmlnod.attributes.getNamedItem("fraction").text = "100"
-                    xmlnod.selectSingleNode("text").text = misword
+                    xmlnod.Attributes.GetNamedItem("fraction").InnerText = "100"
+                    xmlnod.SelectSingleNode("text").InnerText = misword
 
                     'Case STYLE_COMMENT
                     '    Dim Comment As String
@@ -1537,36 +1537,38 @@ Public Class MoodleQuestions
                     '    dd.loadXML("")
 
                 Case Else
-                    dd.loadXML("")
+                    dd = Nothing
             End Select
 
 
-            If Not paralookahead Is Nothing Then
-                If (paralookahead.Style.NameLocal = STYLE_QUESTIONNAME) Then
-                    xmlnod = dd.documentElement.selectSingleNode("name")
-                    dd.documentElement.removeChild(xmlnod)
-                    xmlnod.selectSingleNode("text").text = RemoveCR(paralookahead.Range.Text)
-                    dd.documentElement.appendChild(xmlnod)
-                    xmlnod = xmlnod.cloneNode(True)
-                    paralookahead = paralookahead.Next
+            If dd IsNot Nothing Then
+
+                If paralookahead IsNot Nothing Then
+                    If (paralookahead.Style.NameLocal = STYLE_QUESTIONNAME) Then
+                        xmlnod = dd.DocumentElement.SelectSingleNode("name")
+                        dd.DocumentElement.RemoveChild(xmlnod)
+                        xmlnod.SelectSingleNode("text").InnerText = RemoveCR(paralookahead.Range.Text)
+                        dd.DocumentElement.AppendChild(xmlnod)
+                        xmlnod = xmlnod.CloneNode(True)
+                        paralookahead = paralookahead.Next
+                    End If
+
+                Else  '**seems to be setting generalfeedback for any feedback tag...
+                    ' CPF commented out
+                    '          If (paralookahead.Style.NameLocal = STYLE_FEEDBACK) Then
+                    '             Set xmlnod = dd.documentElement.SelectSingleNode("generalfeedback")
+                    '             dd.documentElement.RemoveChild xmlnod
+                    '             xmlnod.SelectSingleNode("text").text = RemoveCR(paralookahead.Range.text)
+                    '             dd.documentElement.appendChild xmlnod
+                    '             Set xmlnod = xmlnod.CloneNode(True)
+                    '             Set paralookahead = paralookahead.Next
+                    '          End If
                 End If
 
-            End If
-            If Not paralookahead Is Nothing Then '**seems to be setting generalfeedback for any feedback tag...
-                ' CPF commented out
-                '          If (paralookahead.Style.NameLocal = STYLE_FEEDBACK) Then
-                '             Set xmlnod = dd.documentElement.SelectSingleNode("generalfeedback")
-                '             dd.documentElement.RemoveChild xmlnod
-                '             xmlnod.SelectSingleNode("text").text = RemoveCR(paralookahead.Range.text)
-                '             dd.documentElement.appendChild xmlnod
-                '             Set xmlnod = xmlnod.CloneNode(True)
-                '             Set paralookahead = paralookahead.Next
-                '          End If
-            End If
+                If dd.InnerXml <> "" Then objStream.WriteText(dd.InnerXml & vbCr)
 
-            If dd.xml <> "" Then objStream.WriteText(dd.xml & vbCr)
-
-            dd = Nothing
+                dd = Nothing
+            End If
         Next para
 
         objStream.WriteText("</quiz>")
@@ -1577,14 +1579,14 @@ Public Class MoodleQuestions
     End Sub
 
     'This is called as the first processing task for each question. It
-    Private Sub ProcessCommonTags(dd As MSXML2.DOMDocument60, para As Paragraph)
+    Private Sub ProcessCommonTags(dd As Xml.XmlDocument, para As Paragraph)
         ' processing <name> '
-        dd.documentElement.selectSingleNode("name") _
-        .selectSingleNode("text").text = RemoveCR(para.Range.Text)
+        dd.DocumentElement.SelectSingleNode("name") _
+        .SelectSingleNode("text").InnerText = RemoveCR(para.Range.Text)
 
         ' processing <questiontext> '
-        dd.documentElement.selectSingleNode("questiontext") _
-        .selectSingleNode("text").text = XSLT_Range(para.Range, My.Resources.FormattedText_xslt)
+        dd.DocumentElement.SelectSingleNode("questiontext") _
+        .SelectSingleNode("text").InnerText = XSLT_Range(para.Range, My.Resources.FormattedText_xslt)
 
         '
         If Not XSLT_Range(para.Range, My.Resources.PictureName_xslt) = "" Then 'if it is NOT null/empty
@@ -1597,33 +1599,51 @@ Public Class MoodleQuestions
             header = Left(header, stringlength - 1)
 
             'processing <image>'
-            dd.documentElement.selectSingleNode("image").text = "Images_forQuizQuestions/" & header & Right(XSLT_Range(para.Range, My.Resources.PictureName_xslt), 4)
+            dd.DocumentElement.SelectSingleNode("image").InnerText = "Images_forQuizQuestions/" & header & Right(XSLT_Range(para.Range, My.Resources.PictureName_xslt), 4)
             'dd.documentElement.SelectSingleNode("image").text = Mid(XSLT_Range(para.Range, My.Resources.PictureName_xslt), 10) (commented out: Rohrer)'
             'processing <image_base64>'
-            dd.documentElement.selectSingleNode("image_base64").text = XSLT_Range(para.Range, My.Resources.Picture_xslt)
+            dd.DocumentElement.SelectSingleNode("image_base64").InnerText = XSLT_Range(para.Range, My.Resources.Picture_xslt)
         End If
 
     End Sub
 
 
     Private Function XSLT_Range(textrange As Range, xsltFileContents As String) As String
-        Dim xsldoc As New MSXML2.FreeThreadedDOMDocument60
-        xsldoc.loadXML(xsltFileContents)
-        Dim xslt As New MSXML2.XSLTemplate60
-        xslt.stylesheet = xsldoc
-        Dim xsltProcessor As MSXML2.IXSLProcessor
-        xsltProcessor = xslt.createProcessor
-        Dim d As New MSXML2.DOMDocument60
-        Dim s As String
-        d.loadXML(textrange.XML) '!!! Bug in Word 2010 when file is created from a template (Textrange.xml can not be read)
-        xsltProcessor.input = d
-        xsltProcessor.transform()
-        s = xsltProcessor.output
+        ' http://stackoverflow.com/a/11862542/1168342
+        Dim sourceXmlFile As New Xml.XmlDocument
+        sourceXmlFile.LoadXml(textrange.XML)
 
-        xsltProcessor = Nothing
-        xslt = Nothing
-        xsldoc = Nothing
-        XSLT_Range = s
+        Dim xslt As New System.Xml.Xsl.XslCompiledTransform()
+
+        Using xsltStringReader As New IO.StringReader(xsltFileContents)
+            Using xsltReader As XmlReader = XmlReader.Create(xsltStringReader)
+                Using translatedXmlFile As New IO.StringWriter()
+                    xslt.Load(xsltReader)
+                    xslt.Transform(sourceXmlFile, Nothing, translatedXmlFile)
+                    XSLT_Range = translatedXmlFile.ToString
+                End Using
+            End Using
+        End Using
+
+
+
+        'Dim xsldoc As New MSXML2.FreeThreadedDOMDocument60
+        'xsldoc.loadXML(xsltFileContents)
+        'Dim xslt As New System.Xml.Xsl.MSXML2.XSLTemplate60
+        'xslt.stylesheet = xsldoc
+        'Dim xsltProcessor As MSXML2.IXSLProcessor
+        'xsltProcessor = xslt.createProcessor
+        'Dim d As New Xml.XmlDocument
+        'Dim s As String
+        'd.LoadXml(textrange.XML) '!!! Bug in Word 2010 when file is created from a template (Textrange.xml can not be read)
+        'xsltProcessor.input = d
+        'xsltProcessor.transform()
+        's = xsltProcessor.output
+
+        'xsltProcessor = Nothing
+        'xslt = Nothing
+        'xsldoc = Nothing
+        'XSLT_Range = s
     End Function
 
 
@@ -1686,12 +1706,13 @@ Public Class MoodleQuestions
         Return fd.SelectedItems.Item(1)
     End Function
 
-    Private Sub loadXML(xmlResource As String, dd As MSXML2.DOMDocument60)
-        If Not dd.loadXML(xmlResource) Then
-            MsgBox("Failed to load XML " & xmlResource & " in program.")
-            'TODO fail gracefully?
-            Throw New Exception
-        End If
+    Private Sub loadXML(xmlResource As String, dd As Xml.XmlDocument)
+        dd.LoadXml(xmlResource)
+        'If Not dd.LoadXml(xmlResource) Then
+        '    MsgBox("Failed to load XML " & xmlResource & " in program.")
+        '    'TODO fail gracefully?
+        '    Throw New Exception
+        'End If
     End Sub
 
     Private Sub updateVersionInfo()
