@@ -22,10 +22,10 @@
     <OldToolsVersion>12.0</OldToolsVersion>
     <VSTO_TrustAssembliesLocation>true</VSTO_TrustAssembliesLocation>
     <BootstrapperEnabled>true</BootstrapperEnabled>
-    <PublishUrl>C:\Users\Cris\Google Drive ETSMTL.NET\MoodleQuestionsPublish\</PublishUrl>
-    <InstallUrl>https://drive.google.com/folderview%3fid=0B9aAbha28QkacTJJN0RsRy1IX1E&amp;usp=sharing/</InstallUrl>
+    <PublishUrl>\\saumon.ens.ad.etsmtl.ca\FSWEB\profs\cfuhrman\MoodleQuestions\</PublishUrl>
+    <InstallUrl>http://profs.etsmtl.ca/cfuhrman/MoodleQuestions/</InstallUrl>
     <TargetCulture>en</TargetCulture>
-    <ApplicationVersion>1.0.0.3</ApplicationVersion>
+    <ApplicationVersion>1.0.1.10</ApplicationVersion>
     <AutoIncrementApplicationRevision>true</AutoIncrementApplicationRevision>
     <UpdateEnabled>true</UpdateEnabled>
     <UpdateInterval>7</UpdateInterval>
@@ -155,7 +155,9 @@
       <LastGenOutput>RibbonIcons.Designer.vb</LastGenOutput>
     </EmbeddedResource>
     <None Include="MoodleQuestions.docm" />
-    <Compile Include="MoodleQuestions.vb" />
+    <Compile Include="MoodleQuestions.vb">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="RibbonIcons.Designer.vb">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -165,6 +167,7 @@
       <DependentUpon>MoodleQuestions.docm</DependentUpon>
     </Compile>
     <None Include="MoodleQuestions_2_TemporaryKey.pfx" />
+    <None Include="MoodleQuestions_3_TemporaryKey.pfx" />
     <None Include="MoodleQuestions_TemporaryKey.pfx" />
     <None Include="ThisDocument.Designer.xml">
       <DependentUpon>ThisDocument.vb</DependentUpon>
@@ -330,20 +333,19 @@
     <SignManifests>true</SignManifests>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestKeyFile>MoodleQuestions_2_TemporaryKey.pfx</ManifestKeyFile>
+    <ManifestKeyFile>MoodleQuestions_3_TemporaryKey.pfx</ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>B889363D4D3686A3F5AA28789A2694755CA45F9F</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>B529492F63CA2F181CA31B84C2B1000738081803</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup>
-    <SignAssembly>true</SignAssembly>
+    <SignAssembly>false</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
     <DelaySign>false</DelaySign>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>
-    </AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>MoodleQuestions_2_TemporaryKey.pfx</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <Import Project="$(VSToolsPath)\OfficeTools\Microsoft.VisualStudio.Tools.Office.targets" Condition="'$(VSToolsPath)' != ''" />

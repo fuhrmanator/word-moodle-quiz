@@ -20,19 +20,19 @@
 'FIXED fix paragraph styles so language comes from Keyboard or Normal (http://answers.microsoft.com/en-us/office/forum/office_2010-word/how-to-specify-dont-change-the-language-setting-in/966aec6e-4d4d-4fef-af42-5c4ad260f751)
 'FIXED Style "A Short Answer" is missing from .DOCM
 'FIXED find a deployment site for Project Publishing. Google Drive won't work because it doesn't have clean URLs for directories.
-'TODO Try using style content to indicate [shuffled] questions (rather than arbitrary colors). Numbering allows inserting text after the 1. (e.g., 1. [S] for shuffled)
-'TODO For which questions is answer feedback valid? Do we need different feedback word styles?
+'FIXED The carriage return doesn't work for context change (uses Timer to check)
+'TODO Try using style content to indicate [shuffled] questions (rather than arbitrary colors). Numbering allows inserting text after the 1. (e.g., 1. [S] for shuffled) - The base style is where numbering is done, so this could be a problem.
+'FIXED For which questions is answer feedback valid? Do we need different feedback word styles?
 'TODO Figure out what "Question Name" button is supposed to do
 'TODO Add "Question Feedback" button (different from Answer feedback)
 'TODO Understand Numerical Questions: "Q Numerical" is followed by "Short Answer" in the v21 template. Should we make a "A Numerical" for consistency? Might impact "Check Layout" function.
 'TODO Fix XML Export for all question types
 'TODO Selecting a missing word and using the button also selects the space after the word, which cause a problem in <questiontext/text>
-'TODO The carriage return doesn't work for context change
+'TODO consider using 
 
 
 Imports Microsoft.Office.Interop.Word
 Imports stdole
-'Imports MSXML2
 Imports System.Runtime.InteropServices
 Imports System.Collections
 Imports System.Windows.Forms.VisualStyles.VisualStyleElement.ListView
@@ -44,7 +44,8 @@ Public Class MoodleQuestions
 
     Private ribbon As Office.IRibbonUI
     Dim enabled As Boolean
-
+    Dim undoRecord As UndoRecord
+    Dim imageToPictureDispConverter As MQIconConverter = New MQIconConverter
 
     Public Sub New()
         enabled = False
@@ -54,6 +55,26 @@ Public Class MoodleQuestions
     Public Function GetCustomUI(ByVal ribbonID As String) As String Implements Office.IRibbonExtensibility.GetCustomUI
         Return GetResourceText("MoodleQuestions.MoodleQuestions.xml")
     End Function
+    ' inspired by http://www.mztools.com/articles/2012/MZ2012016.aspx
+    Private Class MQIconConverter
+        Inherits System.Windows.Forms.AxHost
+        Friend Sub New()
+            MyBase.New("{63109182-966B-4e3c-A8B2-8BC4A88D221C}")
+        End Sub
+
+        Friend Function GetIPictureDispFromImage(ByVal img As Drawing.Image) As stdole.IPictureDisp
+
+            Dim picture As stdole.IPictureDisp
+
+            picture = CType(AxHost.GetIPictureDispFromPicture(img), stdole.IPictureDisp)
+
+            Return picture
+
+        End Function
+
+    End Class
+
+
 
 #Region "Ribbon Callbacks"
     'Create callback methods here. For more information about adding callback methods, visit http://go.microsoft.com/fwlink/?LinkID=271226
@@ -62,19 +83,22 @@ Public Class MoodleQuestions
         Globals.ThisDocument.ribbon = Me.ribbon
         Me.ribbon.ActivateTab("MoodleQuestions") 'Make Moodle Questions toolbar active on startup
         updateVersionInfo()
+        ' move cursor to second paragraph, after category (by default)
         With Globals.ThisDocument.Application.Selection.Range
             .Move(Unit:=WdUnits.wdParagraph, Count:=+1)
             .Select()
         End With
 
         CheckStyle()
+        undoRecord = Globals.ThisDocument.Application.UndoRecord
     End Sub
 
 
     Public Function OnLoadImage(imageId As String) As IPictureDisp
         Dim tempImage As stdole.IPictureDisp = Nothing
         'load image from resources file
-        tempImage = Microsoft.VisualBasic.Compatibility.VB6.Support.ImageToIPicture(My.Resources.RibbonIcons.ResourceManager.GetObject(imageId))
+        'tempImage = Microsoft.VisualBasic.Compatibility.VB6.Support.ImageToIPicture(My.Resources.RibbonIcons.ResourceManager.GetObject(imageId))
+        tempImage = imageToPictureDispConverter.GetIPictureDispFromImage(My.Resources.RibbonIcons.ResourceManager.GetObject(imageId))
         Return tempImage
 
     End Function
@@ -179,6 +203,9 @@ Public Class MoodleQuestions
 
 
     Public Sub AddMultipleChoiceQ(ByVal control As Office.IRibbonControl)
+
+        undoRecord.StartCustomRecord("Insert multiple choice question")
+
         If isSelectionNormalStyle() Then
             AddMultipleChoiceQText()
         Else
@@ -208,9 +235,13 @@ Public Class MoodleQuestions
                 InsertParagraphAfterCurrentParagraph("Insert feedback explaining why this is an incorrect answer here", "A Feedback")
             End If
         End If
+        undoRecord.EndCustomRecord()
+
     End Sub
 
     Public Sub AddCategoryQ(ByVal control As Office.IRibbonControl)
+        undoRecord.StartCustomRecord("Insert category")
+
         If isSelectionNormalStyle() Then
             InsertParagraphAfterCurrentParagraph("Question_Category/Question_Subcategory", "Q Category")
             '  AddParagraphOfStyle(STYLE_CATEGORYQ, "Question_Category/Question_Subcategory")
@@ -228,10 +259,13 @@ Public Class MoodleQuestions
                 InsertParagraphOfStyleInSelectedRangeBefore(STYLE_CATEGORYQ, "Question_Category/Question_Subcategory", min)
             End If
         End If
+        undoRecord.EndCustomRecord()
     End Sub
 
     ' Add Matching Question to the end of the active document
     Public Sub AddMatchingQ(ByVal control As Office.IRibbonControl)
+        undoRecord.StartCustomRecord("Insert matching question")
+
         If isSelectionNormalStyle() Then
             InsertParagraphAfterCurrentParagraph("Insert Matching Question", "Q Matching")
         Else
@@ -249,12 +283,15 @@ Public Class MoodleQuestions
                 InsertParagraphOfStyleInSelectedRangeBefore(STYLE_MATCHINGQ, "Insert Matching Question", min)
             End If
         End If
+        undoRecord.EndCustomRecord()
     End Sub
 
     ' Add Numerical Question to the end of the active document
     Public Sub AddNumericalQ(ByVal control As Office.IRibbonControl)
+        undoRecord.StartCustomRecord("Insert numerical question")
+        Dim questionText As String = "Type numerical question here."
         If isSelectionNormalStyle() Then
-            InsertParagraphAfterCurrentParagraph("Insert Numerical Question", "Q Numerical")
+            InsertParagraphAfterCurrentParagraph(questionText, "Q Numerical")
         Else
             Dim min As Integer = Math.Min(StyleUsed(STYLE_CATEGORYQ), QuestionStyleFound(styleList))
             Dim max As Integer = Math.Max(StyleUsed(STYLE_CATEGORYQ), QuestionStyleFound(styleList))
@@ -262,22 +299,26 @@ Public Class MoodleQuestions
             'both styles not found
             If StyleUsed(STYLE_CATEGORYQ) = -1 And QuestionStyleFound(styleList) = -1 Then
                 moveCursorToEndOfDocument()
-                InsertParagraphAfterCurrentParagraph("Insert Numerical Question", "Q Numerical")
+                InsertParagraphAfterCurrentParagraph(questionText, "Q Numerical")
                 'one of the two style found
             ElseIf min = -1 Then
-                InsertParagraphOfStyleInSelectedRangeBefore(STYLE_NUMERICALQ, "Insert Numerical Question", max)
+                InsertParagraphOfStyleInSelectedRangeBefore(STYLE_NUMERICALQ, questionText, max)
             Else  'both styles found
-                InsertParagraphOfStyleInSelectedRangeBefore(STYLE_NUMERICALQ, "Insert Numerical Question", min)
+                InsertParagraphOfStyleInSelectedRangeBefore(STYLE_NUMERICALQ, questionText, min)
             End If
         End If
+        undoRecord.EndCustomRecord()
     End Sub
 
 
     ' Add Short Answer Question to the end of the active document
     Public Sub AddShortAnswerQ(ByVal control As Office.IRibbonControl)
+        Dim questionText As String = "Type short-answer question here."
+        Dim answerText As String = "Type short answer here."
+        undoRecord.StartCustomRecord("Insert short-answer question")
         If isSelectionNormalStyle() Then
-            InsertParagraphAfterCurrentParagraph("Insert Short Answer Question", "Q Short Answer")
-            InsertParagraphAfterCurrentParagraph("Insert Short Answer here", "A Short Answer")
+            InsertParagraphAfterCurrentParagraph(questionText, "Q Short Answer")
+            InsertParagraphAfterCurrentParagraph(answerText, "A Short Answer")
         Else
             Dim min As Integer = Math.Min(StyleUsed(STYLE_CATEGORYQ), QuestionStyleFound(styleList))
             Dim max As Integer = Math.Max(StyleUsed(STYLE_CATEGORYQ), QuestionStyleFound(styleList))
@@ -285,21 +326,24 @@ Public Class MoodleQuestions
             'both styles not found
             If StyleUsed(STYLE_CATEGORYQ) = -1 And QuestionStyleFound(styleList) = -1 Then
                 moveCursorToEndOfDocument()
-                InsertParagraphAfterCurrentParagraph("Insert Short Answer Question", "Q Short Answer")
-                InsertParagraphAfterCurrentParagraph("Insert Short Answer here", "A Short Answer")
+                InsertParagraphAfterCurrentParagraph(questionText, "Q Short Answer")
+                InsertParagraphAfterCurrentParagraph(answerText, "A Short Answer")
                 'one of the two style found
             ElseIf min = -1 Then
-                InsertParagraphOfStyleInSelectedRangeBefore(STYLE_SHORTANSWERQ, "Insert Short Answer Question", max)
-                InsertParagraphAfterCurrentParagraph("Insert Short Answer here", "A Short Answer")
+                InsertParagraphOfStyleInSelectedRangeBefore(STYLE_SHORTANSWERQ, questionText, max)
+                InsertParagraphAfterCurrentParagraph(answerText, "A Short Answer")
             Else  'both styles found
-                InsertParagraphOfStyleInSelectedRangeBefore(STYLE_SHORTANSWERQ, "Insert Short Answer Question", min)
-                InsertParagraphAfterCurrentParagraph("Insert Short Answer here", "A Short Answer")
+                InsertParagraphOfStyleInSelectedRangeBefore(STYLE_SHORTANSWERQ, questionText, min)
+                InsertParagraphAfterCurrentParagraph(answerText, "A Short Answer")
             End If
         End If
+        undoRecord.EndCustomRecord()
     End Sub
 
     ' Add Missing Word Question
     Public Sub AddMissingWordQ(ByVal control As Office.IRibbonControl)
+        undoRecord.StartCustomRecord("Insert missing-word question")
+
         If isSelectionNormalStyle() Then
             InsertParagraphAfterCurrentParagraph("Insert Missing Word Question. Then select the missing word!", "Q Missing Word")
         Else
@@ -317,10 +361,13 @@ Public Class MoodleQuestions
                 InsertParagraphOfStyleInSelectedRangeBefore(STYLE_MISSINGWORDQ, "Insert Missing Word Question. Then select the missing word!", min)
             End If
         End If
+        undoRecord.EndCustomRecord()
     End Sub
 
     ' Add an Essay
     Public Sub AddEssay(ByVal control As Office.IRibbonControl)
+        undoRecord.StartCustomRecord("Insert essay question")
+
         If isSelectionNormalStyle() Then
             InsertParagraphAfterCurrentParagraph("Insert An Essay question here (an Open Question). [This can not be the last question in the document.]", "Q Essay")
         Else
@@ -338,10 +385,14 @@ Public Class MoodleQuestions
                 InsertParagraphOfStyleInSelectedRangeBefore(STYLE_ESSAY, "Insert An Essay question here (an Open Question). [This can not be the last question in the document.]", min)
             End If
         End If
+        undoRecord.EndCustomRecord()
     End Sub
     Public Sub ToggleMissingWord(ByVal control As Office.IRibbonControl)
+
         ' Only applies to questions of STYLE_MISSINGWORDQ
         If (getSelectionStyleName() = STYLE_MISSINGWORDQ) Then
+            undoRecord.StartCustomRecord("Toggle missing word")
+
             ' get only the first word of the selection
             Dim aRange As Microsoft.Office.Interop.Word.Range = getDocumentSelectionRange()
             aRange.Start = Globals.ThisDocument.Application.Selection.Words(1).Start
@@ -352,6 +403,8 @@ Public Class MoodleQuestions
             Else
                 aRange.Style = STYLE_BLANK_WORD
             End If
+            undoRecord.EndCustomRecord()
+
         Else
             MsgBox("Select a word inside a Missing-word question first.", vbExclamation)
         End If
@@ -377,8 +430,10 @@ Public Class MoodleQuestions
     ' Add tolerance
     Public Sub AddNumericalTolerance(ByVal control As Office.IRibbonControl)
         If getSelectionStyleName() = STYLE_SHORT_ANSWER Then
+            undoRecord.StartCustomRecord("Set numerical tolerance")
             InsertParagraphAfterCurrentParagraph("Replace me with Tolerance for the answer as a Decimal. Eg: 0.01", _
                              STYLE_NUM_TOLERANCE)
+            undoRecord.EndCustomRecord()
         Else 'Error: Give Instructions:
             MsgBox(" " & vbCr & _
                    "Place the cursor at the end of the numerical answer.", vbExclamation)
@@ -398,7 +453,9 @@ Public Class MoodleQuestions
            getSelectionStyleName() = STYLE_FALSESTATEMENT Or _
            getSelectionStyleName() = STYLE_RIGHT_MATCH Or _
            getSelectionStyleName() = STYLE_BLANK_WORD Then
+            undoRecord.StartCustomRecord("Insert question title")
             InsertParagraphAfterCurrentParagraph("Add a question title.", STYLE_QUESTIONNAME)
+            undoRecord.EndCustomRecord()
         Else 'Error: Give Instructions:
             MsgBox("Feedback to insert at the end of the last response selected. " & vbCr & _
                    "The title must appear before the feedback" & vbCr & _
@@ -409,6 +466,7 @@ Public Class MoodleQuestions
 
     ' Add a true statement of the true-false question
     Public Sub AddTrueStatement(ByVal control As Office.IRibbonControl)
+        undoRecord.StartCustomRecord("Insert true statement")
         If isSelectionNormalStyle() Then
             InsertParagraphAfterCurrentParagraph("True-false question: insert a TRUE statement here (not at the end of the document)", "Q True Statement")
             InsertParagraphAfterCurrentParagraph("Insert feedback explaining why this is a True statement here", "A Feedback TS")
@@ -434,10 +492,12 @@ Public Class MoodleQuestions
                 InsertParagraphAfterCurrentParagraph("Insert feedback explaining why this is not a False statement here", "A Feedback FS")
             End If
         End If
+        undoRecord.EndCustomRecord()
     End Sub
 
     ' Add a false statement of the true-false question
     Public Sub AddFalseStatement(ByVal control As Office.IRibbonControl)
+        undoRecord.StartCustomRecord("Insert false statement")
         If isSelectionNormalStyle() Then
             InsertParagraphAfterCurrentParagraph("True-false question: insert a FALSE statement here (not at the end of the document)", "Q False Statement")
             InsertParagraphAfterCurrentParagraph("Insert feedback explaining why this is not a True statement here", "A Feedback TS")
@@ -463,6 +523,7 @@ Public Class MoodleQuestions
                 InsertParagraphAfterCurrentParagraph("Insert feedback explaining why this is a False statement here", "A Feedback FS")
             End If
         End If
+        undoRecord.EndCustomRecord()
 
     End Sub
 
@@ -488,9 +549,11 @@ Public Class MoodleQuestions
                getSelectionStyleName() = STYLE_CORRECT_MC_ANSWER Or _
                getSelectionStyleName() = STYLE_INCORRECT_MC_ANSWER Then
                 Globals.ThisDocument.Application.Options.ReplaceSelection = False
-                .TypeText(Text:=(" " & Chr(11)))
                 If (Not Clipboard.ContainsText) Then
+                    undoRecord.StartCustomRecord("Paste image")
+                    .TypeText(Text:=(" " & Chr(11)))
                     .Paste()  ' don't paste if clipboard is empty, else exception
+                    undoRecord.EndCustomRecord()
                 Else
                     MsgBox("Clipboard does not contain an image. ", vbExclamation)
                 End If
@@ -506,13 +569,21 @@ Public Class MoodleQuestions
         Dim theStyle As String = getSelectionStyleName()
 
         If theStyle = STYLE_CORRECT_MC_ANSWER Then
+            undoRecord.StartCustomRecord("Toggle correct/incorrect choice")
             setSelectionParagraphStyle(STYLE_INCORRECT_MC_ANSWER)
+            undoRecord.EndCustomRecord()
         ElseIf theStyle = STYLE_INCORRECT_MC_ANSWER Then
+            undoRecord.StartCustomRecord("Toggle correct/incorrect choice")
             setSelectionParagraphStyle(STYLE_CORRECT_MC_ANSWER)
+            undoRecord.EndCustomRecord()
         ElseIf theStyle = STYLE_TRUESTATEMENT Then
+            undoRecord.StartCustomRecord("Toggle true/false question")
             setSelectionParagraphStyle(STYLE_FALSESTATEMENT)
+            undoRecord.EndCustomRecord()
         ElseIf theStyle = STYLE_FALSESTATEMENT Then
+            undoRecord.StartCustomRecord("Toggle true/false question")
             setSelectionParagraphStyle(STYLE_TRUESTATEMENT)
+            undoRecord.EndCustomRecord()
         Else 'Error: give instructions:
             MsgBox("This command toggles a statement from True to False." & vbCr & _
                    "Cursor must be on an answer for Multiple Choice" & vbCr & _
@@ -523,14 +594,21 @@ Public Class MoodleQuestions
     Public Sub ChangeShuffleanswerTrueFalse(ByVal control As Office.IRibbonControl)
 
         If getSelectionStyleName() = STYLE_MATCHINGQ Then
+            undoRecord.StartCustomRecord("Set fixed matching order")
             setSelectionParagraphStyle(STYLE_MATCHINGQ_FIXANSWER)
+            undoRecord.EndCustomRecord()
         ElseIf getSelectionStyleName() = STYLE_MATCHINGQ_FIXANSWER Then
+            undoRecord.StartCustomRecord("Set random matching order")
             setSelectionParagraphStyle(STYLE_MATCHINGQ)
+            undoRecord.EndCustomRecord()
         ElseIf getSelectionStyleName() = STYLE_MULTICHOICEQ Then
+            undoRecord.StartCustomRecord("Set fixed multiple choice order")
             setSelectionParagraphStyle(STYLE_MULTICHOICEQ_FIXANSWER)
+            undoRecord.EndCustomRecord()
         ElseIf getSelectionStyleName() = STYLE_MULTICHOICEQ_FIXANSWER Then
+            undoRecord.StartCustomRecord("Set fixed multiple choice order")
             setSelectionParagraphStyle(STYLE_MULTICHOICEQ)
-
+            undoRecord.EndCustomRecord()
         Else 'Error: give instructions:
             MsgBox("This command is only for MCQs and Matching Questions. " & vbCr & _
                    "Place the cursor in the text of the question, then push this button." & vbCr & _
