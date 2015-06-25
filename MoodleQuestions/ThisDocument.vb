@@ -38,7 +38,7 @@ Public Class ThisDocument
     End Sub
 
     Public Sub HandleDocumentChange()
-        System.Diagnostics.Debug.WriteLine("caught DocumentChange Event")
+        'System.Diagnostics.Debug.WriteLine("caught DocumentChange Event")
         Me.ribbon.Invalidate()
     End Sub
 
@@ -58,10 +58,20 @@ Public Class ThisDocument
 
     ' Invalidate the Ribbon to refresh the button states when change selection 
     Public Sub OnTimedEvent(source As Object, e As System.EventArgs)
-        Dim currentSelectionParagraphStyle = Globals.ThisDocument.Application.Selection.Paragraphs.Style
+        Dim currentSelectionParagraphStyle = Nothing
         Dim currentSelectionStyle As String
         Dim isSelectionDifferent As Boolean
-        If Not IsNothing(currentSelectionParagraphStyle) Then
+        ' special case of inserted images
+        Try
+            If Globals.ThisDocument.Application.Selection.Type <> WdSelectionType.wdSelectionInlineShape Then
+                currentSelectionParagraphStyle = Globals.ThisDocument.Application.Selection.Paragraphs.Style
+            End If
+        Catch ex As System.Runtime.InteropServices.COMException
+            ' certain dialogs in word cause Application.Selection to throw this exception because there's no Selection
+            ' It's easier to catch the exception than try to detect when the dialog is up
+        End Try
+
+        If currentSelectionParagraphStyle IsNot Nothing Then
             currentSelectionStyle = CType(currentSelectionParagraphStyle, Word.Style).NameLocal
             isSelectionDifferent = Not currentSelectionStyle = previousSelectionStyle
             If isSelectionDifferent Then
