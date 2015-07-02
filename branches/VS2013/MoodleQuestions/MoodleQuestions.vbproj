@@ -168,6 +168,7 @@
     </Compile>
     <None Include="MoodleQuestions_2_TemporaryKey.pfx" />
     <None Include="MoodleQuestions_3_TemporaryKey.pfx" />
+    <None Include="MoodleQuestions_4_TemporaryKey.pfx" />
     <None Include="MoodleQuestions_TemporaryKey.pfx" />
     <None Include="ThisDocument.Designer.xml">
       <DependentUpon>ThisDocument.vb</DependentUpon>
@@ -333,10 +334,10 @@
     <SignManifests>true</SignManifests>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestKeyFile>MoodleQuestions_3_TemporaryKey.pfx</ManifestKeyFile>
+    <ManifestKeyFile>MoodleQuestions_4_TemporaryKey.pfx</ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>B529492F63CA2F181CA31B84C2B1000738081803</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>08EBAFA6AABD32B4BBBC749BFB82A0D168F2607A</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>false</SignAssembly>
