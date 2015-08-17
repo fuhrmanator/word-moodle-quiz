@@ -1,0 +1,2098 @@
+﻿'TODO:  Follow these steps to enable the Ribbon (XML) item:
+
+'1: Copy the following code block into the ThisAddin, ThisWorkbook, or ThisDocument class.
+
+'Protected Overrides Function CreateRibbonExtensibilityObject() As Microsoft.Office.Core.IRibbonExtensibility
+'    Return New MoodleQuestions()
+'End Function
+
+'2. Create callback methods in the "Ribbon Callbacks" region of this class to handle user
+'   actions, such as clicking a button. Note: if you have exported this Ribbon from the
+'   Ribbon designer, move your code from the event handlers to the callback methods and
+'   modify the code to work with the Ribbon extensibility (RibbonX) programming model.
+
+'3. Assign attributes to the control tags in the Ribbon XML file to identify the appropriate callback methods in your code.
+
+'For more information, see the Ribbon XML documentation in the Visual Studio Tools for Office Help.
+'FIXED (didn't do, different design, simplify) integrate template file so Paragraph Styles will be valid
+'FIXED add all Callbacks from ribbon buttons 
+'FIXED add icons to Ribbon item
+'FIXED fix paragraph styles so language comes from Keyboard or Normal (http://answers.microsoft.com/en-us/office/forum/office_2010-word/how-to-specify-dont-change-the-language-setting-in/966aec6e-4d4d-4fef-af42-5c4ad260f751)
+'FIXED Style "A Short Answer" is missing from .DOCM
+'FIXED find a deployment site for Project Publishing. Google Drive won't work because it doesn't have clean URLs for directories.
+'FIXED The carriage return doesn't work for context change (uses Timer to check)
+'TODO Try using style content to indicate [shuffled] questions (rather than arbitrary colors). Numbering allows inserting text after the 1. (e.g., 1. [S] for shuffled) - The base style is where numbering is done, so this could be a problem.
+'FIXED For which questions is answer feedback valid? Do we need different feedback word styles?
+'TODO Figure out what "Question Name" button is supposed to do
+'TODO Add "Question Feedback" button (different from Answer feedback)
+'TODO Understand Numerical Questions: "Q Numerical" is followed by "Short Answer" in the v21 template. Should we make a "A Numerical" for consistency? Might impact "Check Layout" function.
+'TODO Fix XML Export for all question types
+'TODO Selecting a missing word and using the button also selects the space after the word, which cause a problem in <questiontext/text>
+'TODO consider using 
+
+
+Imports Microsoft.Office.Interop.Word
+Imports stdole
+Imports System.Runtime.InteropServices
+Imports System.Collections
+Imports System.Windows.Forms.VisualStyles.VisualStyleElement.ListView
+Imports System.Xml
+
+<Runtime.InteropServices.ComVisible(True)> _
+Public Class MoodleQuestions
+    Implements Office.IRibbonExtensibility
+
+    Private ribbon As Office.IRibbonUI
+    Dim enabled As Boolean
+    Dim undoRecord As UndoRecord
+    Dim imageToPictureDispConverter As MQIconConverter = New MQIconConverter
+
+    Public Sub New()
+        enabled = False
+    End Sub
+
+
+    Public Function GetCustomUI(ByVal ribbonID As String) As String Implements Office.IRibbonExtensibility.GetCustomUI
+        Return GetResourceText("MoodleQuestions.MoodleQuestions.xml")
+    End Function
+    ' inspired by http://www.mztools.com/articles/2012/MZ2012016.aspx
+    Private Class MQIconConverter
+        Inherits System.Windows.Forms.AxHost
+        Friend Sub New()
+            MyBase.New("{63109182-966B-4e3c-A8B2-8BC4A88D221C}")
+        End Sub
+
+        Friend Function GetIPictureDispFromImage(ByVal img As Drawing.Image) As stdole.IPictureDisp
+
+            Dim picture As stdole.IPictureDisp
+
+            picture = CType(AxHost.GetIPictureDispFromPicture(img), stdole.IPictureDisp)
+
+            Return picture
+
+        End Function
+
+    End Class
+
+
+
+#Region "Ribbon Callbacks"
+    'Create callback methods here. For more information about adding callback methods, visit http://go.microsoft.com/fwlink/?LinkID=271226
+    Public Sub Ribbon_Load(ByVal ribbonUI As Office.IRibbonUI)
+        Me.ribbon = ribbonUI
+        Globals.ThisDocument.ribbon = Me.ribbon
+        Me.ribbon.ActivateTab("MoodleQuestions") 'Make Moodle Questions toolbar active on startup
+        updateVersionInfo()
+        ' move cursor to second paragraph, after category (by default)
+        With Globals.ThisDocument.Application.Selection.Range
+            .Move(Unit:=WdUnits.wdParagraph, Count:=+1)
+            .Select()
+        End With
+
+        CheckStyle()
+
+        undoRecord = Globals.ThisDocument.Application.UndoRecord
+    End Sub
+
+    Public Function OnLoadImage(imageId As String) As IPictureDisp
+        Dim tempImage As stdole.IPictureDisp = Nothing
+        'load image from resources file
+        'tempImage = Microsoft.VisualBasic.Compatibility.VB6.Support.ImageToIPicture(My.Resources.RibbonIcons.ResourceManager.GetObject(imageId))
+        tempImage = imageToPictureDispConverter.GetIPictureDispFromImage(My.Resources.RibbonIcons.ResourceManager.GetObject(imageId))
+        Return tempImage
+
+    End Function
+
+    Public Sub CheckStyle()
+        Dim styleCollection As New Microsoft.VisualBasic.Collection()
+        Dim defaultstyleCollection As New Microsoft.VisualBasic.Collection()
+
+        styleCollection.Add("Q Multi Choice")
+        styleCollection.Add("Q Multi Choice FixAnswer")
+        styleCollection.Add("Q Matching")
+        styleCollection.Add("A Correct Choice")
+        styleCollection.Add("A Incorrect Choice")
+        styleCollection.Add("Q True Statement")
+        styleCollection.Add("Q False Statement")
+        styleCollection.Add("Q Missing Word")
+        styleCollection.Add("A Feedback")
+        styleCollection.Add("Q Category")
+        styleCollection.Add("Q Short Answer")
+        styleCollection.Add("A Short Answer")
+        styleCollection.Add("Q Numerical")
+        styleCollection.Add("Q Matching FixAnswer")
+        styleCollection.Add("A Matching Left")
+        styleCollection.Add("A Matching Right")
+        styleCollection.Add("MissingWord")
+        styleCollection.Add("Questionname")
+        styleCollection.Add("Q Essay")
+        styleCollection.Add("A Feedback FS")
+        styleCollection.Add("A Feedback TS")
+
+        For Each styleName In Globals.ThisDocument.Styles
+            defaultstyleCollection.Add(styleName.NameLocal)
+        Next
+
+        Dim found As Boolean = False
+        For Each item As String In styleCollection
+            For Each itemDef As String In defaultstyleCollection
+                If item = itemDef Then
+                    found = True
+                    Exit For
+                End If
+            Next
+            If found = False Then
+                MsgBox("Missing style: " + item)
+                ' Exit For
+            End If
+            found = False
+        Next
+
+    End Sub
+
+    '''''BUTTON callbacks
+
+    Public Sub displayVersionInfo(ByVal control As Office.IRibbonControl)
+        MsgBox("About MoodleQuestions..." & vbCrLf & "Published version: " & VERSION_INFO & vbCrLf & SOURCE_CODE_URL)
+    End Sub
+
+
+    ' Change the button states in the Ribbon
+    Public Function GetEnabled(ByVal control As Office.IRibbonControl) As Boolean
+        System.Diagnostics.Debug.WriteLine("caught GetEnabled for " + control.Id)
+        Dim isEnabled As Boolean = False
+        Dim selectionStyleName As String = getSelectionStyleName()
+        Select Case control.Id
+            Case "shuffleanswers"
+                If (getSelectionStyleName() = STYLE_FEEDBACK Or _
+                    getSelectionStyleName() = STYLE_CORRECT_MC_ANSWER Or _
+                    getSelectionStyleName() = STYLE_INCORRECT_MC_ANSWER Or _
+                    getSelectionStyleName() = STYLE_RIGHT_MATCH Or _
+                    getSelectionStyleName() = STYLE_LEFT_MATCH) Then
+
+                    Dim aRange As Range = Globals.ThisDocument.Application.Selection.Paragraphs(1).Range
+
+                    Do
+                        With aRange
+                            .EndOf(Unit:=WdUnits.wdParagraph, Extend:=WdMovementType.wdMove)
+                            .Move(Unit:=WdUnits.wdParagraph, Count:=-1)
+                        End With
+                    Loop Until ((aRange.Style.NameLocal <> STYLE_RIGHT_MATCH And _
+                                 aRange.Style.NameLocal <> STYLE_LEFT_MATCH And _
+                                 aRange.Style.NameLocal <> STYLE_CORRECT_MC_ANSWER And _
+                                 aRange.Style.NameLocal <> STYLE_INCORRECT_MC_ANSWER And _
+                                 aRange.Style.NameLocal <> STYLE_FEEDBACK) Or _
+                                aRange.Style.NameLocal = STYLE_MATCHINGQ_FIXANSWER Or _
+                                aRange.Style.NameLocal = STYLE_MULTICHOICEQ_FIXANSWER Or _
+                                aRange.Style.NameLocal = STYLE_MATCHINGQ Or _
+                                aRange.Style.NameLocal = STYLE_MULTICHOICEQ)
+                    selectionStyleName = aRange.Style.NameLocal
+                End If
+
+                isEnabled = (selectionStyleName = STYLE_MULTICHOICEQ Or _
+                             selectionStyleName = STYLE_MULTICHOICEQ_FIXANSWER Or _
+                             selectionStyleName = STYLE_MATCHINGQ Or _
+                             selectionStyleName = STYLE_MATCHINGQ_FIXANSWER)
+            Case "fixanswers"
+                If (getSelectionStyleName() = STYLE_FEEDBACK Or _
+                    getSelectionStyleName() = STYLE_CORRECT_MC_ANSWER Or _
+                    getSelectionStyleName() = STYLE_INCORRECT_MC_ANSWER Or _
+                    getSelectionStyleName() = STYLE_RIGHT_MATCH Or _
+                    getSelectionStyleName() = STYLE_LEFT_MATCH) Then
+
+                    Dim aRange As Range = Globals.ThisDocument.Application.Selection.Paragraphs(1).Range
+                    Dim aMove As Integer = 0
+
+                    Do
+                        With aRange
+                            .EndOf(Unit:=WdUnits.wdParagraph, Extend:=WdMovementType.wdMove)
+                            .Move(Unit:=WdUnits.wdParagraph, Count:=-1)
+                        End With
+                    Loop Until ((aRange.Style.NameLocal <> STYLE_RIGHT_MATCH And _
+                                 aRange.Style.NameLocal <> STYLE_LEFT_MATCH And _
+                                 aRange.Style.NameLocal <> STYLE_CORRECT_MC_ANSWER And _
+                                 aRange.Style.NameLocal <> STYLE_INCORRECT_MC_ANSWER And _
+                                 aRange.Style.NameLocal <> STYLE_FEEDBACK) Or _
+                                aRange.Style.NameLocal = STYLE_MATCHINGQ_FIXANSWER Or _
+                                aRange.Style.NameLocal = STYLE_MULTICHOICEQ_FIXANSWER Or _
+                                aRange.Style.NameLocal = STYLE_MATCHINGQ Or _
+                                aRange.Style.NameLocal = STYLE_MULTICHOICEQ)
+                    selectionStyleName = aRange.Style.NameLocal
+                End If
+
+                isEnabled = (selectionStyleName = STYLE_MULTICHOICEQ Or _
+                             selectionStyleName = STYLE_MULTICHOICEQ_FIXANSWER Or _
+                             selectionStyleName = STYLE_MATCHINGQ Or _
+                             selectionStyleName = STYLE_MATCHINGQ_FIXANSWER)
+
+                
+            Case "MarkTrueFalse"
+                isEnabled = (selectionStyleName = STYLE_CORRECT_MC_ANSWER Or _
+                             selectionStyleName = STYLE_INCORRECT_MC_ANSWER Or _
+                             selectionStyleName = STYLE_TRUESTATEMENT Or _
+                             selectionStyleName = STYLE_FALSESTATEMENT)
+            Case "MarkMissingWord"
+                isEnabled = (selectionStyleName = STYLE_MISSINGWORDQ)
+            Case "importImage"
+                isEnabled = (selectionStyleName = STYLE_MULTICHOICEQ Or _
+                             selectionStyleName = STYLE_CORRECT_MC_ANSWER Or _
+                            selectionStyleName = STYLE_INCORRECT_MC_ANSWER)
+            Case "questionTitle"
+                isEnabled = (getSelectionStyleName() = STYLE_MULTICHOICEQ Or _
+                             getSelectionStyleName() = STYLE_FEEDBACK Or _
+                             isSelectionNormalStyle())
+            Case "feedback"
+                isEnabled = (isSelectionNormalStyle())
+            Case "MCQAddTrueAnswer"
+                isEnabled = (selectionStyleName = STYLE_FEEDBACK Or _
+                             selectionStyleName = STYLE_MULTICHOICEQ Or _
+                              selectionStyleName = STYLE_CORRECT_MC_ANSWER Or _
+                               selectionStyleName = STYLE_INCORRECT_MC_ANSWER Or _
+                             selectionStyleName = STYLE_MULTICHOICEQ_FIXANSWER)
+            Case "MCQAddFalseAnswer"
+                isEnabled = (selectionStyleName = STYLE_FEEDBACK Or _
+                             selectionStyleName = STYLE_MULTICHOICEQ Or _
+                             selectionStyleName = STYLE_CORRECT_MC_ANSWER Or _
+                             selectionStyleName = STYLE_INCORRECT_MC_ANSWER Or _
+                             selectionStyleName = STYLE_MULTICHOICEQ_FIXANSWER)
+            Case "MatchingAddAnswer"
+                isEnabled = (selectionStyleName = STYLE_MATCHINGQ Or _
+                             selectionStyleName = STYLE_MATCHINGQ_FIXANSWER Or _
+                             selectionStyleName = STYLE_RIGHT_MATCH Or _
+                             selectionStyleName = STYLE_LEFT_MATCH)
+
+        End Select
+        Return isEnabled
+    End Function
+
+    ' Change the pressed states in the Ribbon for the toggle button
+    Public Function GetPressed(ByVal control As Office.IRibbonControl) As Boolean
+        System.Diagnostics.Debug.WriteLine("caught GetPressed for " + control.Id)
+        Dim isPressed As Boolean = False
+        Dim selectionStyleName As String = getSelectionStyleName()
+        Select Case control.Id
+            Case "shuffleanswers"
+
+                If (getSelectionStyleName() = STYLE_FEEDBACK Or _
+                   getSelectionStyleName() = STYLE_CORRECT_MC_ANSWER Or _
+                   getSelectionStyleName() = STYLE_INCORRECT_MC_ANSWER Or _
+                   getSelectionStyleName() = STYLE_RIGHT_MATCH Or _
+                   getSelectionStyleName() = STYLE_LEFT_MATCH) Then
+
+                    Dim aRange As Range = Globals.ThisDocument.Application.Selection.Paragraphs(1).Range
+
+                    Do
+                        With aRange
+                            .EndOf(Unit:=WdUnits.wdParagraph, Extend:=WdMovementType.wdMove)
+                            .Move(Unit:=WdUnits.wdParagraph, Count:=-1)
+                        End With
+                    Loop Until ((aRange.Style.NameLocal <> STYLE_RIGHT_MATCH And _
+                                 aRange.Style.NameLocal <> STYLE_LEFT_MATCH And _
+                                 aRange.Style.NameLocal <> STYLE_CORRECT_MC_ANSWER And _
+                                 aRange.Style.NameLocal <> STYLE_INCORRECT_MC_ANSWER And _
+                                 aRange.Style.NameLocal <> STYLE_FEEDBACK) Or _
+                                aRange.Style.NameLocal = STYLE_MATCHINGQ_FIXANSWER Or _
+                                aRange.Style.NameLocal = STYLE_MULTICHOICEQ_FIXANSWER Or _
+                                aRange.Style.NameLocal = STYLE_MATCHINGQ Or _
+                                aRange.Style.NameLocal = STYLE_MULTICHOICEQ)
+                    selectionStyleName = aRange.Style.NameLocal
+                End If
+
+                isPressed = (selectionStyleName = STYLE_MULTICHOICEQ Or _
+                             selectionStyleName = STYLE_MATCHINGQ)
+            Case "fixanswers"
+
+                If (getSelectionStyleName() = STYLE_FEEDBACK Or _
+                  getSelectionStyleName() = STYLE_CORRECT_MC_ANSWER Or _
+                  getSelectionStyleName() = STYLE_INCORRECT_MC_ANSWER Or _
+                  getSelectionStyleName() = STYLE_RIGHT_MATCH Or _
+                  getSelectionStyleName() = STYLE_LEFT_MATCH) Then
+
+                    Dim aRange As Range = Globals.ThisDocument.Application.Selection.Paragraphs(1).Range
+
+                    Do
+                        With aRange
+                            .EndOf(Unit:=WdUnits.wdParagraph, Extend:=WdMovementType.wdMove)
+                            .Move(Unit:=WdUnits.wdParagraph, Count:=-1)
+                        End With
+                    Loop Until ((aRange.Style.NameLocal <> STYLE_RIGHT_MATCH And _
+                                 aRange.Style.NameLocal <> STYLE_LEFT_MATCH And _
+                                 aRange.Style.NameLocal <> STYLE_CORRECT_MC_ANSWER And _
+                                 aRange.Style.NameLocal <> STYLE_INCORRECT_MC_ANSWER And _
+                                 aRange.Style.NameLocal <> STYLE_FEEDBACK) Or _
+                                aRange.Style.NameLocal = STYLE_MATCHINGQ_FIXANSWER Or _
+                                aRange.Style.NameLocal = STYLE_MULTICHOICEQ_FIXANSWER Or _
+                                aRange.Style.NameLocal = STYLE_MATCHINGQ Or _
+                                aRange.Style.NameLocal = STYLE_MULTICHOICEQ)
+                    selectionStyleName = aRange.Style.NameLocal
+                End If
+
+                isPressed = (selectionStyleName = STYLE_MULTICHOICEQ_FIXANSWER Or _
+                             selectionStyleName = STYLE_MATCHINGQ_FIXANSWER)
+        End Select
+        Return isPressed
+    End Function
+
+    ' Add Multiple Choice Question to the end of the active document
+    Public Sub AddMultipleChoiceQText()
+        InsertParagraphAfterCurrentParagraph(My.Resources.RibbonString.MultipleChoiceQuestionText, STYLE_MULTICHOICEQ)
+        InsertParagraphAfterCurrentParagraph(My.Resources.RibbonString.CorrectChoiceText, STYLE_CORRECT_MC_ANSWER)
+        InsertParagraphAfterCurrentParagraph(My.Resources.RibbonString.FeedbackCorrectText, STYLE_FEEDBACK)
+        InsertParagraphAfterCurrentParagraph(My.Resources.RibbonString.IncorrectChoiceText, STYLE_INCORRECT_MC_ANSWER)
+        InsertParagraphAfterCurrentParagraph(My.Resources.RibbonString.FeedbackIncorrectText, STYLE_FEEDBACK)
+        InsertParagraphAfterCurrentParagraph(My.Resources.RibbonString.IncorrectChoiceText, STYLE_INCORRECT_MC_ANSWER)
+        AddParagraphOfStyle(STYLE_FEEDBACK, My.Resources.RibbonString.FeedbackIncorrectText)
+
+    End Sub
+
+
+    Public Sub AddMultipleChoiceQ(ByVal control As Office.IRibbonControl)
+
+        undoRecord.StartCustomRecord("Insert multiple choice question")
+
+        If isSelectionNormalStyle() Then
+            AddMultipleChoiceQText()
+        Else
+
+            Dim min As Integer = Math.Min(StyleUsed(STYLE_CATEGORYQ), QuestionStyleFound(styleList))
+            Dim max As Integer = Math.Max(StyleUsed(STYLE_CATEGORYQ), QuestionStyleFound(styleList))
+            'both styles not found
+            If StyleUsed(STYLE_CATEGORYQ) = -1 And QuestionStyleFound(styleList) = -1 Then
+                moveCursorToEndOfDocument()
+                AddMultipleChoiceQText()
+                'one of the two style found
+            ElseIf min = -1 Then
+                InsertParagraphAfterCurrentParagraph(My.Resources.RibbonString.MultipleChoiceQuestionText, STYLE_MULTICHOICEQ)
+                InsertParagraphAfterCurrentParagraph(My.Resources.RibbonString.CorrectChoiceText, STYLE_CORRECT_MC_ANSWER)
+                InsertParagraphAfterCurrentParagraph(My.Resources.RibbonString.FeedbackCorrectText, STYLE_FEEDBACK)
+                InsertParagraphAfterCurrentParagraph(My.Resources.RibbonString.IncorrectChoiceText, STYLE_INCORRECT_MC_ANSWER)
+                InsertParagraphAfterCurrentParagraph(My.Resources.RibbonString.FeedbackIncorrectText, STYLE_FEEDBACK)
+                InsertParagraphAfterCurrentParagraph(My.Resources.RibbonString.IncorrectChoiceText, STYLE_INCORRECT_MC_ANSWER)
+                InsertParagraphAfterCurrentParagraph(My.Resources.RibbonString.FeedbackIncorrectText, STYLE_FEEDBACK)
+            Else 'both styles found
+                InsertParagraphAfterCurrentParagraph(My.Resources.RibbonString.MultipleChoiceQuestionText, STYLE_MULTICHOICEQ)
+                InsertParagraphAfterCurrentParagraph(My.Resources.RibbonString.CorrectChoiceText, STYLE_CORRECT_MC_ANSWER)
+                InsertParagraphAfterCurrentParagraph(My.Resources.RibbonString.FeedbackCorrectText, STYLE_FEEDBACK)
+                InsertParagraphAfterCurrentParagraph(My.Resources.RibbonString.IncorrectChoiceText, STYLE_INCORRECT_MC_ANSWER)
+                InsertParagraphAfterCurrentParagraph(My.Resources.RibbonString.FeedbackIncorrectText, STYLE_FEEDBACK)
+                InsertParagraphAfterCurrentParagraph(My.Resources.RibbonString.IncorrectChoiceText, STYLE_INCORRECT_MC_ANSWER)
+                InsertParagraphAfterCurrentParagraph(My.Resources.RibbonString.FeedbackIncorrectText, STYLE_FEEDBACK)
+            End If
+        End If
+        undoRecord.EndCustomRecord()
+
+    End Sub
+
+    Public Sub AddCategoryQ(ByVal control As Office.IRibbonControl)
+        undoRecord.StartCustomRecord("Insert category")
+
+        If isSelectionNormalStyle() Then
+            InsertParagraphAfterCurrentParagraph(My.Resources.RibbonString.CategoryQText, STYLE_CATEGORYQ)
+            '  AddParagraphOfStyle(STYLE_CATEGORYQ, "Question_Category/Question_Subcategory")
+        Else
+            Dim min As Integer = Math.Min(StyleUsed(STYLE_CATEGORYQ), QuestionStyleFound(styleList))
+            Dim max As Integer = Math.Max(StyleUsed(STYLE_CATEGORYQ), QuestionStyleFound(styleList))
+            'both styles not found
+            If StyleUsed(STYLE_CATEGORYQ) = -1 And QuestionStyleFound(styleList) = -1 Then
+                moveCursorToEndOfDocument()
+                InsertParagraphAfterCurrentParagraph(My.Resources.RibbonString.CategoryQText, STYLE_CATEGORYQ)
+                'one of the two style found
+            ElseIf min = -1 Then
+                InsertParagraphOfStyleInSelectedRangeBefore(STYLE_CATEGORYQ, My.Resources.RibbonString.CategoryQText, max)
+            Else 'both styles found
+                InsertParagraphOfStyleInSelectedRangeBefore(STYLE_CATEGORYQ, My.Resources.RibbonString.CategoryQText, min)
+            End If
+        End If
+        undoRecord.EndCustomRecord()
+    End Sub
+
+    ' Add Matching Question to the end of the active document
+    Public Sub AddMatchingQ(ByVal control As Office.IRibbonControl)
+        undoRecord.StartCustomRecord("Insert matching question")
+
+        If isSelectionNormalStyle() Then
+            InsertParagraphAfterCurrentParagraph(My.Resources.RibbonString.MatchingQText, STYLE_MATCHINGQ)
+            InsertParagraphAfterCurrentParagraph(My.Resources.RibbonString.LeftMatchText, STYLE_LEFT_MATCH)
+            InsertParagraphAfterCurrentParagraph(My.Resources.RibbonString.RightMatchText, STYLE_RIGHT_MATCH)
+            InsertParagraphAfterCurrentParagraph(My.Resources.RibbonString.LeftMatchText, STYLE_LEFT_MATCH)
+            InsertParagraphAfterCurrentParagraph(My.Resources.RibbonString.RightMatchText, STYLE_RIGHT_MATCH)
+        Else
+            Dim min As Integer = Math.Min(StyleUsed(STYLE_CATEGORYQ), QuestionStyleFound(styleList))
+            Dim max As Integer = Math.Max(StyleUsed(STYLE_CATEGORYQ), QuestionStyleFound(styleList))
+
+            'both styles not found
+            If StyleUsed(STYLE_CATEGORYQ) = -1 And QuestionStyleFound(styleList) = -1 Then
+                moveCursorToEndOfDocument()
+                InsertParagraphAfterCurrentParagraph(My.Resources.RibbonString.MatchingQText, STYLE_MATCHINGQ)
+                InsertParagraphAfterCurrentParagraph(My.Resources.RibbonString.LeftMatchText, STYLE_LEFT_MATCH)
+                InsertParagraphAfterCurrentParagraph(My.Resources.RibbonString.RightMatchText, STYLE_RIGHT_MATCH)
+                InsertParagraphAfterCurrentParagraph(My.Resources.RibbonString.LeftMatchText, STYLE_LEFT_MATCH)
+                InsertParagraphAfterCurrentParagraph(My.Resources.RibbonString.RightMatchText, STYLE_RIGHT_MATCH)
+                'one of the two style found
+            ElseIf min = -1 Then
+                InsertParagraphOfStyleInSelectedRangeBefore(STYLE_MATCHINGQ, My.Resources.RibbonString.MatchingQText, max)
+                InsertParagraphAfterCurrentParagraph(My.Resources.RibbonString.LeftMatchText, STYLE_LEFT_MATCH)
+                InsertParagraphAfterCurrentParagraph(My.Resources.RibbonString.RightMatchText, STYLE_RIGHT_MATCH)
+                InsertParagraphAfterCurrentParagraph(My.Resources.RibbonString.LeftMatchText, STYLE_LEFT_MATCH)
+                InsertParagraphAfterCurrentParagraph(My.Resources.RibbonString.RightMatchText, STYLE_RIGHT_MATCH)
+            Else  'both styles found
+                InsertParagraphOfStyleInSelectedRangeBefore(STYLE_MATCHINGQ, My.Resources.RibbonString.MatchingQText, min)
+                InsertParagraphAfterCurrentParagraph(My.Resources.RibbonString.LeftMatchText, STYLE_LEFT_MATCH)
+                InsertParagraphAfterCurrentParagraph(My.Resources.RibbonString.RightMatchText, STYLE_RIGHT_MATCH)
+                InsertParagraphAfterCurrentParagraph(My.Resources.RibbonString.LeftMatchText, STYLE_LEFT_MATCH)
+                InsertParagraphAfterCurrentParagraph(My.Resources.RibbonString.RightMatchText, STYLE_RIGHT_MATCH)
+            End If
+        End If
+        undoRecord.EndCustomRecord()
+    End Sub
+
+    ' Add Numerical Question to the end of the active document
+    Public Sub AddNumericalQ(ByVal control As Office.IRibbonControl)
+        undoRecord.StartCustomRecord("Insert numerical question")
+        Dim questionText As String = My.Resources.RibbonString.NumericalQText
+        If isSelectionNormalStyle() Then
+            InsertParagraphAfterCurrentParagraph(questionText, STYLE_NUMERICALQ)
+        Else
+            Dim min As Integer = Math.Min(StyleUsed(STYLE_CATEGORYQ), QuestionStyleFound(styleList))
+            Dim max As Integer = Math.Max(StyleUsed(STYLE_CATEGORYQ), QuestionStyleFound(styleList))
+
+            'both styles not found
+            If StyleUsed(STYLE_CATEGORYQ) = -1 And QuestionStyleFound(styleList) = -1 Then
+                moveCursorToEndOfDocument()
+                InsertParagraphAfterCurrentParagraph(questionText, STYLE_NUMERICALQ)
+                'one of the two style found
+            ElseIf min = -1 Then
+                InsertParagraphOfStyleInSelectedRangeBefore(STYLE_NUMERICALQ, questionText, max)
+            Else  'both styles found
+                InsertParagraphOfStyleInSelectedRangeBefore(STYLE_NUMERICALQ, questionText, min)
+            End If
+        End If
+        undoRecord.EndCustomRecord()
+    End Sub
+
+
+    ' Add Short Answer Question to the end of the active document
+    Public Sub AddShortAnswerQ(ByVal control As Office.IRibbonControl)
+        Dim questionText As String = My.Resources.RibbonString.ShortAnswerQText
+        Dim answerText As String = My.Resources.RibbonString.ShortAnswerAText
+        undoRecord.StartCustomRecord("Insert short-answer question")
+        If isSelectionNormalStyle() Then
+            InsertParagraphAfterCurrentParagraph(questionText, STYLE_SHORTANSWERQ)
+            InsertParagraphAfterCurrentParagraph(answerText, STYLE_SHORT_ANSWER)
+        Else
+            Dim min As Integer = Math.Min(StyleUsed(STYLE_CATEGORYQ), QuestionStyleFound(styleList))
+            Dim max As Integer = Math.Max(StyleUsed(STYLE_CATEGORYQ), QuestionStyleFound(styleList))
+
+            'both styles not found
+            If StyleUsed(STYLE_CATEGORYQ) = -1 And QuestionStyleFound(styleList) = -1 Then
+                moveCursorToEndOfDocument()
+                InsertParagraphAfterCurrentParagraph(questionText, STYLE_SHORTANSWERQ)
+                InsertParagraphAfterCurrentParagraph(answerText, STYLE_SHORT_ANSWER)
+                'one of the two style found
+            ElseIf min = -1 Then
+                InsertParagraphOfStyleInSelectedRangeBefore(STYLE_SHORTANSWERQ, questionText, max)
+                InsertParagraphAfterCurrentParagraph(answerText, STYLE_SHORT_ANSWER)
+            Else  'both styles found
+                InsertParagraphOfStyleInSelectedRangeBefore(STYLE_SHORTANSWERQ, questionText, min)
+                InsertParagraphAfterCurrentParagraph(answerText, STYLE_SHORT_ANSWER)
+            End If
+        End If
+        undoRecord.EndCustomRecord()
+    End Sub
+
+    ' Add Missing Word Question
+    Public Sub AddMissingWordQ(ByVal control As Office.IRibbonControl)
+        undoRecord.StartCustomRecord("Insert missing-word question")
+
+        If isSelectionNormalStyle() Then
+            InsertParagraphAfterCurrentParagraph(My.Resources.RibbonString.MissingWordQText, STYLE_MISSINGWORDQ)
+        Else
+            Dim min As Integer = Math.Min(StyleUsed(STYLE_CATEGORYQ), QuestionStyleFound(styleList))
+            Dim max As Integer = Math.Max(StyleUsed(STYLE_CATEGORYQ), QuestionStyleFound(styleList))
+
+            'both styles not found
+            If StyleUsed(STYLE_CATEGORYQ) = -1 And QuestionStyleFound(styleList) = -1 Then
+                moveCursorToEndOfDocument()
+                InsertParagraphAfterCurrentParagraph(My.Resources.RibbonString.MissingWordQText, STYLE_MISSINGWORDQ)
+                'one of the two style found
+            ElseIf min = -1 Then
+                InsertParagraphOfStyleInSelectedRangeBefore(STYLE_MISSINGWORDQ, My.Resources.RibbonString.MissingWordQText, max)
+            Else  'both styles found
+                InsertParagraphOfStyleInSelectedRangeBefore(STYLE_MISSINGWORDQ, My.Resources.RibbonString.MissingWordQText, min)
+            End If
+        End If
+        undoRecord.EndCustomRecord()
+    End Sub
+
+    ' Add an Essay
+    Public Sub AddEssay(ByVal control As Office.IRibbonControl)
+        undoRecord.StartCustomRecord("Insert essay question")
+
+        If isSelectionNormalStyle() Then
+            InsertParagraphAfterCurrentParagraph(My.Resources.RibbonString.EssayQText, STYLE_ESSAY)
+        Else
+            Dim min As Integer = Math.Min(StyleUsed(STYLE_CATEGORYQ), QuestionStyleFound(styleList))
+            Dim max As Integer = Math.Max(StyleUsed(STYLE_CATEGORYQ), QuestionStyleFound(styleList))
+
+            'both styles not found
+            If StyleUsed(STYLE_CATEGORYQ) = -1 And QuestionStyleFound(styleList) = -1 Then
+                moveCursorToEndOfDocument()
+                InsertParagraphAfterCurrentParagraph(My.Resources.RibbonString.EssayQText, STYLE_ESSAY)
+                'one of the two style found
+            ElseIf min = -1 Then
+                InsertParagraphOfStyleInSelectedRangeBefore(STYLE_ESSAY, My.Resources.RibbonString.EssayQText, max)
+            Else  'both styles found
+                InsertParagraphOfStyleInSelectedRangeBefore(STYLE_ESSAY, My.Resources.RibbonString.EssayQText, min)
+            End If
+        End If
+        undoRecord.EndCustomRecord()
+    End Sub
+    Public Sub ToggleMissingWord(ByVal control As Office.IRibbonControl)
+
+        ' Only applies to questions of STYLE_MISSINGWORDQ
+        If (getSelectionStyleName() = STYLE_MISSINGWORDQ) Then
+            undoRecord.StartCustomRecord("Toggle missing word")
+
+            ' get only the first word of the selection
+            Dim aRange As Microsoft.Office.Interop.Word.Range = getDocumentSelectionRange()
+            aRange.Start = Globals.ThisDocument.Application.Selection.Words(1).Start
+            aRange.End = Globals.ThisDocument.Application.Selection.Words(1).End
+            ' toggle the style of the word
+            If CType(aRange.Words(1).Style, Word.Style).NameLocal = STYLE_BLANK_WORD Then
+                Globals.ThisDocument.Application.Selection.ClearCharacterStyle()
+            Else
+                aRange.Style = STYLE_BLANK_WORD
+            End If
+            undoRecord.EndCustomRecord()
+
+        Else
+            MsgBox("Select a word inside a Missing-word question first.", vbExclamation)
+        End If
+    End Sub
+
+    'TODO make sure only answers that can get feedback are allowed
+    Public Sub AddAnswerFeedback(ByVal control As Office.IRibbonControl)
+        If getSelectionStyleName() = STYLE_CORRECT_MC_ANSWER Or _
+           getSelectionStyleName() = STYLE_INCORRECT_MC_ANSWER Or _
+           getSelectionStyleName() = STYLE_TRUESTATEMENT Or _
+           getSelectionStyleName() = STYLE_FALSESTATEMENT Or _
+           getSelectionStyleName() = STYLE_SHORT_ANSWER Then
+            InsertParagraphAfterCurrentParagraph("Insert feedback of the previous choice or answer here.", _
+                             STYLE_FEEDBACK)
+            MsgBox("Feedback is")
+
+        Else 'Error: Give Instructions:
+            MsgBox("Feedback is placed at the end of the last possible response. " & vbCr & _
+                   "It doesn't work for True/False questions." & vbCr & _
+                   "Place the cursor on top of the question or answer you are giving feedback for.", vbExclamation)
+        End If
+    End Sub
+    ' Add tolerance
+    Public Sub AddNumericalTolerance(ByVal control As Office.IRibbonControl)
+        If getSelectionStyleName() = STYLE_SHORT_ANSWER Then
+            undoRecord.StartCustomRecord("Set numerical tolerance")
+            InsertParagraphAfterCurrentParagraph("Replace me with Tolerance for the answer as a Decimal. Eg: 0.01", _
+                             STYLE_NUM_TOLERANCE)
+            undoRecord.EndCustomRecord()
+        Else 'Error: Give Instructions:
+            MsgBox(" " & vbCr & _
+                   "Place the cursor at the end of the numerical answer.", vbExclamation)
+        End If
+    End Sub
+
+    ' Add QuestionName / Question Title
+    Public Sub AddQuestionTitle(ByVal control As Office.IRibbonControl)
+        If getSelectionStyleName() = STYLE_ANSWERWEIGHT Or _
+           getSelectionStyleName() = STYLE_SHORTANSWERQ Or _
+           getSelectionStyleName() = STYLE_MISSINGWORDQ Or _
+           getSelectionStyleName() = STYLE_CORRECT_MC_ANSWER Or _
+           getSelectionStyleName() = STYLE_NUM_TOLERANCE Or _
+           getSelectionStyleName() = STYLE_INCORRECT_MC_ANSWER Or _
+           getSelectionStyleName() = STYLE_TRUESTATEMENT Or _
+           getSelectionStyleName() = STYLE_SHORT_ANSWER Or _
+           getSelectionStyleName() = STYLE_FALSESTATEMENT Or _
+           getSelectionStyleName() = STYLE_RIGHT_MATCH Or _
+           getSelectionStyleName() = STYLE_BLANK_WORD Then
+            undoRecord.StartCustomRecord("Insert question title")
+            InsertParagraphAfterCurrentParagraph(My.Resources.RibbonString.QuestionNameText, STYLE_QUESTIONNAME)
+            undoRecord.EndCustomRecord()
+        Else 'Error: Give Instructions:
+            MsgBox("Feedback to insert at the end of the last response selected. " & vbCr & _
+                   "The title must appear before the feedback" & vbCr & _
+                   "Place the cursor at the end of the last line selected", vbExclamation)
+        End If
+    End Sub
+
+
+    ' Add a true statement of the true-false question
+    Public Sub AddTrueStatement(ByVal control As Office.IRibbonControl)
+        undoRecord.StartCustomRecord("Insert true statement")
+        If isSelectionNormalStyle() Then
+            InsertParagraphAfterCurrentParagraph(My.Resources.RibbonString.TrueStatementText, STYLE_TRUESTATEMENT)
+            InsertParagraphAfterCurrentParagraph(My.Resources.RibbonString.FeedbackTrueStatementTrueText, STYLE_FEEDBACK_TS)
+            InsertParagraphAfterCurrentParagraph(My.Resources.RibbonString.FeedbackTrueStatementFalseText, STYLE_FEEDBACK_FS)
+        Else
+            Dim min As Integer = Math.Min(StyleUsed(STYLE_CATEGORYQ), QuestionStyleFound(styleList))
+            Dim max As Integer = Math.Max(StyleUsed(STYLE_CATEGORYQ), QuestionStyleFound(styleList))
+
+            'both styles not found
+            If StyleUsed(STYLE_CATEGORYQ) = -1 And QuestionStyleFound(styleList) = -1 Then
+                moveCursorToEndOfDocument()
+                InsertParagraphAfterCurrentParagraph(My.Resources.RibbonString.TrueStatementText, STYLE_TRUESTATEMENT)
+                InsertParagraphAfterCurrentParagraph(My.Resources.RibbonString.FeedbackTrueStatementTrueText, STYLE_FEEDBACK_TS)
+                InsertParagraphAfterCurrentParagraph(My.Resources.RibbonString.FeedbackTrueStatementFalseText, STYLE_FEEDBACK_FS)
+                'one of the two style found
+            ElseIf min = -1 Then
+                InsertParagraphOfStyleInSelectedRangeBefore(STYLE_TRUESTATEMENT, My.Resources.RibbonString.TrueStatementText, max)
+                InsertParagraphAfterCurrentParagraph(My.Resources.RibbonString.FeedbackTrueStatementTrueText, STYLE_FEEDBACK_TS)
+                InsertParagraphAfterCurrentParagraph(My.Resources.RibbonString.FeedbackTrueStatementFalseText, STYLE_FEEDBACK_FS)
+            Else  'both styles found
+                InsertParagraphOfStyleInSelectedRangeBefore(STYLE_TRUESTATEMENT, My.Resources.RibbonString.TrueStatementText, min)
+                InsertParagraphAfterCurrentParagraph(My.Resources.RibbonString.FeedbackTrueStatementTrueText, STYLE_FEEDBACK_TS)
+                InsertParagraphAfterCurrentParagraph(My.Resources.RibbonString.FeedbackTrueStatementFalseText, STYLE_FEEDBACK_FS)
+            End If
+        End If
+        undoRecord.EndCustomRecord()
+    End Sub
+
+    ' Add a false statement of the true-false question
+    Public Sub AddFalseStatement(ByVal control As Office.IRibbonControl)
+        undoRecord.StartCustomRecord("Insert false statement")
+        If isSelectionNormalStyle() Then
+            InsertParagraphAfterCurrentParagraph(My.Resources.RibbonString.FalseStatementText, STYLE_FALSESTATEMENT)
+            InsertParagraphAfterCurrentParagraph(My.Resources.RibbonString.FeedbackFalseStatementTrueText, STYLE_FEEDBACK_TS)
+            InsertParagraphAfterCurrentParagraph(My.Resources.RibbonString.FeedbackFalseStatementFalseText, STYLE_FEEDBACK_FS)
+        Else
+            Dim min As Integer = Math.Min(StyleUsed(STYLE_CATEGORYQ), QuestionStyleFound(styleList))
+            Dim max As Integer = Math.Max(StyleUsed(STYLE_CATEGORYQ), QuestionStyleFound(styleList))
+
+            'both styles not found
+            If StyleUsed(STYLE_CATEGORYQ) = -1 And QuestionStyleFound(styleList) = -1 Then
+                moveCursorToEndOfDocument()
+                InsertParagraphAfterCurrentParagraph(My.Resources.RibbonString.FalseStatementText, STYLE_FALSESTATEMENT)
+                InsertParagraphAfterCurrentParagraph(My.Resources.RibbonString.FeedbackFalseStatementTrueText, STYLE_FEEDBACK_TS)
+                InsertParagraphAfterCurrentParagraph(My.Resources.RibbonString.FeedbackFalseStatementFalseText, STYLE_FEEDBACK_FS)
+                'one of the two style found
+            ElseIf min = -1 Then
+                InsertParagraphOfStyleInSelectedRangeBefore(STYLE_FALSESTATEMENT, My.Resources.RibbonString.FalseStatementText, max)
+                InsertParagraphAfterCurrentParagraph(My.Resources.RibbonString.FeedbackFalseStatementTrueText, STYLE_FEEDBACK_TS)
+                InsertParagraphAfterCurrentParagraph(My.Resources.RibbonString.FeedbackFalseStatementFalseText, STYLE_FEEDBACK_FS)
+            Else  'both styles found
+                InsertParagraphOfStyleInSelectedRangeBefore(STYLE_FALSESTATEMENT, My.Resources.RibbonString.FalseStatementText, min)
+                InsertParagraphAfterCurrentParagraph(My.Resources.RibbonString.FeedbackFalseStatementTrueText, STYLE_FEEDBACK_TS)
+                InsertParagraphAfterCurrentParagraph(My.Resources.RibbonString.FeedbackFalseStatementFalseText, STYLE_FEEDBACK_FS)
+            End If
+        End If
+        undoRecord.EndCustomRecord()
+
+    End Sub
+
+    ' Add a comment
+    'Public Sub AddComment(ByVal control As Office.IRibbonControl)
+    '    AddParagraphOfStyle(STYLE_COMMENT, "")
+    'End Sub
+    Public Sub importImage(ByVal control As Office.IRibbonControl)
+        Dim intChoice As Integer
+        Dim strPath As String
+
+        With Globals.ThisDocument.Application.Selection
+            If getSelectionStyleName() = STYLE_SHORTANSWERQ Or _
+               getSelectionStyleName() = STYLE_MISSINGWORDQ Or _
+               getSelectionStyleName() = STYLE_MULTICHOICEQ Or _
+               getSelectionStyleName() = STYLE_MATCHINGQ Or _
+               getSelectionStyleName() = STYLE_NUMERICALQ Or _
+               getSelectionStyleName() = STYLE_TRUESTATEMENT Or _
+               getSelectionStyleName() = STYLE_FALSESTATEMENT Or _
+               getSelectionStyleName() = STYLE_MULTICHOICEQ_FIXANSWER Or _
+               getSelectionStyleName() = STYLE_MATCHINGQ_FIXANSWER Or _
+               getSelectionStyleName() = STYLE_CORRECT_MC_ANSWER Or _
+               getSelectionStyleName() = STYLE_INCORRECT_MC_ANSWER Then
+                Globals.ThisDocument.Application.Options.ReplaceSelection = False
+
+
+                'only allow the user to select one file 
+                Globals.ThisDocument.Application.FileDialog(Microsoft.Office.Core.MsoFileDialogType.msoFileDialogOpen).AllowMultiSelect = False
+
+                With Globals.ThisDocument.Application.FileDialog(Microsoft.Office.Core.MsoFileDialogType.msoFileDialogOpen)
+                    .AllowMultiSelect = False
+                    .Title = "Select an image"
+                    .Filters.Clear()
+                    .Filters.Add("JPG", "*.JPG")
+                    .Filters.Add("JPEG", "*.JPEG")
+                    .Filters.Add("GIF", "*.GIF")
+                    .Filters.Add("PNG", "*.PNG")
+                    .Filters.Add("All Pictures", "*.GIF; *.JPEG; *.PNG; *.JPG", 1)
+                    .Filters.Add("All Files", "*.*", 2)
+                End With
+
+                'make the file dialog visible to the user 
+                intChoice = Globals.ThisDocument.Application.FileDialog(Microsoft.Office.Core.MsoFileDialogType.msoFileDialogOpen).Show
+                'determine what choice the user made 
+                If intChoice <> 0 Then
+                    'get the file path selected by the user 
+                    strPath = Globals.ThisDocument.Application.FileDialog(Microsoft.Office.Core.MsoFileDialogType.msoFileDialogOpen).SelectedItems().Item(1)
+
+                    undoRecord.StartCustomRecord("Import image")
+                    .TypeText(Text:=(" " & Chr(11)))
+                    .InlineShapes.AddPicture(FileName:=strPath, SaveWithDocument:=True)
+                    undoRecord.EndCustomRecord()
+                End If
+            End If
+        End With
+    End Sub
+
+    Public Sub AddMCQTrueAnswer(ByVal control As Office.IRibbonControl)
+        'Add a correct answer in a multiple choice question.
+        If getSelectionStyleName() = STYLE_CORRECT_MC_ANSWER Or _
+            getSelectionStyleName() = STYLE_INCORRECT_MC_ANSWER Then
+
+            Dim aRange As Range = Globals.ThisDocument.Application.Selection.Paragraphs(1).Range
+
+            With aRange
+                .Move(Unit:=WdUnits.wdParagraph, Count:=1)
+            End With
+            If (aRange.Style.NameLocal = STYLE_FEEDBACK) Then
+                aRange.Select()
+                InsertParagraphAfterCurrentParagraph(My.Resources.RibbonString.CorrectChoiceText, STYLE_CORRECT_MC_ANSWER)
+            End If
+
+        Else
+            InsertParagraphAfterCurrentParagraph(My.Resources.RibbonString.CorrectChoiceText, STYLE_CORRECT_MC_ANSWER)
+        End If
+        InsertParagraphAfterCurrentParagraph(My.Resources.RibbonString.FeedbackCorrectText, STYLE_FEEDBACK)
+    End Sub
+
+    Public Sub AddMCQFalseAnswer(ByVal control As Office.IRibbonControl)
+        'Add a incorrect answer in a multiple choice question.
+        If getSelectionStyleName() = STYLE_CORRECT_MC_ANSWER Or _
+            getSelectionStyleName() = STYLE_INCORRECT_MC_ANSWER Then
+
+            Dim aRange As Range = Globals.ThisDocument.Application.Selection.Paragraphs(1).Range
+
+            With aRange
+                .Move(Unit:=WdUnits.wdParagraph, Count:=1)
+            End With
+            If (aRange.Style.NameLocal = STYLE_FEEDBACK) Then
+                aRange.Select()
+                InsertParagraphAfterCurrentParagraph(My.Resources.RibbonString.IncorrectChoiceText, STYLE_INCORRECT_MC_ANSWER)
+            End If
+
+        Else
+            InsertParagraphAfterCurrentParagraph(My.Resources.RibbonString.IncorrectChoiceText, STYLE_INCORRECT_MC_ANSWER)
+        End If
+        InsertParagraphAfterCurrentParagraph(My.Resources.RibbonString.FeedbackIncorrectText, STYLE_FEEDBACK)
+    End Sub
+
+    Public Sub AddMatchingAnswer(ByVal control As Office.IRibbonControl)
+        'Add a matching answer in a matching question.   
+        If getSelectionStyleName() = STYLE_LEFT_MATCH Then
+
+            Dim aRange As Range = Globals.ThisDocument.Application.Selection.Paragraphs(1).Range
+
+            With aRange
+                .Move(Unit:=WdUnits.wdParagraph, Count:=1)
+            End With
+            If (aRange.Style.NameLocal = STYLE_RIGHT_MATCH) Then
+                aRange.Select()
+                InsertParagraphAfterCurrentParagraph("Insert the item to be match here", STYLE_LEFT_MATCH)
+            End If
+
+        Else
+            InsertParagraphAfterCurrentParagraph("Insert the item to be match here", STYLE_LEFT_MATCH)
+        End If
+        InsertParagraphAfterCurrentParagraph("Insert the matching here", STYLE_RIGHT_MATCH)
+    End Sub
+
+    Public Sub ToggleAnswer(ByVal control As Office.IRibbonControl)
+        'Toggles MCQ answer (right-wrong) or switches true and false statements.
+        Dim theStyle As String = getSelectionStyleName()
+
+        If theStyle = STYLE_CORRECT_MC_ANSWER Then
+            undoRecord.StartCustomRecord("Toggle correct/incorrect choice")
+            setSelectionParagraphStyle(STYLE_INCORRECT_MC_ANSWER)
+            undoRecord.EndCustomRecord()
+        ElseIf theStyle = STYLE_INCORRECT_MC_ANSWER Then
+            undoRecord.StartCustomRecord("Toggle correct/incorrect choice")
+            setSelectionParagraphStyle(STYLE_CORRECT_MC_ANSWER)
+            undoRecord.EndCustomRecord()
+        ElseIf theStyle = STYLE_TRUESTATEMENT Then
+            undoRecord.StartCustomRecord("Toggle true/false question")
+            setSelectionParagraphStyle(STYLE_FALSESTATEMENT)
+            undoRecord.EndCustomRecord()
+        ElseIf theStyle = STYLE_FALSESTATEMENT Then
+            undoRecord.StartCustomRecord("Toggle true/false question")
+            setSelectionParagraphStyle(STYLE_TRUESTATEMENT)
+            undoRecord.EndCustomRecord()
+        Else 'Error: give instructions:
+            MsgBox("This command toggles a statement from True to False." & vbCr & _
+                   "Cursor must be on an answer for Multiple Choice" & vbCr & _
+                   "or on a True or False statement.", vbExclamation)
+        End If
+    End Sub
+
+    Public Sub ChangeToShuffleAnswer(ByVal control As Office.IRibbonControl, ByVal returnValue As Boolean)
+        'Activate the suffle answer for a MCQ or a matching question.
+        Dim aRange As Range = Globals.ThisDocument.Application.Selection.Paragraphs(1).Range
+
+        Do
+            With aRange
+                .EndOf(Unit:=WdUnits.wdParagraph, Extend:=WdMovementType.wdMove)
+                .Move(Unit:=WdUnits.wdParagraph, Count:=-1)
+            End With
+        Loop Until ((aRange.Style.NameLocal <> STYLE_RIGHT_MATCH And _
+                     aRange.Style.NameLocal <> STYLE_LEFT_MATCH And _
+                     aRange.Style.NameLocal <> STYLE_CORRECT_MC_ANSWER And _
+                     aRange.Style.NameLocal <> STYLE_INCORRECT_MC_ANSWER And _
+                     aRange.Style.NameLocal <> STYLE_FEEDBACK) Or _
+                    aRange.Style.NameLocal = STYLE_MATCHINGQ_FIXANSWER Or _
+                    aRange.Style.NameLocal = STYLE_MULTICHOICEQ_FIXANSWER Or _
+                    aRange.Style.NameLocal = STYLE_MATCHINGQ Or _
+                    aRange.Style.NameLocal = STYLE_MULTICHOICEQ)
+
+        If aRange.Style.NameLocal = STYLE_MATCHINGQ_FIXANSWER Then
+            undoRecord.StartCustomRecord("Set random matching order")
+            aRange.Style = STYLE_MATCHINGQ
+            undoRecord.EndCustomRecord()
+        ElseIf aRange.Style.NameLocal = STYLE_MULTICHOICEQ_FIXANSWER Then
+            undoRecord.StartCustomRecord("Set Random multiple choice order")
+            aRange.Style = STYLE_MULTICHOICEQ
+            undoRecord.EndCustomRecord()
+        End If
+        Me.ribbon.Invalidate()
+    End Sub
+
+    Public Sub ChangeToFixAnswer(ByVal control As Office.IRibbonControl, ByVal returnValue As Boolean)
+        'Activate the fix answer for a MCQ or a matching question.
+        Dim aRange As Range = Globals.ThisDocument.Application.Selection.Paragraphs(1).Range
+
+        Do
+            With aRange
+                .EndOf(Unit:=WdUnits.wdParagraph, Extend:=WdMovementType.wdMove)
+                .Move(Unit:=WdUnits.wdParagraph, Count:=-1)
+            End With
+        Loop Until ((aRange.Style.NameLocal <> STYLE_RIGHT_MATCH And _
+                     aRange.Style.NameLocal <> STYLE_LEFT_MATCH And _
+                     aRange.Style.NameLocal <> STYLE_CORRECT_MC_ANSWER And _
+                     aRange.Style.NameLocal <> STYLE_INCORRECT_MC_ANSWER And _
+                     aRange.Style.NameLocal <> STYLE_FEEDBACK) Or _
+                    aRange.Style.NameLocal = STYLE_MATCHINGQ_FIXANSWER Or _
+                    aRange.Style.NameLocal = STYLE_MULTICHOICEQ_FIXANSWER Or _
+                    aRange.Style.NameLocal = STYLE_MATCHINGQ Or _
+                    aRange.Style.NameLocal = STYLE_MULTICHOICEQ)
+
+        If aRange.Style.NameLocal = STYLE_MATCHINGQ Then
+            undoRecord.StartCustomRecord("Set fixed matching order")
+            aRange.Style = STYLE_MATCHINGQ_FIXANSWER
+            undoRecord.EndCustomRecord()
+        ElseIf aRange.Style.NameLocal = STYLE_MULTICHOICEQ Then
+            undoRecord.StartCustomRecord("Set fixed multiple choice order")
+            aRange.Style = STYLE_MULTICHOICEQ_FIXANSWER
+            undoRecord.EndCustomRecord()
+        End If
+        Me.ribbon.Invalidate()
+    End Sub
+
+    Public Sub Check(ByVal control As Office.IRibbonControl)
+        ' Macro recorded on 21.12.2008 by Daniel to Update Header
+        Globals.ThisDocument.Application.ActiveWindow.ActivePane.View.SeekView = WdSeekView.wdSeekCurrentPageHeader
+        Globals.ThisDocument.Application.Selection.Fields.Update()
+        Globals.ThisDocument.Application.Selection.EndKey(Unit:=WdUnits.wdLine)
+        Globals.ThisDocument.Application.Selection.MoveLeft(Unit:=WdUnits.wdCharacter, Count:=1)
+        Globals.ThisDocument.Application.Selection.Fields.Update()
+        Globals.ThisDocument.Application.ActiveWindow.ActivePane.View.SeekView = WdSeekView.wdSeekMainDocument
+
+        If CheckQuestionnaire() Then MsgBox("Now everything is OK", vbInformation)
+    End Sub
+
+    Public Sub Export(ByVal control As Office.IRibbonControl)
+        Dim StatusBar As String
+        StatusBar = "Checking the quiz questions formatting, please wait..."
+        ' Before conversion, document is validated
+        If CheckQuestionnaire() = True Then
+
+            StatusBar = "Converting to Moodle XML format, please wait..."
+            Convert2XML()
+
+        Else
+            MsgBox("The export operation can not be started until everything is OK" & vbCr & "and there is at least one question.", vbCritical, "Error")
+        End If
+    End Sub
+
+#End Region
+
+#Region "Helpers"
+
+    Private Shared Function GetResourceText(ByVal resourceName As String) As String
+        Dim asm As Reflection.Assembly = Reflection.Assembly.GetExecutingAssembly()
+        Dim resourceNames() As String = asm.GetManifestResourceNames()
+        For i As Integer = 0 To resourceNames.Length - 1
+            If String.Compare(resourceName, resourceNames(i), StringComparison.OrdinalIgnoreCase) = 0 Then
+                Using resourceReader As IO.StreamReader = New IO.StreamReader(asm.GetManifestResourceStream(resourceNames(i)))
+                    If resourceReader IsNot Nothing Then
+                        Return resourceReader.ReadToEnd()
+                    End If
+                End Using
+            End If
+        Next
+        Return Nothing
+    End Function
+
+#End Region
+
+    Public VERSION_INFO As String = "unknown"
+    Public Const SOURCE_CODE_URL As String = "https://code.google.com/p/word-moodle-quiz/"
+    ' General purpose styles.
+    Public Const STYLE_NORMAL = Microsoft.Office.Interop.Word.WdBuiltinStyle.wdStyleNormal
+
+    Public Const STYLE_FEEDBACK = "A Feedback"
+    Public Const STYLE_ANSWERWEIGHT = "A Weight"
+
+    Public Const STYLE_CATEGORYQ = "Q Category"
+    Public Const STYLE_SHORTANSWERQ = "Q Short Answer"
+    Public Const STYLE_MULTICHOICEQ = "Q Multi Choice"
+    Public Const STYLE_MATCHINGQ = "Q Matching"
+    Public Const STYLE_NUMERICALQ = "Q Numerical"
+    Public Const STYLE_MISSINGWORDQ = "Q Missing Word"
+    Public Const STYLE_TRUESTATEMENT = "Q True Statement"
+    Public Const STYLE_FALSESTATEMENT = "Q False Statement"
+    Public Const STYLE_CORRECT_MC_ANSWER = "A Correct Choice"
+    Public Const STYLE_INCORRECT_MC_ANSWER = "A Incorrect Choice"
+    Public Const STYLE_SHORT_ANSWER = "A Short Answer"
+    Public Const STYLE_LEFT_MATCH = "A Matching Left"
+    Public Const STYLE_RIGHT_MATCH = "A Matching Right"
+    Public Const STYLE_BLANK_WORD = "MissingWord"  'this string used in an XSLT template
+    ' Public Const STYLE_COMMENT = "Comment"
+    ' Supplement(ed by) Daniel
+    Public Const STYLE_MULTICHOICEQ_FIXANSWER = "Q Multi Choice FixAnswer"
+    Public Const STYLE_MATCHINGQ_FIXANSWER = "Q Matching FixAnswer"
+    Public Const STYLE_NUM_TOLERANCE = "Num Tolerance"
+    Public Const STYLE_QUESTIONNAME = "Questionname"
+    'from v12
+    Public Const STYLE_ESSAY = "Q Essay"
+    '#modif feedback
+    Public Const STYLE_FEEDBACK_FS = "A Feedback FS"
+    Public Const STYLE_FEEDBACK_TS = "A Feedback TS"
+
+    ' saves the current question type
+    Dim questionType As String
+    Dim xmlpath As String
+
+    ' Prefix for the filename
+    Const FILE_PREFIX = "Moodle_Questions_" 'this has an underscore obscured by the line
+
+    Dim styleList As String() = {STYLE_MULTICHOICEQ, STYLE_MATCHINGQ, STYLE_SHORTANSWERQ, STYLE_ESSAY, STYLE_TRUESTATEMENT,
+     STYLE_FALSESTATEMENT, STYLE_MISSINGWORDQ, STYLE_NUMERICALQ}
+
+    ' Add a new paragraph with a specified style and text
+    ' Inserted text is selected
+    Public Sub AddParagraphOfStyle(aStyle, text)
+        Dim myRange As Word.Range = Globals.ThisDocument.Application.Selection.Range
+        Try
+            With myRange
+                .InsertParagraphAfter() '.InsertBefore(text)
+                .Move(Unit:=WdUnits.wdParagraph, Count:=1)
+                .Style = aStyle
+                .Text = text
+                .Select()
+            End With
+        Catch ex As System.Runtime.InteropServices.COMException
+            MessageBox.Show(aStyle + " style doesn't exist") 'ex.Message)
+        End Try
+    End Sub
+
+    ' Moodle requires a dot (.) as a decimal separator. Thus, all comma separators need to
+    ' be converted.
+    Private Sub ConvertDecimalSeparator(ByVal aRange As Microsoft.Office.Interop.Word.Range)
+        aRange.Find.Execute(FindText:=",", ReplaceWith:=".", _
+        Format:=False, Replace:=Microsoft.Office.Interop.Word.WdReplace.wdReplaceAll)
+    End Sub
+
+    ' Remove all formatting from the document
+    Private Sub RemoveFormatting()
+        Globals.ThisDocument.Application.Selection.WholeStory()
+        Globals.ThisDocument.Application.Selection.Find.ClearFormatting()
+    End Sub
+
+    ' Count the number of paragraphs having the specified
+    ' style in the defined range
+    Function CountStylesInRange(aStyle As String, startPoint As Integer, endPoint As Integer) As Integer
+        Dim aRange As Microsoft.Office.Interop.Word.Range
+        Dim endP
+        Dim counter
+        aRange = getDocumentRange(startPoint, endPoint)
+        endP = aRange.End  'store end point
+        counter = 0
+
+        With aRange.Find
+            .ClearFormatting()
+            .Text = ""
+            .Replacement.Text = ""
+            .Forward = True
+            .Style = aStyle
+            .Format = True
+            Do While .Execute(Wrap:=Microsoft.Office.Interop.Word.WdFindWrap.wdFindStop) = True
+                If aRange.End > endP Then
+                    Exit Do
+                Else
+                    counter = counter + 1    ' Increment Counter.
+                End If
+            Loop
+
+        End With
+        CountStylesInRange = counter
+    End Function
+    ' Check if the Category style is found in the range 
+    Function StyleUsed(aStyle As Object) As Integer
+        Dim rng As Word.Range
+        rng = Globals.ThisDocument.Application.ActiveDocument.Range
+
+        With rng.Find
+            .ClearFormatting()
+            .Style = aStyle
+            .Forward = True
+            .Format = True
+            .Execute()
+        End With
+        If rng.Find.Found Then
+            Return rng.End
+        Else
+            Return -1
+        End If
+    End Function
+
+
+    'Check if the specified style is found in the range
+    Function QuestionStyleFound(ByVal styleList As String()) As Integer
+        Dim rng As Word.Range
+
+        Dim find As Integer = 0
+        Dim rangeFound(7) As Integer
+        Dim min As Integer = 3000
+        Dim i As Integer = 0
+        For Each element As String In styleList
+            rng = Globals.ThisDocument.Application.Selection.Range
+            rng.Start = rng.Start + 1
+            With rng.Find
+                .ClearFormatting()
+                .Style = element
+                .Forward = True
+                .Format = True
+                .Execute()
+            End With
+            If rng.Find.Found Then
+                find = rng.End
+            Else
+                find = -1
+            End If
+            rangeFound(i) = find
+            i += 1
+        Next
+
+        For Each element As Integer In rangeFound
+            If element > 0 Then
+                find = Math.Min(min, element)
+                min = find
+            End If
+        Next
+        Return find
+    End Function
+
+    ' Removes answer weights from the selection
+    Public Sub RemoveAnswerWeightsFromTheSelection()
+        With Globals.ThisDocument.Application.Selection.Find
+            .ClearFormatting()
+            .Style = STYLE_ANSWERWEIGHT
+            .Text = ""
+            .Replacement.Text = ""
+            .Forward = True
+            .Format = True
+            .Execute(Replace:=Microsoft.Office.Interop.Word.WdReplace.wdReplaceAll)
+        End With
+    End Sub
+
+
+    ' Checks the questionnaire.
+    ' Returns true if everything is fine, otherwise false
+    Function CheckQuestionnaire() As Boolean
+        'return false if empty document
+        If getDocumentCharacterCount() = 1 Then Return False
+
+        Dim startOfQuestion, endOfQuestion, setEndPoint
+        Dim isOK As Boolean
+
+        isOK = True
+        setEndPoint = False ' indicates whether the question end point should be set
+        startOfQuestion = 0
+        questionType = ""
+
+        ' Check each paragraph at a time and specify needed tags
+        For Each para As Paragraph In getDocumentParagraphs()
+
+            ' Check if empty paragraph
+            If para.Range.Text = vbCr Then
+                para.Range.Delete() ' delete all empty paragraphs
+                If questionType = "" Then questionType = para.Range.Style.NameLocal
+                ' #modif category
+            ElseIf para.Range.Style.NameLocal = STYLE_CATEGORYQ Or _
+                   para.Range.Style.NameLocal = STYLE_MULTICHOICEQ Or _
+                   para.Range.Style.NameLocal = STYLE_MULTICHOICEQ_FIXANSWER Or _
+                   para.Range.Style.NameLocal = STYLE_MATCHINGQ Or _
+                   para.Range.Style.NameLocal = STYLE_MATCHINGQ_FIXANSWER Or _
+                   para.Range.Style.NameLocal = STYLE_NUMERICALQ Or _
+                   para.Range.Style.NameLocal = STYLE_SHORTANSWERQ Then
+
+                If setEndPoint Then
+                    endOfQuestion = para.Range.Start
+                    isOK = CheckQuestion(startOfQuestion, endOfQuestion)
+                    If isOK = False Then Exit For ' Exit if error is found
+                End If
+
+                startOfQuestion = para.Range.Start
+                setEndPoint = True
+                questionType = para.Range.Style.NameLocal
+
+            ElseIf para.Range.Style.NameLocal = STYLE_TRUESTATEMENT Or _
+                   para.Range.Style.NameLocal = STYLE_FALSESTATEMENT Or _
+                   para.Range.Style.NameLocal = STYLE_MISSINGWORDQ Or _
+                   para.Range.Style.NameLocal = STYLE_BLANK_WORD Or _
+                   para.Range.Style.NameLocal = STYLE_ESSAY Then
+
+                If setEndPoint Then
+                    endOfQuestion = para.Range.Start
+                    isOK = CheckQuestion(startOfQuestion, endOfQuestion)
+                    If isOK = False Then Exit For ' Exit if error is found
+                    startOfQuestion = para.Range.Start
+                End If
+
+                questionType = para.Range.Style.NameLocal
+
+                isOK = CheckQuestion(startOfQuestion, para.Range.End)
+                If isOK = False Then Exit For ' Exit if error is found
+                startOfQuestion = para.Range.End
+                questionType = "NOT_KNOWN"
+                setEndPoint = False
+            ElseIf para.Range.Style.NameLocal = STYLE_CORRECT_MC_ANSWER And _
+                   questionType = STYLE_NUMERICALQ Then
+                ' Exit if error is found
+                If CheckNumericAnswer(para.Range) = False Then Return False 'Exit Function
+            End If
+
+            ' Check if the end of document
+            If para.Range.End = getDocumentRangeEnd() And _
+            startOfQuestion <> para.Range.End Then
+                isOK = CheckQuestion(startOfQuestion, getDocumentRangeEnd())
+            End If
+
+            'Check if Category Style exist
+            If StyleUsed(STYLE_CATEGORYQ) = -1 Then
+                MsgBox("We must have Ctegory style in your style list")
+                isOK = False
+            End If
+
+
+            If isOK = False Then Exit For ' Exit if error is found
+
+        Next para
+
+        'TODO not sure this makes sense, it will just skip the refresh
+        If getDocumentCharacterCount() = 1 Then Return isOK
+
+
+        moveCursorToEndOfDocument()
+        Globals.ThisDocument.Application.ScreenRefresh()
+        Return isOK
+    End Function
+
+    ' Checks whether the chosen question is valid
+    ' Returns true if the question is OK, otherwise
+    Function CheckQuestion(startPoint As Integer, endPoint As Integer) As Boolean
+        Dim isOk As Boolean
+        Dim rightCount, rightPairCount, leftPairCount, wordCount, feedbackCount, wrongCount, feedbackTSCount, feedbackFSCount As Integer
+
+        Dim aRange As Range
+
+        aRange = getDocumentRange(startPoint, endPoint)
+        aRange.Select()
+        'MsgBox "See Range for specifying question type." & questionType & vbCr & _
+        '      "Start: " & startPoint & " End: " & endPoint
+        isOk = True 'no errors
+
+        ' #modif category
+        If questionType = STYLE_CATEGORYQ Then
+
+            rightCount = CountStylesInRange(STYLE_MULTICHOICEQ, startPoint, endPoint)
+
+        ElseIf questionType = STYLE_MULTICHOICEQ Or _
+          questionType = STYLE_MULTICHOICEQ_FIXANSWER Then
+
+            ' Check that there are right anwers specified
+            rightCount = CountStylesInRange(STYLE_CORRECT_MC_ANSWER, startPoint, endPoint)
+
+            If rightCount = 0 Then
+                aRange.Select()
+                MsgBox("Error, no correct answer defined.", vbExclamation)
+                isOk = False
+            End If
+
+            ' Check that there are right feedback specified #modif feedback
+            feedbackCount = CountStylesInRange(STYLE_FEEDBACK, startPoint, endPoint)
+            wrongCount = CountStylesInRange(STYLE_INCORRECT_MC_ANSWER, startPoint, endPoint)
+            If feedbackCount <> rightCount + wrongCount And feedbackCount > 0 Then
+                aRange.Select()
+                MsgBox("Error, no feedback was supplied for one of answer for this question.", vbExclamation)
+                isOk = False
+                'ElseIf feedbackCount = 0 Then
+                '    isOk = True
+            End If
+
+        ElseIf questionType = STYLE_SHORTANSWERQ Then
+            rightCount = CountStylesInRange(STYLE_SHORT_ANSWER, startPoint, endPoint)
+
+            If rightCount = 0 Then
+                aRange.Select()
+                MsgBox("Error, no correct short answer is defined.", vbExclamation)
+                isOk = False
+            End If
+
+        ElseIf questionType = STYLE_NUMERICALQ Then
+            rightCount = CountStylesInRange(STYLE_SHORT_ANSWER, startPoint, endPoint)
+
+            If rightCount = 0 Then
+                aRange.Select()
+                MsgBox("Error, no correct numerical answer is defined.", vbExclamation)
+                isOk = False
+            End If
+
+            ' MATCHING QUESTION
+        ElseIf questionType = STYLE_MATCHINGQ Or questionType = STYLE_MATCHINGQ_FIXANSWER Then
+
+            ' Count the number of pairs
+            rightPairCount = CountStylesInRange(STYLE_RIGHT_MATCH, startPoint, endPoint)
+            leftPairCount = CountStylesInRange(STYLE_LEFT_MATCH, startPoint, endPoint)
+
+            ' Too few pairs
+            If leftPairCount < 3 Then
+                aRange.Select()
+                MsgBox("Error, there are not enough pairs for a matching question" & vbCr & _
+                       "There must be at least 3 matching pairs. Please add more.", vbExclamation, "Error!")
+                isOk = False
+                ' Error -> the number of left and right pairs is different or zero
+            ElseIf rightPairCount <> leftPairCount Then
+                aRange.Select()
+                MsgBox("Error, pairs are not correctly defined" & vbCr & _
+                       "The number of left and right pairs is not equal.", vbExclamation, "Error!")
+                isOk = False
+            End If
+
+        ElseIf questionType = STYLE_MISSINGWORDQ Then
+            wordCount = CountStylesInRange(STYLE_BLANK_WORD, startPoint, endPoint)
+            If wordCount <> 1 Then
+                aRange.Select()
+                MsgBox("There must be exactly one answer specified as a blank word." _
+                + Chr(13) + Chr(13) + "To remove unnecessary markup, select a word(s) and press Ctrl+Space.", vbExclamation, "Error!")
+                isOk = False
+            End If
+
+        ElseIf questionType = STYLE_TRUESTATEMENT Or _
+               questionType = STYLE_FALSESTATEMENT Then
+            ' Check that there are right feedback specified #modif feedback
+            feedbackTSCount = CountStylesInRange(STYLE_FEEDBACK_TS, startPoint, endPoint)
+            feedbackFSCount = CountStylesInRange(STYLE_FEEDBACK_FS, startPoint, endPoint)
+
+            If feedbackTSCount = feedbackFSCount = 1 Then
+                aRange.Select()
+                MsgBox("Error, no correct feedback defined.", vbExclamation)
+                isOk = False
+            End If
+
+            '  feedbackCount = CountStylesInRange(STYLE_FEEDBACK, startPoint, endPoint)
+
+        ElseIf questionType = STYLE_ESSAY Then
+            'nothing to check for answers to these ones. Figure out what the issue is with being last question in test and fix here?
+
+            ' UNDEFINED QUESTION TYPE
+        Else
+            aRange.Select()
+            MsgBox("Undefined Question type:" & questionType & vbCr & vbCr _
+                   & "Illegal question is deleted.", vbExclamation, "Error!")
+            aRange.Delete()
+        End If
+
+        'MsgBox questionType & "=" & isOk  'debugging output - show OK after each q checked.
+        CheckQuestion = isOk
+    End Function
+
+    ' Check the numeric answer. Note, not checking all valid GIFT formats.
+    Function CheckNumericAnswer(aRange As Range) As Boolean
+
+        CheckNumericAnswer = True ' By default OK
+
+        ' Search for the error margin separator
+        aRange.Find.Execute(FindText:=":", Format:=False)
+
+        If aRange.Find.Found = False And IsNumeric(aRange) = False Then
+            Dim Response As Integer
+
+            aRange.Select()
+            Response = MsgBox("Is this a right numerical answer?" & vbCr & _
+                       "Your answer: " & aRange.Characters.ToString, vbYesNo, "Correct?")  ' CPF not sure about converting the aRange to a string here...
+            If Response = vbNo Then CheckNumericAnswer = False
+        End If
+    End Function
+
+    ' Insert text before the specified range. A new paragraph is inserted.
+    Sub InsertTextBeforeRange(ByVal text As String, ByVal aRange As Range)
+        With aRange
+            .Style = STYLE_NORMAL
+            .InsertBefore(text)
+            .Move(Unit:=WdUnits.wdParagraph, Count:=1)
+        End With
+
+    End Sub
+
+    ' Insert text having trailing VbCr before the range
+    Sub InsertQuestionEndTag(endPoint As Integer)
+        Dim aRange As Range
+        aRange = Globals.ThisDocument.Application.Range(endPoint - 1, endPoint)
+        With aRange
+            '            .InsertBefore(vbCr & TAG_QUESTION_END)
+            .InsertBefore(vbCr)
+            .Style = STYLE_NORMAL
+            .Move(Unit:=WdUnits.wdParagraph, Count:=1)
+        End With
+
+    End Sub
+
+    ' Insert text at the end of the paragraph before the trailing VbCr
+    Sub InsertAfterBeforeCR(ByVal text As String, ByVal aRange As Range)
+        aRange.End = aRange.End - 1 ' insert text before cr
+        With aRange
+            .InsertAfter(text)
+            .Style = STYLE_NORMAL
+            .Move(Unit:=WdUnits.wdParagraph, Count:=1)
+        End With
+    End Sub
+
+    ' Insert text at the end of the paragraph
+    Sub InsertParagraphAfterCurrentParagraph(ByVal text As String, aStyle As String)
+        Dim aRange As Range = Globals.ThisDocument.Application.Selection.Paragraphs(1).Range
+
+        With aRange
+            .EndOf(Unit:=WdUnits.wdParagraph, Extend:=WdMovementType.wdMove)
+            .InsertParagraphBefore()
+            .Move(Unit:=WdUnits.wdParagraph, Count:=-1)
+            .Style = aStyle
+            .InsertBefore(text)
+            .Select()
+        End With
+
+    End Sub
+
+    ' Insert text before range found
+    Public Sub InsertParagraphOfStyleInSelectedRangeBefore(aStyle, text, index)
+        Dim aRange As Microsoft.Office.Interop.Word.Range = getDocumentSelectionRange()
+        aRange.Start = index - 1
+        With aRange
+            .StartOf(Unit:=WdUnits.wdParagraph, Extend:=WdMovementType.wdMove)
+            .InsertParagraphBefore()
+            .Style = aStyle
+            .InsertBefore(text)
+            .Select()
+        End With
+    End Sub
+    ' Set the answer weights of multiple choice questions.
+    'TODO dead code (never called)
+    Public Sub SetAnswerWeights() ' aStyle, startPoint, endPoint)
+        Dim startPoint, endPoint, rightScore, wrongScore, rightCount, wrongCount As Integer
+
+        If getSelectionStyleName() = STYLE_MULTICHOICEQ Or STYLE_MULTICHOICEQ_FIXANSWER Then
+            startPoint = Globals.ThisDocument.Application.Selection.Paragraphs(1).Range.Start
+            rightCount = 0
+            wrongCount = 0
+            Globals.ThisDocument.Application.Selection.MoveDown(Unit:=WdUnits.wdParagraph, Count:=1)
+
+            Do While getSelectionStyleName() = STYLE_CORRECT_MC_ANSWER Or _
+                  getSelectionStyleName() = STYLE_INCORRECT_MC_ANSWER Or _
+                  getSelectionStyleName() = STYLE_FEEDBACK Or _
+                  getSelectionStyleName() = STYLE_ANSWERWEIGHT
+
+                'Delete empty paragraphs
+                If Globals.ThisDocument.Application.Selection.Paragraphs(1).Range.Text = vbCr Then
+                    Globals.ThisDocument.Application.Selection.Paragraphs(1).Range.Delete() ' delete all empty paragraphs
+                    ' Remove old answer weights
+                ElseIf getSelectionStyleName() = STYLE_ANSWERWEIGHT Then
+                    With Globals.ThisDocument.Application.Selection.Find
+                        .ClearFormatting()
+                        .Style = STYLE_ANSWERWEIGHT
+                        .Text = ""
+                        .Replacement.Text = ""
+                        .Forward = True
+                        .Format = True
+                        .Execute(Replace:=WdReplace.wdReplaceOne)
+                    End With
+                End If
+
+                ' Count the number of right and wrong answers
+                If getSelectionStyleName() = STYLE_CORRECT_MC_ANSWER Then
+                    rightCount = rightCount + 1
+                ElseIf getSelectionStyleName() = STYLE_INCORRECT_MC_ANSWER Then
+                    wrongCount = wrongCount + 1
+                End If
+
+                If Globals.ThisDocument.Application.Selection.Paragraphs(1).Range.End = Globals.ThisDocument.Application.Range.End Then
+                    endPoint = Globals.ThisDocument.Application.Selection.Paragraphs(1).Range.End
+                    Exit Do
+                Else
+                    Globals.ThisDocument.Application.Selection.MoveDown(Unit:=WdUnits.wdParagraph, Count:=1)
+                    endPoint = Globals.ThisDocument.Application.Selection.Paragraphs(1).Range.Start
+                End If
+            Loop
+
+            Dim QuestionRange As Range
+            QuestionRange = Globals.ThisDocument.Application.Range(startPoint, endPoint)
+
+            If rightCount < 1 Then
+                QuestionRange.Select()
+                MsgBox("No correct answer specified.", vbExclamation, "Error!")
+            Else
+                ' Calculate the right and wrong scores
+                rightScore = Math.Round(100 / rightCount, 3)
+                ' MODIFY the default scoring principle for wrong answers if necessary
+                wrongScore = -rightScore
+
+                AddAnswerWeights(QuestionRange, rightScore, wrongScore)
+            End If
+        Else
+            MsgBox("Place the cursor on the question title" & vbCr & _
+                   "of the Multiple Choice Question", vbExclamation, "Error!")
+            ' Find the previous paragraph having the style of multiple choice question.
+            With Globals.ThisDocument.Application.Selection.Find
+                .ClearFormatting()
+                .Text = ""
+                .Style = STYLE_MULTICHOICEQ Or STYLE_MULTICHOICEQ_FIXANSWER
+                .Forward = False
+                .Format = True
+                .MatchCase = False
+                .Execute()
+            End With
+        End If
+    End Sub
+
+    ' Insert answer weights
+    Private Sub AddAnswerWeights(ByVal aRange As Range, rightScore As Integer, wrongScore As Integer)
+        ' Check each paragraph at a time and specify needed tags
+        For Each para In aRange.Paragraphs
+            ' Check if empty paragraph
+            If para.Range = vbCr Then
+                para.Range.Delete() ' delete all empty paragraphs
+            ElseIf para.Range.Style = STYLE_CORRECT_MC_ANSWER Then
+                InsertAnswerWeight(rightScore, para.Range)
+            ElseIf para.Range.Style = STYLE_INCORRECT_MC_ANSWER Then
+                InsertAnswerWeight(wrongScore, para.Range)
+            End If
+        Next para
+
+    End Sub
+
+    ' Insert text at the end of the chapter before the trailing VbCr
+    Private Sub InsertAnswerWeight(Score As Integer, ByVal aRange As Range)
+        Dim startPoint As Integer
+        Dim scoreString As String
+        Dim newRange As Range
+        startPoint = aRange.Start
+        scoreString = "" & Score & "%"
+        aRange.InsertBefore(scoreString)
+        newRange = Globals.ThisDocument.Application.Range(Start:=startPoint, End:=startPoint + Len(scoreString))
+        newRange.Style = STYLE_ANSWERWEIGHT
+        'Moodle requires that the decimal separator is dot, not comma.
+        ConvertDecimalSeparator(newRange)
+
+    End Sub
+
+    'LTG: This seems to be unused? left over from GIFT format days?
+    Private Sub FindBlanks(aRange As Range)
+        'Set aRange = Globals.ThisDocument.Application.Selection.Paragraphs(1).Range
+
+
+        'ActiveDocument.Content
+        Dim endPoint As Integer
+        endPoint = aRange.End
+        With aRange.Find
+            .ClearFormatting()
+            .Style = STYLE_BLANK_WORD
+            Do While .Execute(FindText:="", Forward:=True, Format:=True) = True And _
+                Globals.ThisDocument.Application.Selection.Range.End < endPoint And Globals.ThisDocument.Application.Range.End <> Globals.ThisDocument.Application.Selection.Range.End
+                With .Parent
+                    .InsertBefore("{=")
+                    .InsertAfter("}")
+                    '  .Move Unit:=wdParagraph, Count:=1
+                    .Move(Unit:=WdUnits.wdWord, Count:=1)
+                End With
+            Loop
+        End With
+    End Sub
+
+
+
+    Public Sub Convert2XML()
+
+        ' Macro recorded on 21.12.2008 by Daniel Refresh Header (translation?)
+        Globals.ThisDocument.Application.ActiveWindow.ActivePane.View.SeekView = WdSeekView.wdSeekCurrentPageHeader
+        Globals.ThisDocument.Application.Selection.Fields.Update()
+        Globals.ThisDocument.Application.Selection.EndKey(Unit:=WdUnits.wdLine)
+        Globals.ThisDocument.Application.Selection.MoveLeft(Unit:=WdUnits.wdCharacter, Count:=1)
+        Globals.ThisDocument.Application.Selection.Fields.Update()
+        Globals.ThisDocument.Application.ActiveWindow.ActivePane.View.SeekView = WdSeekView.wdSeekMainDocument
+
+
+        'choose the file name to save with
+        'Dim fd As SaveFileDialog = New SaveFileDialog
+
+        Dim fd As Microsoft.Office.Core.FileDialog = Globals.ThisDocument.Application.FileDialog(Microsoft.Office.Core.MsoFileDialogType.msoFileDialogSaveAs)
+        '.FilterIndex = 2 fuer Word 2003, 14 fuer Word 2010
+        fd.FilterIndex = 14
+        fd.InitialFileName = FILE_PREFIX & Format(Now, "yyyyMMdd") & ".xml"
+        If fd.Show <> -1 Then Exit Sub
+
+        Dim header As String
+        header = getDocumentHeaderText()
+
+
+        '//*** save the file in utf-8 using stream ***//
+        Dim objStream As ADODB.Stream
+        'Create the stream
+        objStream = CreateObject("ADODB.Stream")
+        'Initialize the stream
+        objStream.Open()
+        'Reset the position and indicate the charactor encoding
+        objStream.Position = 0
+        objStream.Charset = "UTF-8"
+
+        'specify XML version and that it is a quiz
+        objStream.WriteText("<?xml version=""1.0""?><quiz>" & vbCr)
+        ''write the categories from the header '#modif category
+        'objStream.WriteText("<question type=""category"">" & vbCr)
+        'objStream.WriteText("<category>" & vbCr)
+        'objStream.WriteText("<text>" & header & "</text>" & vbCr)
+        'objStream.WriteText("</category>" & vbCr)
+        'objStream.WriteText("</question>" & vbCr & vbCr)
+
+        Dim dd As Xml.XmlDocument
+        Dim xmlnod As Xml.XmlNode
+
+        'Dim dd As Xml.XmlDocument
+        'Dim xmlnod As XMLNode
+
+        'Dim xmlnodelist As MSXML2.IXMLDOMNodeList
+        Dim para As Paragraph, paralookahead As Paragraph
+        paralookahead = Nothing
+
+        Dim rac, wac As Integer
+        Dim xmlResource As String
+        Dim i As Integer = 0
+
+        For Each para In getDocumentParagraphs() '?handle each paragraph separately.
+            dd = New Xml.XmlDocument
+
+            Select Case para.Range.Style.NameLocal
+
+
+                Case STYLE_CATEGORYQ
+                    'write the categories '#modif category
+                    objStream.WriteText("<question type=""category"">" & vbCr)
+                    objStream.WriteText("<category>" & vbCr)
+                    objStream.WriteText("<text>" & RemoveCR(para.Range.Text) & "</text>" & vbCr)
+                    objStream.WriteText("</category>" & vbCr)
+                    objStream.WriteText("</question>" & vbCr & vbCr)
+
+                Case STYLE_SHORTANSWERQ
+                    xmlResource = My.Resources.Shortanswer_xml
+                    loadXML(xmlResource, dd)
+                    ProcessCommonTags(dd, para)
+                    ' processing each <answer>'
+                    paralookahead = para.Next
+                    xmlnod = dd.DocumentElement.SelectSingleNode("answer")
+                    dd.DocumentElement.RemoveChild(xmlnod)
+                    Do While (paralookahead.Style.NameLocal = STYLE_SHORT_ANSWER)
+                        xmlnod.Attributes.GetNamedItem("fraction").InnerText = "100"
+                        xmlnod.SelectSingleNode("text").InnerText = RemoveCR(paralookahead.Range.Text)
+                        dd.DocumentElement.AppendChild(xmlnod)
+
+                        xmlnod = xmlnod.CloneNode(True)
+                        paralookahead = paralookahead.Next
+                        If paralookahead Is Nothing Then Exit Do
+                    Loop
+
+                Case STYLE_ESSAY
+                    xmlResource = My.Resources.Essay_xml
+                    loadXML(xmlResource, dd)
+                    ProcessCommonTags(dd, para)
+                    'LTG: do I need to have Set paralookahead = para.Next here? why / why not?
+
+                Case STYLE_NUMERICALQ
+                    xmlResource = My.Resources.Numerical_xml
+                    loadXML(xmlResource, dd)
+                    ProcessCommonTags(dd, para)
+                    ' processing each <answer>'
+                    paralookahead = para.Next
+                    xmlnod = dd.DocumentElement.SelectSingleNode("answer")
+                    dd.DocumentElement.RemoveChild(xmlnod)
+
+                    Do While (paralookahead.Style.NameLocal = STYLE_SHORT_ANSWER)
+                        xmlnod.Attributes.GetNamedItem("fraction").Value = "100"
+                        xmlnod.SelectSingleNode("text").InnerText = RemoveCR(paralookahead.Range.Text)
+                        paralookahead = paralookahead.Next
+                        If Not paralookahead Is Nothing Then
+                            If (paralookahead.Style.NameLocal = STYLE_NUM_TOLERANCE) Then
+                                xmlnod.SelectSingleNode("tolerance").InnerText = RemoveCR(paralookahead.Range.Text)
+                                paralookahead = paralookahead.Next
+                            Else
+                                xmlnod.SelectSingleNode("tolerance").InnerText = "0"
+                            End If
+                        End If
+                        dd.DocumentElement.AppendChild(xmlnod)
+                        xmlnod = xmlnod.CloneNode(True)
+                        If paralookahead Is Nothing Then Exit Do
+                    Loop
+
+                Case STYLE_FALSESTATEMENT
+                    xmlResource = My.Resources.False_xml
+                    loadXML(xmlResource, dd)
+                    ProcessCommonTags(dd, para)
+                    paralookahead = para.Next
+                    Do While i < 2
+                        xmlnod = dd.DocumentElement.SelectSingleNode("answer")
+                        If xmlnod.Attributes.GetNamedItem("fraction").InnerText = "100" Then
+                            If paralookahead.Style.NameLocal = STYLE_FEEDBACK_FS Then
+                                If paralookahead.Range.Text = "" Then
+                                    MsgBox("no feedback was supplied for the false statement")
+                                Else
+                                    ' Set XML <feedback> text
+                                    xmlnod.SelectSingleNode("feedback/text").InnerText = RemoveCR(paralookahead.Range.Text)
+                                    paralookahead = paralookahead.Next
+                                End If
+                            End If
+                            dd.DocumentElement.AppendChild(xmlnod)
+                        End If
+                        If xmlnod.Attributes.GetNamedItem("fraction").InnerText = "0" Then
+                            'xmlnod.selectSingleNode("text").text = "True"
+                            If paralookahead.Style.NameLocal = STYLE_FEEDBACK_TS Then
+                                If paralookahead.Range.Text = "" Then
+                                    MsgBox("no feedback was supplied for the false statement")
+                                Else
+                                    ' Set XML <feedback> text
+                                    xmlnod.SelectSingleNode("feedback/text").InnerText = RemoveCR(paralookahead.Range.Text)
+                                    paralookahead = paralookahead.Next
+                                End If
+                            End If
+                            dd.DocumentElement.AppendChild(xmlnod)
+                        End If
+                        i += 1
+                    Loop
+
+
+                Case STYLE_TRUESTATEMENT
+                    xmlResource = My.Resources.True_xml
+                    loadXML(xmlResource, dd)
+                    ProcessCommonTags(dd, para)
+                    paralookahead = para.Next
+
+
+                    i = 0
+                    Do While i < 2
+                        xmlnod = dd.DocumentElement.SelectSingleNode("answer")
+                        If xmlnod.Attributes.GetNamedItem("fraction").InnerText = "100" Then
+                            If paralookahead.Style.NameLocal = STYLE_FEEDBACK_TS Then
+                                If paralookahead.Range.Text = "" Then
+                                    MsgBox("no feedback was supplied for the true statement")
+                                Else
+                                    ' Set XML <feedback> text
+                                    xmlnod.SelectSingleNode("feedback/text").InnerText = RemoveCR(paralookahead.Range.Text)
+                                    paralookahead = paralookahead.Next
+                                End If
+                            End If
+                            dd.DocumentElement.AppendChild(xmlnod)
+                        End If
+                        If xmlnod.Attributes.GetNamedItem("fraction").InnerText = "0" Then
+                            If paralookahead.Style.NameLocal = STYLE_FEEDBACK_FS Then
+                                If paralookahead.Range.Text = "" Then
+                                    MsgBox("no feedback was supplied for the false statement")
+                                Else
+                                    ' Set XML <feedback> text
+                                    xmlnod.SelectSingleNode("feedback/text").InnerText = RemoveCR(paralookahead.Range.Text)
+                                    paralookahead = paralookahead.Next
+                                End If
+                            End If
+                            dd.DocumentElement.AppendChild(xmlnod)
+                        End If
+                        i += 1
+                    Loop
+
+                Case STYLE_MULTICHOICEQ_FIXANSWER, STYLE_MULTICHOICEQ
+                    If para.Range.Style.NameLocal = STYLE_MULTICHOICEQ_FIXANSWER Then
+                        xmlResource = My.Resources.MultiChoiceFix_xml
+                    Else
+                        xmlResource = My.Resources.MultiChoiceVar_xml
+                    End If
+                    loadXML(xmlResource, dd)
+                    ProcessCommonTags(dd, para)
+
+                    ' processing each <answer>'
+                    paralookahead = para.Next
+                    xmlnod = dd.DocumentElement.SelectSingleNode("answer")
+                    dd.DocumentElement.RemoveChild(xmlnod)
+                    rac = 0 'right answer choices
+                    wac = 0 'wrong answer choices
+
+                    Do While (paralookahead.Style.NameLocal = STYLE_CORRECT_MC_ANSWER) Or (paralookahead.Style.NameLocal = STYLE_INCORRECT_MC_ANSWER)
+                        If paralookahead.Style.NameLocal = STYLE_CORRECT_MC_ANSWER Then
+                            xmlnod.Attributes.GetNamedItem("fraction").InnerText = "100"
+                            rac = rac + 1
+                        Else
+                            xmlnod.Attributes.GetNamedItem("fraction").InnerText = "0"
+                            wac = wac + 1
+                        End If
+                        ' xmlnod.selectSingleNode("text").text = RemoveCR(paralookahead.Range.Text)
+
+                        'insert image in answer
+                        'processing <image>'
+
+                        'Create a CData section. 
+                        Dim CDATASection As XmlCDataSection
+                        CDATASection = dd.CreateCDataSection("<p>" & XSLT_Range(paralookahead.Range, My.Resources.FormattedText_xslt) & "<img src=""@@PLUGINFILE@@/image.gif"" width=""88"" height=""74""/></p>")
+                        xmlnod.SelectSingleNode("text").AppendChild(CDATASection)
+                        If Not XSLT_Range(paralookahead.Range, My.Resources.PictureName_xslt) = "" Then 'if it is NOT null/empty
+                            '   Dim header As String
+                            Dim stringlength As Long
+                            header = getDocumentHeaderText() ' Globals.ThisDocument.Application.ActiveDocument.Sections(1).Headers(WdHeaderFooterIndex.wdHeaderFooterPrimary).Range.Text
+                            stringlength = Len(header)
+                            header = Left(header, stringlength - 1)
+                            'processing <image_base64>'
+                            xmlnod.SelectSingleNode("file").InnerText = XSLT_Range(paralookahead.Range, My.Resources.Picture_xslt)
+                        Else
+                            xmlnod.SelectSingleNode("text").InnerText = RemoveCR(paralookahead.Range.Text)
+                            xmlnod.SelectSingleNode("file").InnerText = ""
+                        End If
+                        ' fin bloc to insert image in answer
+
+                        paralookahead = paralookahead.Next
+
+                        ' Answer Feedback Style processing here
+                        If paralookahead IsNot Nothing Then
+                            If paralookahead.Style.NameLocal = STYLE_FEEDBACK Then
+                                If paralookahead.Range.Text = "" Then
+                                    MsgBox("feedback dosn't exist")
+                                Else
+                                    ' Set XML <feedback> text
+                                    xmlnod.SelectSingleNode("feedback/text").InnerText = RemoveCR(paralookahead.Range.Text)
+                                    paralookahead = paralookahead.Next
+                                End If
+                            End If
+                        End If
+                        dd.DocumentElement.AppendChild(xmlnod)
+                        xmlnod = xmlnod.CloneNode(True)
+
+                        xmlnod.SelectSingleNode("text").InnerText = Nothing
+                        If paralookahead Is Nothing Then Exit Do
+                    Loop
+
+                    If rac > 1 Then
+                        ' multiple correct/incorrect answers
+                        dd.DocumentElement.SelectSingleNode("single").InnerText = "false"
+                        ' re-looping for setting multi-true-answer fractions
+                        For Each mansw In dd.DocumentElement.SelectNodes("answer")
+                            With mansw.Attributes.getNamedItem("fraction")
+                                If .text = 100 Then .text = Replace(100 / rac, ",", ".") 'original
+                                If .text = 0 Then .text = Replace(-100 / wac, ",", ".") 'original
+                                'If .text = 100 Then .text = Round(100 / rac, 5) 'sd 2010 für Moodle 2.0
+                                'If .text = 0 Then .text = Round(-100 / wac, 5) 'sd 2010 für moodle 2.0
+                            End With
+                        Next mansw
+                    End If
+
+                Case STYLE_MATCHINGQ, STYLE_MATCHINGQ_FIXANSWER
+
+                    If para.Range.Style.NameLocal = STYLE_MATCHINGQ Then
+                        xmlResource = My.Resources.MatchingVar_xml
+                    Else
+                        xmlResource = My.Resources.MatchingFix_xml
+                    End If
+                    loadXML(xmlResource, dd)
+                    ProcessCommonTags(dd, para)
+
+                    ' processing each <subquestion>'
+                    paralookahead = para.Next
+                    xmlnod = dd.DocumentElement.SelectSingleNode("subquestion")
+                    dd.DocumentElement.RemoveChild(xmlnod)
+                    Do While (paralookahead.Style.NameLocal = STYLE_LEFT_MATCH)
+                        'process left
+                        Dim leftQuestion As String = RemoveCR(paralookahead.Range.Text)
+                        xmlnod.SelectSingleNode("text").InnerText = leftQuestion
+                        paralookahead = paralookahead.Next
+                        'process right
+                        If paralookahead.Style.NameLocal = STYLE_RIGHT_MATCH Then
+                            xmlnod.SelectSingleNode("answer").SelectSingleNode("text").InnerText = RemoveCR(paralookahead.Range.Text)
+                            paralookahead = paralookahead.Next
+                        Else
+                            'error, right is not matching left (should be found in check prior to calling here)
+                            Throw New Exception("No matching answer to left question '" & leftQuestion & "'")
+                        End If
+                        dd.DocumentElement.AppendChild(xmlnod)
+                        xmlnod = xmlnod.CloneNode(True)
+                        If paralookahead Is Nothing Then Exit Do 'end of questions
+                    Loop
+
+                    'Case STYLE_MATCHINGQ_FIXANSWER
+                    '    xmlResource = My.Resources.MatchingFix_xml
+                    '    loadXML(xmlResource, dd)
+                    '    ProcessCommonTags(dd, para)
+
+                    '    ' processing each <subquestion>'
+                    '    paralookahead = para.Next
+                    '    xmlnod = dd.documentElement.selectSingleNode("subquestion")
+                    '    dd.documentElement.removeChild(xmlnod)
+                    '    Do While (paralookahead.Style.NameLocal = STYLE_LEFT_PAIR) Or (paralookahead.Style.NameLocal = STYLE_RIGHT_PAIR)
+                    '        If paralookahead.Style.NameLocal = STYLE_LEFT_PAIR Then
+                    '            xmlnod.selectSingleNode("text").text = RemoveCR(paralookahead.Range.Text)
+                    '        Else
+                    '            xmlnod.selectSingleNode("answer").selectSingleNode("text").text = RemoveCR(paralookahead.Range.Text)
+
+                    '            dd.documentElement.appendChild(xmlnod)
+                    '            xmlnod = xmlnod.cloneNode(True)
+                    '        End If
+                    '        paralookahead = paralookahead.Next
+                    '        If paralookahead Is Nothing Then Exit Do
+                    '    Loop
+
+                Case STYLE_MISSINGWORDQ
+                    'TODO: Verify that MissingWord uses same XML as short answer?
+                    xmlResource = My.Resources.Shortanswer_xml
+                    loadXML(xmlResource, dd)
+                    Dim theChar As Range
+                    Dim misword As String
+                    misword = ""
+                    For Each theChar In para.Range.Characters
+                        If theChar.Style.NameLocal = STYLE_BLANK_WORD Then misword = misword & theChar.Text
+                    Next theChar
+                    ProcessCommonTags(dd, para)  ' XSLT template will swap out missing word
+                    dd.DocumentElement.SelectSingleNode("name").SelectSingleNode("text").InnerText = _
+                        Replace(dd.DocumentElement.SelectSingleNode("name").SelectSingleNode("text").Value, misword, "__________")
+
+                    ' processing each <answer>'
+                    paralookahead = para.Next
+                    xmlnod = dd.DocumentElement.SelectSingleNode("answer")
+                    xmlnod.Attributes.GetNamedItem("fraction").InnerText = "100"
+                    xmlnod.SelectSingleNode("text").InnerText = misword
+
+                    'Case STYLE_COMMENT
+                    '    Dim Comment As String
+                    '    Comment = "<!-- " & RemoveCR(para.Range.Text) & " -->"
+                    '    objStream.WriteText(Comment & vbCr & vbCr)
+                    '    dd.loadXML("")
+
+                Case Else
+                    dd = Nothing
+            End Select
+
+
+            If dd IsNot Nothing Then
+
+                If paralookahead IsNot Nothing Then
+                    If (paralookahead.Style.NameLocal = STYLE_QUESTIONNAME) Then
+                        xmlnod = dd.DocumentElement.SelectSingleNode("name")
+                        dd.DocumentElement.RemoveChild(xmlnod)
+                        xmlnod.SelectSingleNode("text").InnerText = RemoveCR(paralookahead.Range.Text)
+                        dd.DocumentElement.AppendChild(xmlnod)
+                        xmlnod = xmlnod.CloneNode(True)
+                        paralookahead = paralookahead.Next
+                    End If
+
+                Else  '**seems to be setting generalfeedback for any feedback tag...
+                    ' CPF commented out
+                    '          If (paralookahead.Style.NameLocal = STYLE_FEEDBACK) Then
+                    '             Set xmlnod = dd.documentElement.SelectSingleNode("generalfeedback")
+                    '             dd.documentElement.RemoveChild xmlnod
+                    '             xmlnod.SelectSingleNode("text").text = RemoveCR(paralookahead.Range.text)
+                    '             dd.documentElement.appendChild xmlnod
+                    '             Set xmlnod = xmlnod.CloneNode(True)
+                    '             Set paralookahead = paralookahead.Next
+                    '          End If
+                End If
+
+                If dd.InnerXml <> "" Then objStream.WriteText(dd.InnerXml & vbCr)
+
+                dd = Nothing
+            End If
+        Next para
+
+        objStream.WriteText("</quiz>")
+        'Save the stream to a file
+        objStream.SaveToFile(getFileNameFromFileDialog(fd), ADODB.SaveOptionsEnum.adSaveCreateOverWrite)
+        'objStream.SaveToFile(FileName:=fd.SelectedItems(1), Options:=ADODB.SaveOptionsEnum.adSaveCreateOverWrite)
+
+    End Sub
+
+    'This is called as the first processing task for each question. It
+    Private Sub ProcessCommonTags(dd As Xml.XmlDocument, para As Paragraph)
+        ' processing <name> '
+        dd.DocumentElement.SelectSingleNode("name") _
+        .SelectSingleNode("text").InnerText = RemoveCR(para.Range.Text)
+
+        ' processing <questiontext> '
+        dd.DocumentElement.SelectSingleNode("questiontext") _
+        .SelectSingleNode("text").InnerText = XSLT_Range(para.Range, My.Resources.FormattedText_xslt)
+
+        '
+        If Not XSLT_Range(para.Range, My.Resources.PictureName_xslt) = "" Then 'if it is NOT null/empty
+
+            Dim header As String
+            Dim stringlength As Long
+
+            header = getDocumentHeaderText() ' Globals.ThisDocument.Application.ActiveDocument.Sections(1).Headers(WdHeaderFooterIndex.wdHeaderFooterPrimary).Range.Text
+            stringlength = Len(header)
+            header = Left(header, stringlength - 1)
+
+            'processing <image>'
+            dd.DocumentElement.SelectSingleNode("image").InnerText = "Images_forQuizQuestions/" & header & Right(XSLT_Range(para.Range, My.Resources.PictureName_xslt), 4)
+            'dd.documentElement.SelectSingleNode("image").text = Mid(XSLT_Range(para.Range, My.Resources.PictureName_xslt), 10) (commented out: Rohrer)'
+            'processing <image_base64>'
+            dd.DocumentElement.SelectSingleNode("image_base64").InnerText = XSLT_Range(para.Range, My.Resources.Picture_xslt)
+        End If
+
+    End Sub
+
+
+    Private Function XSLT_Range(textrange As Range, xsltFileContents As String) As String
+        ' http://stackoverflow.com/a/11862542/1168342
+        Dim sourceXmlFile As New Xml.XmlDocument
+        sourceXmlFile.LoadXml(textrange.XML)
+
+        Dim xslt As New System.Xml.Xsl.XslCompiledTransform()
+
+        Using xsltStringReader As New IO.StringReader(xsltFileContents)
+            Using xsltReader As XmlReader = XmlReader.Create(xsltStringReader)
+                Using translatedXmlFile As New IO.StringWriter()
+                    xslt.Load(xsltReader)
+                    xslt.Transform(sourceXmlFile, Nothing, translatedXmlFile)
+                    XSLT_Range = translatedXmlFile.ToString
+                End Using
+            End Using
+        End Using
+
+
+
+        'Dim xsldoc As New MSXML2.FreeThreadedDOMDocument60
+        'xsldoc.loadXML(xsltFileContents)
+        'Dim xslt As New System.Xml.Xsl.MSXML2.XSLTemplate60
+        'xslt.stylesheet = xsldoc
+        'Dim xsltProcessor As MSXML2.IXSLProcessor
+        'xsltProcessor = xslt.createProcessor
+        'Dim d As New Xml.XmlDocument
+        'Dim s As String
+        'd.LoadXml(textrange.XML) '!!! Bug in Word 2010 when file is created from a template (Textrange.xml can not be read)
+        'xsltProcessor.input = d
+        'xsltProcessor.transform()
+        's = xsltProcessor.output
+
+        'xsltProcessor = Nothing
+        'xslt = Nothing
+        'xsldoc = Nothing
+        'XSLT_Range = s
+    End Function
+
+
+    Private Function RemoveCR(str As String) As String
+        str = Replace(str, vbCr, "")
+        RemoveCR = Trim(Globals.ThisDocument.Application.CleanString(str))
+    End Function
+
+
+    Function DirExists(ByVal sDirName As String) As Boolean
+        On Error Resume Next
+        DirExists = (GetAttr(sDirName) And vbDirectory) = vbDirectory
+        Err.Clear()
+    End Function
+
+    Private Function getSelectionStyleName() As String
+        If IsNothing(Globals.ThisDocument.Application.Selection.Paragraphs.Style) Then
+            Return ""
+        Else
+            Return CType(Globals.ThisDocument.Application.Selection.Paragraphs.Style, Word.Style).NameLocal
+        End If
+    End Function
+
+    Private Sub setSelectionParagraphStyle(theStyle As String)
+        Globals.ThisDocument.Application.Selection.Paragraphs.Style = theStyle
+    End Sub
+    Private Function getDocumentSelectionRange() As Range
+        Return Globals.ThisDocument.Application.Selection.Range
+    End Function
+
+    Private Function getDocumentCharacterCount() As Integer
+        Return Globals.ThisDocument.Application.ActiveDocument.Characters.Count
+    End Function
+
+    Private Function getDocumentParagraphs() As Paragraphs
+        Return Globals.ThisDocument.Application.ActiveDocument.Paragraphs
+    End Function
+
+    Private Function getDocumentRangeEnd() As Integer
+        Return Globals.ThisDocument.Application.ActiveDocument.Range.End
+    End Function
+
+    Public Function getDocumentRange(startPoint As Integer, endPoint As Integer) As Microsoft.Office.Interop.Word.Range
+        Return Globals.ThisDocument.Application.ActiveDocument.Range(startPoint, endPoint)
+    End Function
+
+    Private Sub moveCursorToEndOfDocument()
+        Globals.ThisDocument.Application.Selection.EndKey(WdUnits.wdStory, Nothing)
+    End Sub
+
+    Private Sub moveCursorToStartOfDocument()
+        Globals.ThisDocument.Application.Selection.HomeKey(WdUnits.wdStory, Nothing)
+    End Sub
+
+    Private Function getDocumentHeaderText() As String
+        Return Globals.ThisDocument.Application.ActiveDocument.Sections(1).Headers(WdHeaderFooterIndex.wdHeaderFooterPrimary).Range.Text()
+    End Function
+
+    Private Function getFileNameFromFileDialog(fd As Microsoft.Office.Core.FileDialog) As String
+        Return fd.SelectedItems.Item(1)
+    End Function
+
+    Private Sub loadXML(xmlResource As String, dd As Xml.XmlDocument)
+        dd.LoadXml(xmlResource)
+        'If Not dd.LoadXml(xmlResource) Then
+        '    MsgBox("Failed to load XML " & xmlResource & " in program.")
+        '    'TODO fail gracefully?
+        '    Throw New Exception
+        'End If
+    End Sub
+
+    Private Sub updateVersionInfo()
+        ' Initialize the version number
+        If System.Deployment.Application.ApplicationDeployment.IsNetworkDeployed Then
+            VERSION_INFO = "unknown Network Deployed"
+
+            'This is a ClickOnce Application
+            If Not System.Diagnostics.Debugger.IsAttached Then
+                VERSION_INFO = System.Deployment.Application _
+                    .ApplicationDeployment.CurrentDeployment _
+                        .CurrentVersion.ToString()
+
+                'MsgBox("Started " & vbCrLf & " App Version:" _
+                '    & My.Application.Info.Version.ToString() & vbCrLf & _
+                '    " Published Version " & VERSION_INFO)
+            End If
+        End If
+    End Sub
+
+    Private Function isSelectionNormalStyle() As Boolean
+        'Return (Globals.ThisDocument.Application.Selection.Paragraphs(1).Style = Word.WdBuiltinStyle.wdStyleNormal)
+        'Return CType(Globals.ThisDocument.Application.Selection.Paragraphs(1).Style, Word.Style).NameLocal = "Normal"
+        Dim normalStyle As Style = Globals.ThisDocument.ThisApplication.ActiveDocument.Styles(Word.WdBuiltinStyle.wdStyleNormal)
+        Dim selectionStyle As Style = CType(Globals.ThisDocument.Application.Selection.Paragraphs(1).Style, Word.Style)
+        Return selectionStyle.NameLocal.Equals(normalStyle.NameLocal) 'http://stackoverflow.com/a/27295771/1168342
+    End Function
+
+End Class

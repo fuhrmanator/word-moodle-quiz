@@ -1,0 +1,17 @@
+C:\Users\Jean-David\Documents\université\session 11\PFE\word-moodle-quiz-VS2013\MoodleQuestions\bin\Debug\MoodleQuestions.dll
+C:\Users\Jean-David\Documents\université\session 11\PFE\word-moodle-quiz-VS2013\MoodleQuestions\bin\Debug\MoodleQuestions.pdb
+C:\Users\Jean-David\Documents\université\session 11\PFE\word-moodle-quiz-VS2013\MoodleQuestions\bin\Debug\MoodleQuestions.xml
+C:\Users\Jean-David\Documents\université\session 11\PFE\word-moodle-quiz-VS2013\MoodleQuestions\bin\Debug\MoodleQuestions.dll.manifest
+C:\Users\Jean-David\Documents\université\session 11\PFE\word-moodle-quiz-VS2013\MoodleQuestions\bin\Debug\MoodleQuestions.vsto
+C:\Users\Jean-David\Documents\université\session 11\PFE\word-moodle-quiz-VS2013\MoodleQuestions\bin\Debug\MoodleQuestions.docm
+C:\Users\Jean-David\Documents\université\session 11\PFE\word-moodle-quiz-VS2013\MoodleQuestions\bin\Debug\Microsoft.Office.Tools.Common.v4.0.Utilities.dll
+C:\Users\Jean-David\Documents\université\session 11\PFE\word-moodle-quiz-VS2013\MoodleQuestions\bin\Debug\Microsoft.Office.Tools.Word.v4.0.Utilities.dll
+C:\Users\Jean-David\Documents\université\session 11\PFE\word-moodle-quiz-VS2013\MoodleQuestions\bin\Debug\Microsoft.Office.Tools.Common.v4.0.Utilities.xml
+C:\Users\Jean-David\Documents\université\session 11\PFE\word-moodle-quiz-VS2013\MoodleQuestions\bin\Debug\Microsoft.Office.Tools.Word.v4.0.Utilities.xml
+C:\Users\Jean-David\Documents\université\session 11\PFE\word-moodle-quiz-VS2013\MoodleQuestions\obj\Debug\MoodleQuestions.RibbonIcons.resources
+C:\Users\Jean-David\Documents\université\session 11\PFE\word-moodle-quiz-VS2013\MoodleQuestions\obj\Debug\MoodleQuestions.Resources.resources
+C:\Users\Jean-David\Documents\université\session 11\PFE\word-moodle-quiz-VS2013\MoodleQuestions\obj\Debug\MoodleQuestions.vbproj.GenerateResource.Cache
+C:\Users\Jean-David\Documents\université\session 11\PFE\word-moodle-quiz-VS2013\MoodleQuestions\obj\Debug\MoodleQuestions.dll
+C:\Users\Jean-David\Documents\université\session 11\PFE\word-moodle-quiz-VS2013\MoodleQuestions\obj\Debug\MoodleQuestions.xml
+C:\Users\Jean-David\Documents\université\session 11\PFE\word-moodle-quiz-VS2013\MoodleQuestions\obj\Debug\MoodleQuestions.pdb
+C:\Users\Jean-David\Documents\université\session 11\PFE\word-moodle-quiz-VS2013\MoodleQuestions\obj\Debug\MoodleQuestions.RibbonString.resources

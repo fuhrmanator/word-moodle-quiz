@@ -1,0 +1,399 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <ProjectTypeGuids>{BAA0C2D2-18E2-41B9-852F-F413020CAA33};{F184B08F-C81C-45F6-A57F-5ABD9991F28F}</ProjectTypeGuids>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <OutputType>Library</OutputType>
+    <RootNamespace>MoodleQuestions</RootNamespace>
+    <AssemblyName>MoodleQuestions</AssemblyName>
+    <VSTO_HostDocumentName>MoodleQuestions.docm</VSTO_HostDocumentName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <DefineConstants>VSTO40</DefineConstants>
+    <OfficeApplication>Word</OfficeApplication>
+    <ProjectGuid>{1764A072-A87B-4CF5-9535-9943C1E8CF9C}</ProjectGuid>
+    <SolutionID>5a6f181a-d454-4758-97cb-60f26bd4f598</SolutionID>
+    <IsWebBootstrapper>True</IsWebBootstrapper>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>12.0</OldToolsVersion>
+    <VSTO_TrustAssembliesLocation>true</VSTO_TrustAssembliesLocation>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+    <PublishUrl>\\saumon.ens.ad.etsmtl.ca\FSWEB\profs\cfuhrman\MoodleQuestions\</PublishUrl>
+    <InstallUrl>http://profs.etsmtl.ca/cfuhrman/MoodleQuestions/</InstallUrl>
+    <TargetCulture>en</TargetCulture>
+    <ApplicationVersion>1.0.1.10</ApplicationVersion>
+    <AutoIncrementApplicationRevision>true</AutoIncrementApplicationRevision>
+    <UpdateEnabled>true</UpdateEnabled>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>days</UpdateIntervalUnits>
+    <ProductName>MoodleQuestions</ProductName>
+    <PublisherName>Christopher Fuhrman</PublisherName>
+    <SupportUrl>https://code.google.com/p/word-moodle-quiz/</SupportUrl>
+    <FriendlyName>MoodleQuestions</FriendlyName>
+    <OfficeApplicationDescription />
+  </PropertyGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.0">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4 %28x86 and x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Office.PIARedist.2007">
+      <Visible>False</Visible>
+      <ProductName>Microsoft Office 2007 Primary Interop Assemblies</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.VSTORuntime.4.0">
+      <Visible>False</Visible>
+      <ProductName>Microsoft Visual Studio 2010 Tools for Office Runtime %28x86 and x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 3.1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.4.5">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 4.5</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <PropertyGroup>
+    <VSTO_EmbedTypeLibraryInAssembly>false</VSTO_EmbedTypeLibraryInAssembly>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DefineConstants>$(DefineConstants)</DefineConstants>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <DebugType>full</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DocumentationFile>MoodleQuestions.xml</DocumentationFile>
+    <RegisterForComInterop>false</RegisterForComInterop>
+    <RemoveIntegerChecks>false</RemoveIntegerChecks>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DefineConstants>
+    </DefineConstants>
+    <DefineDebug>false</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DocumentationFile>MoodleQuestions.xml</DocumentationFile>
+    <RegisterForComInterop>false</RegisterForComInterop>
+    <RemoveIntegerChecks>false</RemoveIntegerChecks>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+  </PropertyGroup>
+  <!--
+    This section specifies references for the project.
+  -->
+  <ItemGroup>
+    <Reference Include="adodb, Version=7.0.3300.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="Microsoft.Office.Interop.Word, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="Microsoft.Office.Tools, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="Microsoft.Office.Tools.Common, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="Microsoft.Vbe.Interop, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="Microsoft.VisualBasic.Compatibility" />
+    <Reference Include="Microsoft.VisualStudio.Tools.Applications.Runtime, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="Office, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="stdole, Version=7.0.3300.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.Office.Tools.Word, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.Office.Tools.Common.v4.0.Utilities, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Office.Tools.Word.v4.0.Utilities, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <Private>True</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Import Include="Microsoft.VisualBasic" />
+    <Import Include="System" />
+    <Import Include="System.Collections.Generic" />
+    <Import Include="System.Linq" />
+    <Import Include="System.Text" />
+    <Import Include="System.Windows.Forms" />
+    <Import Include="System.Xml.Linq" />
+    <Import Include="Microsoft.Office.Tools.Word" />
+    <Import Include="Microsoft.VisualStudio.Tools.Applications.Runtime" />
+    <Import Include="Office = Microsoft.Office.Core" />
+    <Import Include="Word = Microsoft.Office.Interop.Word" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="RibbonString.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>RibbonString.Designer.vb</LastGenOutput>
+      <CustomToolNamespace>My.Resources</CustomToolNamespace>
+    </EmbeddedResource>
+    <EmbeddedResource Include="RibbonIcons.resx">
+      <CustomToolNamespace>My.Resources</CustomToolNamespace>
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>RibbonIcons.Designer.vb</LastGenOutput>
+    </EmbeddedResource>
+    <None Include="MoodleQuestions.docm" />
+    <Compile Include="MoodleQuestions.vb">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="RibbonString.Designer.vb">
+      <DependentUpon>RibbonString.resx</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="RibbonIcons.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RibbonIcons.resx</DependentUpon>
+    </Compile>
+    <Compile Include="ThisDocument.vb">
+      <DependentUpon>MoodleQuestions.docm</DependentUpon>
+    </Compile>
+    <None Include="MoodleQuestions_4_TemporaryKey.pfx" />
+    <None Include="MoodleQuestions_TemporaryKey.pfx" />
+    <None Include="ThisDocument.Designer.xml">
+      <DependentUpon>ThisDocument.vb</DependentUpon>
+    </None>
+    <Compile Include="ThisDocument.Designer.vb">
+      <DependentUpon>ThisDocument.Designer.xml</DependentUpon>
+    </Compile>
+    <Compile Include="My Project\AssemblyInfo.vb" />
+    <EmbeddedResource Include="My Project\Resources.resx">
+      <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.vb</LastGenOutput>
+      <CustomToolNamespace>My.Resources</CustomToolNamespace>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="My Project\Resources.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <None Include="My Project\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.vb</LastGenOutput>
+    </None>
+    <Compile Include="My Project\Settings.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="MoodleQuestions.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\multiplechoice.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\numerical.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\numerical_b.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\pasteimage.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\questiontitle.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\shortanswer.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\shuffleanswers.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\tolerance.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\true.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\cleanup.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\comment.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\essay.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\export.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\false.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\feedback.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\MarkasTrueFalse.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\markmissing.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\matching.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\matching_a.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\mcq.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\missingword.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\MultiChoiceVar.xml.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Essay_xml.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\False_xml.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\FormattedText.xslt">
+      <SubType>Designer</SubType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\matchingfix.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\matchingvar.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\multichoicefix.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\numerical.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Picture.xslt">
+      <SubType>Designer</SubType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\PictureName.xslt">
+      <SubType>Designer</SubType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\shortanswer.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\true.xml">
+      <SubType>Designer</SubType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Resources\falseAnswer.png" />
+    <Content Include="Resources\fixanswers.png" />
+    <Content Include="Resources\matchingAnswer.png" />
+    <Content Include="Resources\MatchingShapes.png" />
+    <Content Include="Resources\trueAnswer.png" />
+    <Content Include="Resources\TrueFalseBox.png" />
+    <Content Include="Resources\true_false.png" />
+  </ItemGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionExplicit>On</OptionExplicit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionCompare>Binary</OptionCompare>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionStrict>Off</OptionStrict>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionInfer>On</OptionInfer>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignManifests>true</SignManifests>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ManifestKeyFile>MoodleQuestions_4_TemporaryKey.pfx</ManifestKeyFile>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ManifestCertificateThumbprint>08EBAFA6AABD32B4BBBC749BFB82A0D168F2607A</ManifestCertificateThumbprint>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>false</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <DelaySign>false</DelaySign>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
+  <Import Project="$(VSToolsPath)\OfficeTools\Microsoft.VisualStudio.Tools.Office.targets" Condition="'$(VSToolsPath)' != ''" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{BAA0C2D2-18E2-41B9-852F-F413020CAA33}">
+        <ProjectProperties HostName="MoodleQuestions.docm" HostPackage="{763FDC83-64E5-4651-AC9B-28C4FEB985A1}" OfficeVersion="14.0" VstxVersion="4.0" ApplicationType="DOC" Language="VB" TemplatesPath="VSTOTemplates" DebugInfoExeName="C:\Program Files (x86)\Microsoft Office\Office14\WINWORD.EXE" DebugInfoCommandLine="/w &quot;[$OUTPUT]MoodleQuestions.docm&quot;" />
+        <Host Name="Word Document" Path=".\MoodleQuestions.docm" PublishedHash="CFECFF3FB805E9A295392C4C85A42160CA201773">
+          <HostItem Name="ThisDocument" Code="ThisDocument.vb" CanonicalName="ThisDocument" PublishedHash="7F6F56081CA95DCED33C91680AA20C3010BE4E6B" Blueprint="ThisDocument.Designer.xml" GeneratedCode="ThisDocument.Designer.vb" />
+        </Host>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+  <!--
+    To modify your build process, add your task inside one of the targets below and uncomment it.
+    Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
