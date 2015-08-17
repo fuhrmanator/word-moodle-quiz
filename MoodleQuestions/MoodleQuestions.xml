@@ -2,32 +2,53 @@
 <customUI xmlns="http://schemas.microsoft.com/office/2009/07/customui" onLoad="Ribbon_Load" loadImage="OnLoadImage">
   <ribbon>
     <tabs>
-      <tab id="CustomTab1" label="Moodle Quiz">
-        <group id="MoodleQuiz" label="MoodleQuiz">
-          <button id="MCQ" label="Multiple Choice" size="large" onAction="AddMultipleChoiceQ" screentip="Multiple Choice" image="multiplechoice"
-                 showImage="true" visible="true" supertip="Inserts a multiple choice question at the cursor location."/>
-          <button id="matching" label="Matching" size="large" onAction="AddMatchingQ" image="matching_a" />
-          <button id="shuffleanswers" label="Shuffle Answers" size="large" onAction="ChangeShuffleanswerTrueFalse" image="shuffleanswers" />
-          <button id="MarkTrueFalse" label="Mark as True/False" size="large" onAction="MarkTrueAnswer" image="MarkasTrueFalse" />
-          <button id="TrueStatement" label="True Statement" size="large" onAction="AddTrueStatement" image="_true" />
-          <button id="FalseStatement" label="False Statement" size="large" onAction="AddFalseStatement" image="_false" />
-          <separator id="MdlQzSep1" />
-          <button id="MissingWord" label="Missing Word" size="large" onAction="AddMissingWordQ" image="missingword" />
-          <button id="MarkMissingWord" label="Mark Missing Word" size="large" onAction="MarkBlankWord" image="markmissing" />
-          <separator id="MdlQzSep2" />
-          <button id="numerical" label="Numerical" size="large" onAction="AddNumericalQ" image="numerical" />
-          <button id="numericaltolerance" label="Numerical Tolerance" size="large" onAction="AddNumericalTolerance" image="tolerance" />
+      <tab id="MoodleQuiz" label="MoodleQuiz">
+        <group id="InsertQuestions" label="Insert Questions">
+      <button id="category" label="Category" size="large" onAction="AddCategoryQ" imageMso="OrganizationChartInsertCoworker" supertip="Add a category for the following question at the cursor location." />
+          <splitButton id="MCQSplit" size="large">
+          <button id="MCQ" label="Multiple Choice" onAction="AddMultipleChoiceQ" screentip="Multiple Choice" imageMso="SmartArtAddBullet"
+             showImage="true" supertip="Insert a multiple choice question at the cursor location." />
+            <menu id="MCQMenu" itemSize="normal">
+              <button id="MCQinMenu" label="Multiple Choice" onAction="AddMultipleChoiceQ" screentip="Multiple Choice" imageMso="SmartArtAddBullet"
+             showImage="true" supertip="Insert a multiple choice question at the cursor location." />
+              <button id="MCQAddTrueAnswer" label="Add true answer" onAction="AddMCQTrueAnswer" image="trueAnswer" supertip="Add a true answer. Your cursor must be on the question or on a feedback." getEnabled="GetEnabled" />
+              <button id="MCQAddFalseAnswer" label="Add false answer" onAction="AddMCQFalseAnswer" image="falseAnswer" supertip="Add a false answer. Your cursor must be on the question or on a feedback." getEnabled="GetEnabled" />
+            </menu>
+          </splitButton>
+          <splitButton id="MatchingSplit" size="large">
+            <button id="Matching" label="Matching" onAction="AddMatchingQ" image="MatchingShapes" supertip="Insert a matching question at the cursor location." />
+            <menu id="MatchingMenu" itemSize="normal">
+              <button id="MatchinginMenu" label="Matching" onAction="AddMatchingQ" image="MatchingShapes" supertip="Insert a matching question at the cursor location." />
+              <button id="MatchingAddAnswer" label="Add matching answer" onAction="AddMatchingAnswer" image="matchingAnswer" supertip="Add a matching answer. Your cursor must be on the question." getEnabled="GetEnabled" />
+            </menu>
+          </splitButton>
+          <button id="shortanswer" label="Short Answer" size="large" onAction="AddShortAnswerQ" image="shortanswer" supertip="Insert a short question at the cursor location." />
+          <button id="essay" label="Essay" size="large" onAction="AddEssay" imageMso="TextBoxInsertMenu" supertip="Insert an essay question at the cursor location." />
+          <button id="numerical" label="Numerical" size="large" onAction="AddNumericalQ" image="numerical" supertip="Insert a numerical question at the cursor location." />
+          <menu id="TrueFalseMenu" label="True/False" image="true_false" itemSize="large" size="large" supertip="Insert a true or false question at the cursor location." >
+            <button id="TrueStatement" label="True Statement" onAction="AddTrueStatement" image="_true" supertip="Insert a true statement at the cursor location." />
+            <button id="FalseStatement" label="False Statement" onAction="AddFalseStatement" image="_false" supertip="Insert a false statement at the cursor location." />
+          </menu>
+          <button id="MissingWord" label="Missing Word" size="large" onAction="AddMissingWordQ" image="missingword" supertip="Insert a missing word question at the cursor location." />
+        </group>
+        <group id="ConfigureQuestions" label="Configure Questions">
+          <toggleButton id="shuffleanswers" label="Shuffle Answers" size="large" getPressed="GetPressed" onAction="ChangeToShuffleAnswer" image="shuffleanswers" getEnabled="GetEnabled" supertip="Shuffle the answers for the selected question." />
+          <toggleButton id="fixanswers" label="Fix Answers" size="large" getPressed="GetPressed" onAction="ChangeToFixAnswer" image="fixanswers" getEnabled="GetEnabled" supertip="Fix the answers for the selected question." />
+         <separator id="MdlQzSep2" />
+          <button id="MarkTrueFalse" label="Toggle answer" size="large" onAction="ToggleAnswer" image="TrueFalseBox" getEnabled="GetEnabled" supertip="Toggle the answer for a multiple choice answer, a true statement or a false statement." />
+          <button id="MarkMissingWord" label="Mark Missing Word" size="large" onAction="ToggleMissingWord" image="markmissing" getEnabled="GetEnabled" supertip="Mark the missing word in a missing word question." />
+          <button id="numericaltolerance" label="Numerical Tolerance" size="large" onAction="AddNumericalTolerance" image="tolerance" getEnabled="GetEnabled" supertip="Add a numerical tolerance to an answer of a numerical question." />
           <separator id="MdlQzSep3" />
-          <button id="shortanswer" label="Short Answer" size="large" onAction="AddShortAnswerQ" image="shortanswer" />
-          <button id="essay" label="Essay" size="large" onAction="AddEssay" image="essay" />
-          <separator id="MdlQzSep4" />
-          <button id="pasteImage" label="Paste Image" size="large" onAction="PasteImage" image="pasteimage" />
-          <button id="questionTitle" label="Question Name" size="large" onAction="AddQuestionTitle" image="questiontitle" />
-          <button id="feedback" label="Feedback" size="large" onAction="AddQuestionFeedback" image="feedback" />
-          <button id="comment" label="Comment (not imported)" size="large" onAction="AddComment" image="comment" />
-          <separator id="MdlQzSep5" />
-          <button id="cleanup" label="Check Layout" size="large" onAction="check" image="cleanup" />
-          <button id="export" label="Export to XML" size="large" onAction="export" image="export" />
+          <button id="importImage" label="Import Image" size="large" onAction="importImage" imageMso="TextWrappingMenu" getEnabled="GetEnabled" supertip="Import an image to a question or an answer."/>
+          <button id="questionTitle" label="Question Name" size="large" onAction="AddQuestionTitle" image="questiontitle"  getEnabled="GetEnabled" supertip="Add a question name."/>
+          <button id="feedback" label="Answer Feedback" size="large" onAction="AddAnswerFeedback" image="feedback"  getEnabled="GetEnabled" supertip="Display a feedback for the student who selected that answer." />
+        </group>       
+        <group id="Export" label="Export">
+          <button id="cleanup" label="Check Layout" size="large" onAction="check" imageMso="FileCompatibilityCheckerWord" supertip="Verify the layout of the document to make sure it can be exported." />
+          <button id="export" label="Export to XML" size="large" onAction="export" imageMso="ExportXmlFile" supertip="Verify the layout and export the document in a XML file." />
+        </group>
+        <group id="About" label="About">
+          <button id="about" label="About..." size="large" onAction="displayVersionInfo" imageMso="FileProperties" supertip="Display the version's information." />
         </group>
       </tab>
     </tabs>

@@ -1,0 +1,79 @@
+﻿<?xml version="1.0"?><quiz><question type="category"><category><text>Insert Category 1</text></category></question><question type="multichoice">
+	<name>
+		<text>Insert Multiple Choice Question Category 1</text>
+	</name>
+	<questiontext format="html">
+		<text>Insert Multiple Choice Question Category 1</text>
+	</questiontext>
+	<image></image>
+	<image_base64></image_base64>
+	<generalfeedback>
+		<text></text>
+	</generalfeedback>
+	<penalty>0.1</penalty>
+	<hidden>0</hidden>
+	<single>true</single>
+	<shuffleanswers>true</shuffleanswers>
+	<answernumbering>none</answernumbering>
+	<answer fraction="100">
+		<text>Insert correct answer here</text>
+		<file name="image.gif" path="/" encoding="base64"></file>
+		<feedback>
+			<text>Insert feedback explaining why this is a correct answer here</text>
+		</feedback>
+	</answer>
+	<answer fraction="0">
+		<text>Insert incorrect answer here</text>
+		<file name="image.gif" path="/" encoding="base64"></file>
+		<feedback>
+			<text>Insert feedback explaining why this is an incorrect answer here</text>
+		</feedback>
+	</answer>
+	<answer fraction="0">
+		<text>Insert incorrect answer here</text>
+		<file name="image.gif" path="/" encoding="base64"></file>
+		<feedback>
+			<text>Insert feedback explaining why this is an incorrect answer here</text>
+		</feedback>
+	</answer>
+</question>
+<question type="category"><category><text>Insert Category 2</text></category></question><question type="multichoice">
+	<name>
+		<text>Insert Multiple Choice Question Category 2</text>
+	</name>
+	<questiontext format="html">
+		<text>Insert Multiple Choice Question Category 2</text>
+	</questiontext>
+	<image></image>
+	<image_base64></image_base64>
+	<generalfeedback>
+		<text></text>
+	</generalfeedback>
+	<penalty>0.1</penalty>
+	<hidden>0</hidden>
+	<single>true</single>
+	<shuffleanswers>true</shuffleanswers>
+	<answernumbering>none</answernumbering>
+	<answer fraction="100">
+		<text>Insert correct answer here</text>
+		<file name="image.gif" path="/" encoding="base64"></file>
+		<feedback>
+			<text>Insert feedback explaining why this is a correct answer here</text>
+		</feedback>
+	</answer>
+	<answer fraction="0">
+		<text>Insert incorrect answer here</text>
+		<file name="image.gif" path="/" encoding="base64"></file>
+		<feedback>
+			<text>Insert feedback explaining why this is an incorrect answer here</text>
+		</feedback>
+	</answer>
+	<answer fraction="0">
+		<text>Insert incorrect answer here</text>
+		<file name="image.gif" path="/" encoding="base64"></file>
+		<feedback>
+			<text>Insert feedback explaining why this is an incorrect answer here</text>
+		</feedback>
+	</answer>
+</question>
+</quiz>

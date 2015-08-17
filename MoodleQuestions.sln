@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.21005.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "MoodleQuestions", "MoodleQuestions\MoodleQuestions.vbproj", "{1764A072-A87B-4CF5-9535-9943C1E8CF9C}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{011C4051-B493-4380-8ABB-4D3DCA2BA7F9}"
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "MoodleQuestions", "MoodleQuestions\MoodleQuestions.vbproj", "{1764A072-A87B-4CF5-9535-9943C1E8CF9C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

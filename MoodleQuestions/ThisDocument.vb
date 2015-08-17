@@ -14,16 +14,77 @@
 'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 '************************
 Imports Microsoft.Office.Interop.Word
-Imports MSXML2
+Imports Microsoft.VisualBasic.ApplicationServices
+Imports System.Runtime.InteropServices
 
 Public Class ThisDocument
 
+    ' Allow context-sensitive menu bar
+    Event WindowSelectionChange As ApplicationEvents4_WindowSelectionChangeEventHandler
+    Dim instance As ApplicationEvents4_Event
+    Dim handler As ApplicationEvents4_WindowSelectionChangeEventHandler
+    Dim previousSelectionStyle As String
+
+    '<ComVisibleAttribute(False)> _
+    'Public Delegate Sub ApplicationEvents4_WindowSelectionChangeEventHandler( _
+    '    Sel As Selection _
+    ')
+    'Usage
+    'Dim instance As New ApplicationEvents4_WindowSelectionChangeEventHandler(AddressOf HandleSelectionChange)
+
+    Public Sub HandleSelectionChange(sel As Selection)
+        'System.Diagnostics.Debug.WriteLine("caught WindowSelectionChange Event")
+        Me.ribbon.Invalidate()
+    End Sub
+
+    Public Sub HandleDocumentChange()
+        'System.Diagnostics.Debug.WriteLine("caught DocumentChange Event")
+        Me.ribbon.Invalidate()
+    End Sub
+
+    Public ribbon As Office.IRibbonUI
+    Public WithEvents pollSelectionChangeTimer As New Timer
+
     Private Sub ThisDocument_Startup() Handles Me.Startup
+        Me.pollSelectionChangeTimer.Enabled = True
+        AddHandler pollSelectionChangeTimer.Tick, AddressOf OnTimedEvent
+        pollSelectionChangeTimer.Interval = 100
+
+        'AddHandler Globals.ThisDocument.Application.WindowSelectionChange, AddressOf HandleSelectionChange
+        'AddHandler Globals.ThisDocument.Application., AddressOf HandleDocumentChange
+
 
     End Sub
 
-    Private Sub ThisDocument_Shutdown() Handles Me.Shutdown
+    ' Invalidate the Ribbon to refresh the button states when change selection 
+    Public Sub OnTimedEvent(source As Object, e As System.EventArgs)
+        Dim currentSelectionParagraphStyle = Nothing
+        Dim currentSelectionStyle As String
+        Dim isSelectionDifferent As Boolean
+        ' special case of inserted images
+        Try
+            If Globals.ThisDocument.Application.Selection.Type <> WdSelectionType.wdSelectionInlineShape Then
+                currentSelectionParagraphStyle = Globals.ThisDocument.Application.Selection.Paragraphs.Style
+            End If
+        Catch ex As System.Runtime.InteropServices.COMException
+            ' certain dialogs in word cause Application.Selection to throw this exception because there's no Selection
+            ' It's easier to catch the exception than try to detect when the dialog is up
+        End Try
 
+        If currentSelectionParagraphStyle IsNot Nothing Then
+            currentSelectionStyle = CType(currentSelectionParagraphStyle, Word.Style).NameLocal
+            isSelectionDifferent = Not currentSelectionStyle = previousSelectionStyle
+            If isSelectionDifferent Then
+                previousSelectionStyle = currentSelectionStyle
+                If Globals.ThisDocument.Application.MouseAvailable And Me.ribbon IsNot Nothing Then
+                    ribbon.Invalidate()
+                End If
+            End If
+        End If
+    End Sub
+
+    Private Sub ThisDocument_Shutdown() Handles Me.Shutdown
+        ' Globals.ThisDocument.Application.NormalTemplate.Save()
     End Sub
 
     ' Moodle Quiz Ribbon see http://msdn.microsoft.com/en-us/library/aa942955.aspx for design info

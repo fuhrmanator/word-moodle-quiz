@@ -1,0 +1,27 @@
+	<question type="numerical">
+		<name>
+			<text></text>
+		</name>
+
+		<questiontext format="html">
+			<text></text>
+		</questiontext>
+
+    <image></image>
+	  <image_base64></image_base64>
+
+    <generalfeedback>
+	<text></text>
+    </generalfeedback>
+    <penalty>0.1</penalty>
+    <hidden>0</hidden>
+
+    <answer fraction="0">
+      <text></text>
+      <tolerance/>
+      <feedback>
+        <text></text>
+      </feedback>
+    </answer>
+
+	</question>

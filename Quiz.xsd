@@ -1,0 +1,105 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!-- Sample XSD for Moodle Quiz format, based on info from -->
+<xs:schema targetNamespace="http://moodle.org/Quiz.xsd"
+    elementFormDefault="qualified"
+    xmlns="http://moodle.org/Quiz.xsd"
+    xmlns:mstns="http://moodle.org/Quiz.xsd"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+>
+  <!-- Question tags are overloaded in XML schema with Moodle. To avoid problems in a schema, we define a base class and sub-classes -->
+  <xs:complexType name="baseQuestionType" abstract ="true">
+    <!-- base type is just abstract-->
+  </xs:complexType>
+  <!-- Two (top) variants of Questions : the "dummy" category variant and the "true" question variant-->
+  <xs:complexType name="categorySpecifierQuestionType">
+    <xs:complexContent>
+      <xs:extension base="baseQuestionType">
+        <xs:all>
+          <xs:element name="category" type="simpleText"/>
+        </xs:all>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="generalQuestionType">
+    <xs:complexContent>
+      <xs:extension base="baseQuestionType">
+        <xs:sequence>
+          <xs:element name="name" type ="simpleText"/>
+          <xs:element name="questiontext" type="simpleText"/>
+          <xs:element name="generalfeedback" type="simpleText"/>
+          <xs:element name="defaultgrade" type="xs:decimal"/>
+          <xs:element name="penalty" type="xs:decimal"/>
+          <xs:element name="hidden" type="xs:boolean"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="multichoiceQuestionType">
+    <xs:complexContent>
+      <xs:extension base="generalQuestionType">
+        <xs:sequence>
+          <xs:element name="single" type="xs:boolean" />
+          <xs:element name="shuffleanswers" type="xs:boolean" />
+          <xs:element name="answernumbering">
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:enumeration value="none"/>
+                <xs:enumeration value="abc"/>
+                <xs:enumeration value="ABCD"/>
+                <xs:enumeration value="123"/>
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:element>
+          <xs:element name="correctfeedback" type ="simpleText"/>
+          <xs:element name="partiallycorrectfeedback" type ="simpleText"/>
+          <xs:element name="incorrectfeedback" type ="simpleText"/>
+
+          <xs:element name="answer" minOccurs="1" maxOccurs="unbounded">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="text" type="xs:string"/>
+                <xs:sequence>
+                  <xs:element name="feedback" type="simpleText"/>
+                </xs:sequence>
+              </xs:sequence>
+              <xs:attribute name="fraction" type="percentage" use="required"/>
+              <xs:attribute name="format" type="xs:string" use="optional"/>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <!--Percentage type-->
+  <xs:simpleType name="percentage">
+    <xs:restriction base="xs:integer">
+      <xs:minInclusive value="0"/>
+      <xs:maxInclusive value="100"/>
+    </xs:restriction>
+  </xs:simpleType>
+ 
+<!-- <text> ... </text> type -->
+ <xs:complexType name="simpleText">
+   <xs:all>
+     <xs:element name="text" type="xs:string"/>
+   </xs:all>
+   <xs:attribute name="format" type="xs:string" fixed="html" use="optional"/>
+ </xs:complexType>
+
+  <!-- Quiz element starts here -->
+  <xs:element name="quiz">
+    <xs:complexType>
+      <xs:sequence>
+        <!-- first question is a category -->
+        <xs:sequence>
+          <xs:element name="bank_category" type="categorySpecifierQuestionType" minOccurs="1" maxOccurs="1"/>
+        </xs:sequence>
+        <xs:choice maxOccurs="unbounded">
+          <xs:element name="multiple_choice_question" type="multichoiceQuestionType" minOccurs="1" maxOccurs="unbounded"/>
+        </xs:choice>
+      </xs:sequence>
+    </xs:complexType>    
+  </xs:element>  
+</xs:schema>

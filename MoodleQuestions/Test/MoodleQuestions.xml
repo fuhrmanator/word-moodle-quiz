@@ -1,0 +1,464 @@
+﻿<?xml version="1.0"?>
+<doc>
+<assembly>
+<name>
+MoodleQuestions
+</name>
+</assembly>
+<members>
+<member name="P:MoodleQuestions.My.Resources.Resources.ResourceManager">
+	<summary>
+  Returns the cached ResourceManager instance used by this class.
+</summary>
+</member><member name="P:MoodleQuestions.My.Resources.Resources.Culture">
+	<summary>
+  Overrides the current thread's CurrentUICulture property for all
+  resource lookups using this strongly typed resource class.
+</summary>
+</member><member name="P:MoodleQuestions.My.Resources.Resources.Essay_xml">
+	<summary>
+  Looks up a localized string similar to   &lt;question type="essay"&gt;
+    &lt;name&gt;&lt;text&gt;&lt;/text&gt;
+&lt;/name&gt;
+    &lt;questiontext format="html"&gt;
+&lt;text&gt;&lt;/text&gt;
+    &lt;/questiontext&gt;
+    &lt;image&gt;&lt;/image&gt;
+	&lt;image_base64&gt;&lt;/image_base64&gt;
+    &lt;generalfeedback&gt;
+&lt;text&gt;&lt;/text&gt;
+    &lt;/generalfeedback&gt;
+    &lt;defaultgrade&gt;&lt;/defaultgrade&gt;
+    &lt;penalty&gt;1&lt;/penalty&gt;
+    &lt;hidden&gt;&lt;/hidden&gt;
+    &lt;shuffleanswers&gt;&lt;/shuffleanswers&gt;
+&lt;answer fraction="0"&gt;
+    &lt;feedback&gt;&lt;text&gt;&lt;/text&gt;
+&lt;/feedback&gt;
+&lt;/answer&gt;
+&lt;/question&gt;
+.
+</summary>
+</member><member name="P:MoodleQuestions.My.Resources.Resources.False_xml">
+	<summary>
+  Looks up a localized string similar to   &lt;question type="truefalse"&gt;
+    &lt;name&gt;
+    	&lt;text&gt;&lt;/text&gt;
+    &lt;/name&gt;
+
+    &lt;questiontext format="html"&gt;
+			&lt;text&gt;&lt;/text&gt;
+	  &lt;/questiontext&gt;
+
+    &lt;image&gt;&lt;/image&gt;
+	  &lt;image_base64&gt;&lt;/image_base64&gt;
+
+    &lt;generalfeedback&gt;
+	&lt;text&gt;&lt;/text&gt;
+    &lt;/generalfeedback&gt;
+    &lt;penalty&gt;0.1&lt;/penalty&gt;
+    &lt;hidden&gt;0&lt;/hidden&gt;
+
+    &lt;answer fraction="0"&gt;
+      &lt;text&gt;true&lt;/text&gt;
+
+      &lt;feedback&gt;
+        &lt;text&gt;
+
+        &lt;/text&gt;
+      &lt;/feedback&gt;
+    &lt;/answer&gt;
+    &lt;answer fraction="100"&gt;
+&lt;text&gt;false&lt;/tex [rest of string was truncated]";.
+</summary>
+</member><member name="P:MoodleQuestions.My.Resources.Resources.FormattedText_xslt">
+	<summary>
+  Looks up a localized string similar to &lt;xsl:stylesheet version="1.0"
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  xmlns:w="http://schemas.microsoft.com/office/word/2003/wordml"
+	xmlns:wx="http://schemas.microsoft.com/office/word/2003/auxHint"&gt;
+
+	&lt;xsl:output method="text" /&gt; 
+
+	&lt;!-- remove all text --&gt;
+  &lt;xsl:template match="text()"&gt;&lt;/xsl:template&gt; 
+
+
+
+  &lt;xsl:template match="w:p/w:r//node() [@w:val='preformatted']"&gt;&amp;lt;pre&amp;gt;&lt;xsl:value-of select="../../w:t"/&gt;&amp;lt;/pre&amp;gt;&lt;/xsl:template&gt;
+
+  &lt;xsl:template match="w:p/w:r//node( [rest of string was truncated]";.
+</summary>
+</member><member name="P:MoodleQuestions.My.Resources.Resources.MatchingFix_xml">
+	<summary>
+  Looks up a localized string similar to 	&lt;question type="matching"&gt;
+	  &lt;name&gt;
+	  	&lt;text&gt;MatchingQ&lt;/text&gt;
+		&lt;/name&gt;
+
+	  &lt;questiontext format="html"&gt;
+			&lt;text&gt;&lt;/text&gt;
+	  &lt;/questiontext&gt;
+
+	  &lt;image&gt;&lt;/image&gt;
+	  &lt;image_base64&gt;&lt;/image_base64&gt;
+
+    &lt;generalfeedback&gt;
+	&lt;text&gt;&lt;/text&gt;
+    &lt;/generalfeedback&gt;
+	  &lt;penalty&gt;0.1&lt;/penalty&gt;
+	  &lt;hidden&gt;0&lt;/hidden&gt;
+    &lt;shuffleanswers&gt;0&lt;/shuffleanswers&gt;
+
+		&lt;subquestion&gt;
+				&lt;text&gt;&lt;/text&gt;
+			&lt;answer&gt;
+				&lt;text&gt;&lt;/text&gt;
+			&lt;/answer&gt;
+		&lt;/subquestion&gt;
+
+	&lt;/question&gt;
+.
+</summary>
+</member><member name="P:MoodleQuestions.My.Resources.Resources.MatchingVar_xml">
+	<summary>
+  Looks up a localized string similar to 	&lt;question type="matching"&gt;
+	  &lt;name&gt;
+	  	&lt;text&gt;MatchingQ&lt;/text&gt;
+		&lt;/name&gt;
+
+	  &lt;questiontext format="html"&gt;
+			&lt;text&gt;&lt;/text&gt;
+	  &lt;/questiontext&gt;
+
+	  &lt;image&gt;&lt;/image&gt;
+	  &lt;image_base64&gt;&lt;/image_base64&gt;
+
+    &lt;generalfeedback&gt;
+	&lt;text&gt;&lt;/text&gt;
+    &lt;/generalfeedback&gt;
+	  &lt;penalty&gt;0.1&lt;/penalty&gt;
+	  &lt;hidden&gt;0&lt;/hidden&gt;
+    &lt;shuffleanswers&gt;1&lt;/shuffleanswers&gt;
+
+		&lt;subquestion&gt;
+				&lt;text&gt;&lt;/text&gt;
+			&lt;answer&gt;
+				&lt;text&gt;&lt;/text&gt;
+			&lt;/answer&gt;
+		&lt;/subquestion&gt;
+
+	&lt;/question&gt;
+.
+</summary>
+</member><member name="P:MoodleQuestions.My.Resources.Resources.MultiChoiceFix_xml">
+	<summary>
+  Looks up a localized string similar to   &lt;question type="multichoice"&gt;
+    &lt;name&gt;
+    	&lt;text&gt;&lt;/text&gt;
+		&lt;/name&gt;
+
+    &lt;questiontext format="html"&gt;
+			&lt;text&gt;&lt;/text&gt;
+    &lt;/questiontext&gt;
+
+    &lt;image&gt;&lt;/image&gt;
+	  &lt;image_base64&gt;&lt;/image_base64&gt;
+
+    &lt;generalfeedback&gt;
+	&lt;text&gt;&lt;/text&gt;
+    &lt;/generalfeedback&gt;
+    &lt;penalty&gt;0.1&lt;/penalty&gt;
+    &lt;hidden&gt;0&lt;/hidden&gt;
+    &lt;single&gt;true&lt;/single&gt;
+    &lt;shuffleanswers&gt;false&lt;/shuffleanswers&gt;
+	&lt;answernumbering&gt;none&lt;/answernumbering&gt;
+
+
+    &lt;answer fraction="100"&gt;
+        &lt;text&gt;&lt;/text&gt;
+      &lt;feedback&gt;
+ [rest of string was truncated]";.
+</summary>
+</member><member name="P:MoodleQuestions.My.Resources.Resources.MultiChoiceVar_xml">
+	<summary>
+  Looks up a localized string similar to   &lt;question type="multichoice"&gt;
+    &lt;name&gt;
+    	&lt;text&gt;&lt;/text&gt;
+		&lt;/name&gt;
+
+    &lt;questiontext format="html"&gt;
+			&lt;text&gt;&lt;/text&gt;
+    &lt;/questiontext&gt;
+
+    &lt;image&gt;&lt;/image&gt;
+	  &lt;image_base64&gt;&lt;/image_base64&gt;
+
+    &lt;generalfeedback&gt;
+	&lt;text&gt;&lt;/text&gt;
+    &lt;/generalfeedback&gt;
+    &lt;penalty&gt;0.1&lt;/penalty&gt;
+    &lt;hidden&gt;0&lt;/hidden&gt;
+    &lt;single&gt;true&lt;/single&gt;
+    &lt;shuffleanswers&gt;true&lt;/shuffleanswers&gt;
+&lt;answernumbering&gt;none&lt;/answernumbering&gt;
+
+
+    &lt;answer fraction="100"&gt;
+        &lt;text&gt;&lt;/text&gt;
+      &lt;feedback&gt;
+   [rest of string was truncated]";.
+</summary>
+</member><member name="P:MoodleQuestions.My.Resources.Resources.Numerical_xml">
+	<summary>
+  Looks up a localized string similar to 	&lt;question type="numerical"&gt;
+		&lt;name&gt;
+			&lt;text&gt;&lt;/text&gt;
+		&lt;/name&gt;
+
+		&lt;questiontext format="html"&gt;
+			&lt;text&gt;&lt;/text&gt;
+		&lt;/questiontext&gt;
+
+    &lt;image&gt;&lt;/image&gt;
+	  &lt;image_base64&gt;&lt;/image_base64&gt;
+
+    &lt;generalfeedback&gt;
+	&lt;text&gt;&lt;/text&gt;
+    &lt;/generalfeedback&gt;
+    &lt;penalty&gt;0.1&lt;/penalty&gt;
+    &lt;hidden&gt;0&lt;/hidden&gt;
+
+    &lt;answer fraction="0"&gt;
+      &lt;text&gt;&lt;/text&gt;
+      &lt;tolerance/&gt;
+      &lt;feedback&gt;
+        &lt;text&gt;&lt;/text&gt;
+      &lt;/feedback&gt;
+    &lt;/answer&gt;
+
+	&lt;/question&gt;
+.
+</summary>
+</member><member name="P:MoodleQuestions.My.Resources.Resources.Picture_xslt">
+	<summary>
+  Looks up a localized string similar to &lt;xsl:stylesheet version="1.0"
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  xmlns:w="http://schemas.microsoft.com/office/word/2003/wordml"
+	xmlns:wx="http://schemas.microsoft.com/office/word/2003/auxHint"&gt;
+
+	&lt;xsl:output method="text" /&gt; 
+
+	&lt;!-- remove all text --&gt;
+  &lt;xsl:template match="text()"&gt;&lt;/xsl:template&gt; 
+
+	&lt;!-- processing --&gt;
+  &lt;xsl:template match="w:p/w:r/w:pict[1]"&gt;&lt;xsl:value-of select="w:binData"/&gt;&lt;/xsl:template&gt;
+
+&lt;/xsl:stylesheet&gt;.
+</summary>
+</member><member name="P:MoodleQuestions.My.Resources.Resources.PictureName_xslt">
+	<summary>
+  Looks up a localized string similar to &lt;xsl:stylesheet version="1.0"
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  xmlns:w="http://schemas.microsoft.com/office/word/2003/wordml"
+	xmlns:wx="http://schemas.microsoft.com/office/word/2003/auxHint"&gt;
+
+	&lt;xsl:output method="text" /&gt; 
+
+	&lt;!-- remove all text --&gt;
+  &lt;xsl:template match="text()"&gt;&lt;/xsl:template&gt; 
+
+
+  &lt;xsl:template match="w:p/w:r/w:pict"&gt;&lt;xsl:value-of select="w:binData/@w:name"/&gt;&lt;/xsl:template&gt;
+
+&lt;/xsl:stylesheet&gt;.
+</summary>
+</member><member name="P:MoodleQuestions.My.Resources.Resources.Shortanswer_xml">
+	<summary>
+  Looks up a localized string similar to 	&lt;question type="shortanswer"&gt;
+		&lt;name&gt;
+			&lt;text&gt;&lt;/text&gt;
+		&lt;/name&gt;
+
+		&lt;questiontext format="html"&gt;
+			&lt;text&gt;&lt;/text&gt;
+		&lt;/questiontext&gt;
+
+    &lt;image&gt;&lt;/image&gt;
+	  &lt;image_base64&gt;&lt;/image_base64&gt;
+
+    &lt;generalfeedback&gt;
+	&lt;text&gt;&lt;/text&gt;
+    &lt;/generalfeedback&gt;
+    &lt;penalty&gt;0.1&lt;/penalty&gt;
+    &lt;hidden&gt;0&lt;/hidden&gt;
+    &lt;usecase&gt;0&lt;/usecase&gt;
+
+    &lt;answer fraction="0"&gt;
+      &lt;text&gt;&lt;/text&gt;
+      &lt;feedback&gt;
+        &lt;text&gt;&lt;/text&gt;
+      &lt;/feedback&gt;
+    &lt;/answer&gt;
+
+	&lt;/question&gt;
+.
+</summary>
+</member><member name="P:MoodleQuestions.My.Resources.Resources.True_xml">
+	<summary>
+  Looks up a localized string similar to   &lt;question type="truefalse"&gt;
+    &lt;name&gt;
+    	&lt;text&gt;&lt;/text&gt;
+    &lt;/name&gt;
+
+    &lt;questiontext format="html"&gt;
+			&lt;text&gt;&lt;/text&gt;
+	  &lt;/questiontext&gt;
+
+    &lt;image&gt;&lt;/image&gt;
+	  &lt;image_base64&gt;&lt;/image_base64&gt;
+
+    &lt;generalfeedback&gt;
+	&lt;text&gt;&lt;/text&gt;
+    &lt;/generalfeedback&gt;
+    &lt;penalty&gt;0.1&lt;/penalty&gt;
+    &lt;hidden&gt;0&lt;/hidden&gt;
+
+    &lt;answer fraction="100"&gt;
+      &lt;text&gt;true&lt;/text&gt;
+
+      &lt;feedback&gt;
+        &lt;text&gt;
+
+        &lt;/text&gt;
+      &lt;/feedback&gt;
+    &lt;/answer&gt;
+    &lt;answer fraction="0"&gt;
+&lt;text&gt;false&lt;/tex [rest of string was truncated]";.
+</summary>
+</member><member name="T:MoodleQuestions.My.Resources.Resources">
+	<summary>
+  A strongly-typed resource class, for looking up localized strings, etc.
+</summary>
+</member><member name="P:MoodleQuestions.My.Resources.RibbonIcons.ResourceManager">
+	<summary>
+  Returns the cached ResourceManager instance used by this class.
+</summary>
+</member><member name="P:MoodleQuestions.My.Resources.RibbonIcons.Culture">
+	<summary>
+  Overrides the current thread's CurrentUICulture property for all
+  resource lookups using this strongly typed resource class.
+</summary>
+</member><member name="P:MoodleQuestions.My.Resources.RibbonIcons._false">
+	<summary>
+  Looks up a localized resource of type System.Drawing.Bitmap.
+</summary>
+</member><member name="P:MoodleQuestions.My.Resources.RibbonIcons._true">
+	<summary>
+  Looks up a localized resource of type System.Drawing.Bitmap.
+</summary>
+</member><member name="P:MoodleQuestions.My.Resources.RibbonIcons.cleanup">
+	<summary>
+  Looks up a localized resource of type System.Drawing.Bitmap.
+</summary>
+</member><member name="P:MoodleQuestions.My.Resources.RibbonIcons.comment">
+	<summary>
+  Looks up a localized resource of type System.Drawing.Bitmap.
+</summary>
+</member><member name="P:MoodleQuestions.My.Resources.RibbonIcons.essay">
+	<summary>
+  Looks up a localized resource of type System.Drawing.Bitmap.
+</summary>
+</member><member name="P:MoodleQuestions.My.Resources.RibbonIcons.export">
+	<summary>
+  Looks up a localized resource of type System.Drawing.Bitmap.
+</summary>
+</member><member name="P:MoodleQuestions.My.Resources.RibbonIcons.feedback">
+	<summary>
+  Looks up a localized resource of type System.Drawing.Bitmap.
+</summary>
+</member><member name="P:MoodleQuestions.My.Resources.RibbonIcons.markmissing">
+	<summary>
+  Looks up a localized resource of type System.Drawing.Bitmap.
+</summary>
+</member><member name="P:MoodleQuestions.My.Resources.RibbonIcons.matching">
+	<summary>
+  Looks up a localized resource of type System.Drawing.Bitmap.
+</summary>
+</member><member name="P:MoodleQuestions.My.Resources.RibbonIcons.matching_a">
+	<summary>
+  Looks up a localized resource of type System.Drawing.Bitmap.
+</summary>
+</member><member name="P:MoodleQuestions.My.Resources.RibbonIcons.mcq">
+	<summary>
+  Looks up a localized resource of type System.Drawing.Bitmap.
+</summary>
+</member><member name="P:MoodleQuestions.My.Resources.RibbonIcons.missingword">
+	<summary>
+  Looks up a localized resource of type System.Drawing.Bitmap.
+</summary>
+</member><member name="P:MoodleQuestions.My.Resources.RibbonIcons.multiplechoice">
+	<summary>
+  Looks up a localized resource of type System.Drawing.Bitmap.
+</summary>
+</member><member name="P:MoodleQuestions.My.Resources.RibbonIcons.numerical">
+	<summary>
+  Looks up a localized resource of type System.Drawing.Bitmap.
+</summary>
+</member><member name="P:MoodleQuestions.My.Resources.RibbonIcons.numerical_b">
+	<summary>
+  Looks up a localized resource of type System.Drawing.Bitmap.
+</summary>
+</member><member name="P:MoodleQuestions.My.Resources.RibbonIcons.pasteimage">
+	<summary>
+  Looks up a localized resource of type System.Drawing.Bitmap.
+</summary>
+</member><member name="P:MoodleQuestions.My.Resources.RibbonIcons.questiontitle">
+	<summary>
+  Looks up a localized resource of type System.Drawing.Bitmap.
+</summary>
+</member><member name="P:MoodleQuestions.My.Resources.RibbonIcons.shortanswer">
+	<summary>
+  Looks up a localized resource of type System.Drawing.Bitmap.
+</summary>
+</member><member name="P:MoodleQuestions.My.Resources.RibbonIcons.shuffleanswers">
+	<summary>
+  Looks up a localized resource of type System.Drawing.Bitmap.
+</summary>
+</member><member name="P:MoodleQuestions.My.Resources.RibbonIcons.ToggleAnswer">
+	<summary>
+  Looks up a localized resource of type System.Drawing.Bitmap.
+</summary>
+</member><member name="P:MoodleQuestions.My.Resources.RibbonIcons.tolerance">
+	<summary>
+  Looks up a localized resource of type System.Drawing.Bitmap.
+</summary>
+</member><member name="T:MoodleQuestions.My.Resources.RibbonIcons">
+	<summary>
+  A strongly-typed resource class, for looking up localized strings, etc.
+</summary>
+</member><member name="M:MoodleQuestions.ThisDocument.#ctor(Microsoft.Office.Tools.Word.Factory,System.IServiceProvider)">
+</member><member name="M:MoodleQuestions.ThisDocument.Initialize">
+</member><member name="M:MoodleQuestions.ThisDocument.FinishInitialization">
+</member><member name="M:MoodleQuestions.ThisDocument.InitializeDataBindings">
+</member><member name="M:MoodleQuestions.ThisDocument.InitializeCachedData">
+</member><member name="M:MoodleQuestions.ThisDocument.InitializeData">
+</member><member name="M:MoodleQuestions.ThisDocument.BindToData">
+</member><member name="M:MoodleQuestions.ThisDocument.StartCaching(System.String)">
+</member><member name="M:MoodleQuestions.ThisDocument.StopCaching(System.String)">
+</member><member name="M:MoodleQuestions.ThisDocument.IsCached(System.String)">
+</member><member name="M:MoodleQuestions.ThisDocument.BeginInitialization">
+</member><member name="M:MoodleQuestions.ThisDocument.EndInitialization">
+</member><member name="M:MoodleQuestions.ThisDocument.InitializeControls">
+</member><member name="M:MoodleQuestions.ThisDocument.InitializeComponents">
+</member><member name="M:MoodleQuestions.ThisDocument.NeedsFill(System.String)">
+</member><member name="M:MoodleQuestions.ThisDocument.OnShutdown">
+</member><member name="T:MoodleQuestions.ThisDocument">
+</member><member name="M:MoodleQuestions.Globals.#ctor">
+</member><member name="T:MoodleQuestions.Globals">
+</member><member name="M:MoodleQuestions.ThisRibbonCollection.#ctor(Microsoft.Office.Tools.Ribbon.RibbonFactory)">
+</member><member name="T:MoodleQuestions.ThisRibbonCollection">
+</member>
+</members>
+</doc>
