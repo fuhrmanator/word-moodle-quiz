@@ -1,6 +1,3 @@
-# word-moodle-quiz
-Automatically exported from code.google.com/p/word-moodle-quiz
-
 
 This project is a VSTO document-level customization (Word document in Office 2010) to allow users to easily create quizzes in Microsoft Word and export them to Moodle's XML format, for import in Moodle.
 
