@@ -2,7 +2,7 @@
 
 This project is a VSTO document-level customization (Word document in Office 2010) to allow users to easily create quizzes in Microsoft Word and export them to Moodle's XML format, for import in Moodle.
 
-https://110738e8218d6d731f7c564c8647780b947037b5.googledrive.com/host/0B9aAbha28QkabmhyR3Q2aGVXMUk/MoodleWordScreenShot.PNG
+![Screenshot](https://110738e8218d6d731f7c564c8647780b947037b5.googledrive.com/host/0B9aAbha28QkabmhyR3Q2aGVXMUk/MoodleWordScreenShot.PNG)
 
 2014-02-20 There is a branch for a VSTO document-level customization (Word document in Office 2010) for building under Visual Studio 2013. To build it, use VisualSVN to "Get Solution from Subversion" and point to the /branches/VS2013 branch. There may be warnings about the solution file, but in my tests under Windows 8.1 and Windows 7, I was still able to build. I'd appreciate other feedback if you have trouble.
 
